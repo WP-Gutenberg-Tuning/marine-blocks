@@ -19,7 +19,7 @@ function skvn_marine_blocks_core_control_registry(): array {
 	return array(
 		'block_clipboard' => array(
 			'label'       => esc_html__( 'Block Copy/Paste', 'skvn-marine-blocks' ),
-			'description' => esc_html__( 'Add Copy and Paste menu items for blocks in the editor. Does not modify saved markup or native clipboard behaviour.', 'skvn-marine-blocks' ),
+			'description' => esc_html__( 'Add whole-block Copy/Paste and content-only Copy content / Paste content only actions in the editor. Does not modify saved markup or native clipboard behaviour.', 'skvn-marine-blocks' ),
 			'default'     => false,
 		),
 		'button_hover'    => array(

@@ -1,6 +1,6 @@
 # 057 — Block Content Actions trong menu ⋮
 
-Ngày tạo: **2026-11-05**. Status: **Approved for implementation trong V1 /1.3.19 — chưa có source**. Human duyệt toàn gói §11–14 và start coding trong current1.3.19, không bump; cho agent coding và commit `feature patch:`. Bản chi tiết tại §10–16 cùng approval§17 ưu tiên hơn proposal lịch sử nếu có khác biệt.
+Ngày tạo: **2026-11-05**. Status: **Source đã có trong V1 /1.3.19 — chưa runtime PASS**. Human duyệt toàn gói §11–14 và start coding trong current1.3.19, không bump; cho agent coding và commit `feature patch:`. Bản chi tiết tại §10–16 cùng approval§17 ưu tiên hơn proposal lịch sử nếu có khác biệt; ledger implementation§18.
 
 Đây là tài liệu làm việc cho các thảo luận tiếp theo về copy nội dung giữa các block. Cập nhật quyết định, rationale, câu hỏi và evidence tại đây; không tạo một spec song song từ các lượt chat sau.
 
@@ -314,3 +314,30 @@ Human trả lời lựa chọn: **“Duyệt gói, làm trong 1.3.19 như scope 
 - Prompt bàn giao đã cập nhật thành lệnh CODE_NOW với authorization này. Agent hiện tại chỉ cập nhật/commit docs để human chuyển agent khác thực hiện; chưa code plugin.
 
 Approval này supersedes mọi câu “chưa cho code/chưa xếp version/start” ở phần lịch sử đầu tài liệu và §15–16. Acceptance implementation vẫn Chưa làm cho đến khi có source/evidence.
+
+## 18. Implementation ledger — agent2026-11-05
+
+**Source: đã có**, commit `feature patch: add block content actions` trong current V1 /1.3.19. Không bump metadata, không chuyển milestone, không archive tension, không deploy/release.
+
+| Gói | Trạng thái | Evidence |
+|---|---|---|
+| P0 — preflight | Xong | §10.1 + runbook §1: WP 7.1, không Gutenberg plugin, `BlockSettingsMenuControls` (`block-editor.js:6928`, slot `58294–58390` với `canEdit`/`selectedBlocks`/`selectedClientIds`/`onClose`), `updateBlockAttributes` + `uniqueByBlock` (`:16305`, reducer `8500–8560`), `canEditBlock` (`:15126`), parse/serialize behavior (`blocks.js:3652/3764/5721`), core schema trong `wp-includes/blocks/*/block.json` |
+| P1 — pure adapters | Đã có source | `src/core-controls/block-content/{types,fields,plan}.ts`; dependency-free để test bằng Node |
+| P2 — transport/controller | Đã có source | `transport.ts`, `clipboard.ts`, `taxonomy.ts`, `controller.ts`; một dispatch `updateBlockAttributes(..., { uniqueByBlock: true })`, revalidate sau await |
+| P3 — menu integration | Đã có source | `index.tsx` fill `BlockSettingsMenuControls` + `MenuGroup` "Content actions"; import một lần ở `core-controls/index.ts`; registry chỉ mở rộng description `block_clipboard` |
+| P4 — tests/runbook | Unit xong, onsite chờ | `tools/tests/block-content-copy.test.mjs` 16/16 pass; runbook `docs/testing/block-content-actions.md` cập nhật |
+| P5 — review/handoff | Xong phần source | Diff chỉ file scope; build/lint/onsite để human |
+
+Acceptance IDs (§14) — **trạng thái source, không phải PASS**:
+
+| ID | Trạng thái | Ghi chú |
+|---|---|---|
+| CCP-UX05 | Chờ kiểm chứng | Menu/group/gate/keyboard/touch cần runtime |
+| CCP-TECH04 | Có source + unit | Allowlist/no-style proven ở pure test; round-trip serialize/parse thật chưa chứng minh |
+| CCP-TECH05 | Có source + unit | Shape/unknown/root mismatch reject; entity/binding cần runtime |
+| CCP-TECH06 | Có source + unit một phần | No-op/zero patch proven; race/busy/permission/Undo cần runtime |
+| CCP-UX06 | Có source + unit | Empty overwrite + itemsToShow reject proven; query missing ref cần site thật |
+| CCP-TECH07 | Có source + unit gián tiếp | Utility cũ không đổi; settings/option/storage diff audit ở git diff |
+| CCP-UI02 | Chờ kiểm chứng | Save/reopen/frontend desktop/mobile |
+
+Không đánh dấu PASS, không nghiệm thu, không release từ ledger này.

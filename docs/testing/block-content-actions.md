@@ -1,33 +1,113 @@
-# Block Content Actions — onsite acceptance draft
+# Block Content Actions — source status + onsite acceptance
 
-Status2026-11-05: **Chưa làm**. Human duyệt plan057§11–14, coding+commit trong current1.3.19 không bump; chưa implementation/runtime evidence. Không coi file này là evidence PASS. Approval/start source of truth057§17.
+Status2026-11-05: **CÓ SOURCE — CHƯA RUNTIME PASS**. Human duyệt plan057 §11–14 và cho coding+commit trong current V1 / 1.3.19 như scope bổ sung, không bump; approval §17. Source/unit tests đã có; build/lint, menu/clipboard, Undo/Redo và Save/reopen vẫn **Chờ kiểm chứng**. File này không phải evidence PASS và không thay release approval.
 
-## Environment và setup
+## 1. P0 — runtime/API/version evidence (local)
+
+Ghi lại trước khi dùng API, theo plan057 §10.1 và §17:
+
+| Hạng mục | Giá trị đã kiểm |
+|---|---|
+| WordPress | `7.1` (`D:\Github\minhhaifish\wp-includes\version.php:19`) |
+| Gutenberg plugin | **Không cài** (`wp-content/plugins/` chỉ có antispam-bee, contact-form-7, contact-form-cfdb7, ootb-openstreetmap, seo-by-rank-math, skvn-marine-blocks, windpress, woocommerce) |
+| `@wordpress/scripts` | `^30.6.0` trong `package.json` — build tooling, **không phải** editor runtime version |
+| `BlockSettingsMenuControls` | export `wp-includes/js/dist/block-editor.js:6928`; slot/fill `58294–58390`; fill props thực tế gồm `canEdit`, `selectedBlocks` (names), `selectedClientIds`, `onClose`, `count`, `firstBlockClientId` |
+| Slot lồng MenuGroup | `58344` — core đã bọc fills trong `MenuGroup`; `MenuGroup` label render `aria-hidden` nhưng vẫn là `role="group" aria-labelledby` (`components.js:45205`) |
+| `updateBlockAttributes` | action `block-editor.js:16305`, reducer merge từng key `8500–8560`, `uniqueByBlock` map theo clientId; không replace/reset |
+| `canEditBlock` | `block-editor.js:15126` — `! isPreviewMode && ! lock.edit` |
+| `getBlockEditingMode` / `areInnerBlocksControlled` / `getBlockParents` | exports `block-editor.js:10049–10080` |
+| `parse` / `serialize` | `blocks.js:5051` / `3764`; unknown block → `core/missing` + `originalName` (`5721–5782`); serialize bỏ attribute bằng default và attribute có `source` (`3652`, `3742`) |
+| Core schema | đọc trực tiếp `wp-includes/blocks/{heading,paragraph,button,buttons,image,columns,column,group}/block.json` |
+
+Hệ quả: menu dùng `BlockSettingsMenuControls` (không `PluginMoreMenuItem`, không header riêng, không contextmenu). `uniqueByBlock` có thật trên runtime này; **một Undo** vẫn phải kiểm thực tế, không suy từ API.
+
+## 2. Source đã làm (P1–P3)
+
+| File | Nội dung |
+|---|---|
+| `src/core-controls/block-content/types.ts` | type dùng chung, không import runtime |
+| `src/core-controls/block-content/fields.ts` | allowlist content theo block, enum/range/URL/slug validator, inline rich-text policy, `itemLimit` |
+| `src/core-controls/block-content/plan.ts` | projection content-only, shape check theo path, patch theo child index, empty overwrite, signature content, limit 1 MiB / 200 node / depth 20 |
+| `src/core-controls/block-content/transport.ts` | `serialize`/`parse` Gutenberg thuần, `defaultsFor` từ schema, reject `core/missing`/freeform/invalid |
+| `src/core-controls/block-content/clipboard.ts` | chỉ đọc clipboard khi click Paste, chỉ ghi khi click Copy |
+| `src/core-controls/block-content/taxonomy.ts` | validate `categories`/`tags` (slug) theo taxonomy của site trước khi ghi |
+| `src/core-controls/block-content/controller.ts` | guard quyền/mode/controlled/binding, revalidate sau await, một dispatch `updateBlockAttributes(..., { uniqueByBlock: true })`, notices |
+| `src/core-controls/block-content/index.tsx` | Fill `BlockSettingsMenuControls` + `MenuGroup` "Content actions" với `Copy content` / `Paste content only`, busy guard |
+| `src/core-controls/index.ts` | import một lần `./block-content` |
+| `modules/core-control/registry.php` | chỉ mở rộng description của `block_clipboard`; label/option/default giữ nguyên |
+
+Behavior đã cài theo plan:
+
+- Chỉ hiện group khi chọn **đúng một** root thuộc Product Collection, Post Collection, Slider, Slide và gate `block_clipboard` bật; multi-select/block khác không có group.
+- Copy chỉ serialize **projection** content-only; style/layout/preset/overlay/media presentation/behavior không đi theo. Query (`categories`, `tags`, `relation`, `orderMode`, `itemsToShow`, CTA/URL/label, `readMoreLabel`) là content.
+- Empty (`''`, `[]`) ghi đè thật; default bị serializer bỏ được resolve theo schema đích.
+- Exact block name + exact tree shape theo path; Grid ↔ Carousel cùng Collection được phép và giữ `layout` đích; lệch số node/thứ tự/tên node hoặc unknown node → từ chối nguyên thao tác.
+- Inline rich text chỉ giữ `strong,b,em,i,sup,sub,code,mark,br,a` (+`href/target/rel` an toàn); tag/attr khác bị reject, không strip âm thầm. Heading bị flatten vì PHP render bằng `esc_html` (`modules/collection-render/cards.php:627`), `intro` giữ inline HTML vì PHP dùng `wp_kses_post` (`:630`).
+- `itemsToShow` validate theo layout đích (product 20; post carousel 10; post grid 9), reject chứ không clamp.
+- Không sửa utility whole-block `block-clipboard`, không thêm option/storage/dependency/CSS/frontend asset/endpoint, không đổi theme/GeneratePress/query engine/Swiper.
+
+## 3. Test đã chạy (logic, không phải runtime)
+
+```bash
+node --test tools/tests/block-content-copy.test.mjs
+```
+
+Kết quả 2026-11-05: **16/16 pass** (Node 24.20.0, `stripTypeScriptTypes` + `vm`, ghép `types.ts` → `fields.ts` → `plan.ts`). Nội dung kiểm:
+
+- allowlist projection: không lộ `layout`, `contentWidth`, `style`, `titleColor`, `mediaWidthPercent`, `productActionMode`, `appendQuoteContext`, `sizeSlug`, `linkDestination`, `overlayOpacity`, `preset`;
+- structural wrapper không copy attribute; Slider root không copy behavior;
+- empty `''`/`[]` ghi đè; identical content → 0 patch; style-only diff → 0 patch và signature không đổi;
+- Grid ↔ Carousel cùng Collection giữ `layout` đích;
+- lệch root type, lệch số/thứ tự/tên node, unknown child → reject;
+- rich text giữ `strong/em/br/a`; reject `span`, `div`, tag lệch, comment; URL `javascript:`/`data:`/`ftp:` reject; `_blank` thêm `noopener noreferrer`;
+- `itemsToShow` theo limit layout đích, không clamp;
+- heading flatten;
+- node/depth limit.
+
+**Chưa được chứng minh bởi unit test:** round-trip `serialize`/`parse` thật, vì `@wordpress/blocks` không có trong `node_modules` local và không cài Gutenberg plugin. Đây là lý do T02/T09/T11 phải kiểm onsite.
+
+## 4. Environment và setup
 
 - Target site do human cung cấp khi test; URL site đã có trong context: `https://minhhaifishery.com/`. Tạo private/draft fixture page, ghi exact edit URL + preview URL và page ID vào evidence; không tự sửa/publish trang public `/home/`.
-- Ghi WP version, Gutenberg plugin version hoặc inactive, browser/OS, plugin build/source commit, user capabilities. Kiểm minimum supported version theo P0 riêng, không suy từ WP hiện hành.
-- Human build/lint plugin theo057§14 rồi upload bằng workflow của project. Bật existing Core Control `Block Copy/Paste` khi test; lưu giá trị cũ để phục hồi. Copy permission cần HTTPS và browser hỗ trợ.
-- Fixtures: hai Product Collections cùng loại khác layout/styles/content; Post Collection; hai Slider/Hero có cùng sốSlide và cùng câycore nodes nhưng text/ảnh/link/style/overlay/preset khác; hai Slide; thêm Slider khác sốSlide và unknown child. Đảm bảo nguồn/đích dễ phân biệt, có rich text bold/link/inlinecolor, emptyfields và CTA ẩn.
+- Ghi WP version, Gutenberg plugin version hoặc inactive, browser/OS, plugin build/source commit, user capabilities. P0 ở trên là local; onsite phải ghi lại version thật.
+- Human build/lint plugin theo plan057 §14 rồi upload bằng workflow của project. Bật existing Core Control `Block Copy/Paste` khi test; lưu giá trị cũ để phục hồi. Clipboard cần HTTPS/secure context và browser hỗ trợ.
+- Fixtures: hai Product Collections cùng loại khác layout/styles/content; Post Collection; hai Slider/Hero có cùng số Slide và cùng cây core nodes nhưng text/ảnh/link/style/overlay/preset khác; hai Slide; thêm Slider khác số Slide và unknown child. Đảm bảo nguồn/đích dễ phân biệt, có rich text bold/link/inline color, empty fields và CTA ẩn.
 - Chuẩn bị ảnh nguồn có quyền sử dụng trong cùng site. Không di chuyển/copy media library hoặc taxonomy từ site khác.
 
-## Cases
+## 5. Cases
 
 | Case / IDs | Exact steps | Expected / pass criterion | Evidence |
 |---|---|---|---|
-| T01 CCP-UX01/04/05 | Gate off reload editor mở menu ⋮ block; gate on reload mở lại; thử mouse, Tab/Enter/Escape và touch/narrow viewport | Off không group; on đúng2action trong menu block, không menu riêng, không duplicate; focus usable, không quảng bá right-click | Menu screenshots/video, version và gate state |
+| T01 CCP-UX01/04/05 | Gate off reload editor mở menu ⋮ block; gate on reload mở lại; thử mouse, Tab/Enter/Escape và touch/narrow viewport | Off không group; on đúng 2 action trong menu block, không menu riêng, không duplicate; focus usable, không quảng bá right-click | Menu screenshots/video, version và gate state |
 | T02 CCP-TECH01/04 | Snapshot attrs cả cây nguồn/đích; Copy content nguồn → Paste content only đích cùng loại | Chỉ allowlist content đổi; style/support/inherit/anchor/preset/overlay/layout nguyên; source nguyên; không insert/delete/reorder node | Attr diff (kể cả key absent vs unset), video |
 | T03 CCP-UX02 | Product→Post; Slider→Slide; text clipboard không markup, multiple roots, unsupported child | Error cụ thể, không mutation/history/partial write | Notice, before/after attrs và undo state |
-| T04 CCP-TECH05 | Slider2slides→3slides; cùngcount nhưng childname khác; entity/binding/invalid node trong cây | Reject nguyên thao tác, không paste phần hợp lệ trước | Video + zero attr diff |
-| T05 CCP-UX03/TECH06 | Gõ sửa đích rồi blur; paste nhiềuSlide; Undo1lần, Redo1lần; Undo paste rồi Undo lần nữa | Undo đầu hồi toànpaste, giữ edit trước; Undo tiếp mới hồi edit trước; Redo toànpaste; no-op không thêmhistory | Continuous video + attrs/history evidence |
-| T06 CCP-UX06 | Copy emptyheading/image/CTA vào contentfilled; paste query missingref và itemcount vượt giới hạn target | Empty xóa có chủ ý; missingref/invalidlimit reject không silently normalize; CTA visibility/actionmode giữ | Attr diff/notice, query fixture |
-| T07 CCP-TECH06 | Chặn clipboard permission; doubleclick action; trong read pending đổiselection/xóa/sửacontent đích; lặp với chỉ đổi style | Failure/race không mutation; busy chống lặp; style-only change được giữ nếu paste còn hợp lệ, không stale overwrite | Browser permission UI, video, console không clipboard payload |
-| T08 CCP-TECH05/06 | Disabled editing/locked content; move-only lock; multi-select; List View mở menu khi selection khác | Respect content permissions exactruntime, không suy move-lock=readonly; multiselect khônggroup; target menu đúng block hoặc abort | Video + attrs, version/API note |
-| T09 CCP-TECH04 | Nguồn bold/link và inlinefont/color/class; dùng Copy content rồi native wholeblockCopy; dán qua action content-only | Semantic richtext theo policy được giữ; inline source styles không đi theo; native Copy cũng chỉ lấy allowlist; unsupportedrichtext reject rõ | Before/after rendered text + attr/payload fixture test |
-| T10 CCP-TECH07 | Chạy Copy selected block(s)/Paste block(s) utility cũ; theo dõi Save/network/storage | Utility cũ vẫn insert/fullcopy; content action không ghi theme/options/category/product/sharedentities, không autosave/publish qua action | Request/storage audit (không lộ tokens), screenshot |
-| T11 CCP-UI01/02 | Save draft → reopen → preview desktop/mobile, đối chiếu source/target | Content/media/link đúng; layout/overlay/style đích giữ, không invalidblock/recovery prompt, không JS error | Page ID, edit/preview URLs, screenshots, console/build |
+| T04 CCP-TECH05 | Slider 2 slides→3 slides; cùng count nhưng child name khác; entity/binding/invalid node trong cây | Reject nguyên thao tác, không paste phần hợp lệ trước | Video + zero attr diff |
+| T05 CCP-UX03/TECH06 | Gõ sửa đích rồi blur; paste nhiều Slide; Undo 1 lần, Redo 1 lần; Undo paste rồi Undo lần nữa | Undo đầu hồi toàn paste, giữ edit trước; Undo tiếp mới hồi edit trước; Redo toàn paste; no-op không thêm history | Continuous video + attrs/history evidence |
+| T06 CCP-UX06 | Copy empty heading/image/CTA vào content filled; paste query missing ref và item count vượt giới hạn target | Empty xóa có chủ ý; missing ref/invalid limit reject không silently normalize; CTA visibility/action mode giữ | Attr diff/notice, query fixture |
+| T07 CCP-TECH06 | Chặn clipboard permission; double click action; trong read pending đổi selection/xóa/sửa content đích; lặp với chỉ đổi style | Failure/race không mutation; busy chống lặp; style-only change được giữ nếu paste còn hợp lệ, không stale overwrite | Browser permission UI, video, console không clipboard payload |
+| T08 CCP-TECH05/06 | Disabled editing/locked content; move-only lock; multi-select; List View mở menu khi selection khác | Respect content permissions exact runtime, không suy move-lock=readonly; multi-select không group; target menu đúng block hoặc abort | Video + attrs, version/API note |
+| T09 CCP-TECH04 | Nguồn bold/link và inline font/color/class; dùng Copy content rồi native whole block Copy; dán qua action content-only | Semantic rich text theo policy được giữ; inline source styles không đi theo; native Copy cũng chỉ lấy allowlist; unsupported rich text reject rõ | Before/after rendered text + attr/payload fixture test |
+| T10 CCP-TECH07 | Chạy Copy selected block(s)/Paste block(s) utility cũ; theo dõi Save/network/storage | Utility cũ vẫn insert/full copy; content action không ghi theme/options/category/product/shared entities, không autosave/publish qua action | Request/storage audit (không lộ tokens), screenshot |
+| T11 CCP-UI01/02 | Save draft → reopen → preview desktop/mobile, đối chiếu source/target | Content/media/link đúng; layout/overlay/style đích giữ, không invalid block/recovery prompt, không JS error | Page ID, edit/preview URLs, screenshots, console/build |
 
-## Evidence ledger
+Gợi ý thứ tự: T01 → T02 → T04 → T05 (history/Undo) → T03/T06 (reject/empty) → T07/T08 (permission/race) → T09/T10 → T11 (Save/reopen/frontend).
 
-Chưa có kết quả. Mỗi case ghi ngày, environment/build, expected/actual, PASS/FAIL/Chờ kiểm chứng và đường dẫn screenshot/video/attr diff. Unit/mocked API không thay browser clipboard/history evidence. Nếu human hoãn onsite, ghi Deferred + target milestone đã được human xác nhận trong MILESTONES; không tự chọn milestone.
+## 6. Evidence ledger
+
+| Ngày | Hạng mục | Kết quả | Ghi chú |
+|---|---|---|---|
+| 2026-11-05 | Source P1–P3 | Đã có source | Chưa build/lint; human chạy lệnh §7 |
+| 2026-11-05 | Unit logic (`node --test tools/tests/block-content-copy.test.mjs`) | 16/16 pass | Chỉ pure modules; không phải runtime/menu/clipboard/Undo |
+| — | T01–T11 onsite | Chờ kiểm chứng | Cần human chạy sau build/lint |
+
+Mỗi case onsite ghi ngày, environment/build, expected/actual, PASS/FAIL/Chờ kiểm chứng và đường dẫn screenshot/video/attr diff. Unit/mocked API không thay browser clipboard/history evidence. Nếu human hoãn onsite, ghi Deferred + target milestone đã được human xác nhận trong MILESTONES; không tự chọn milestone.
+
+## 7. Build/lint human chạy (plan057 §14)
+
+```bash
+source /home/shinkuro/.nvm/nvm.sh && nvm use 20 && cd /mnt/d/Github/skvn-marine/wp-content/plugins/skvn-marine-blocks && npm run build && find modules/ -name "*.php" -exec php -l {} \;
+```
+
+Registry PHP đã đổi description nên lệnh lint trên bao phủ `modules/core-control/registry.php`. Command treo/timeout thì dừng ngay, không retry/poll.
 
 Human gửi lại: build/lint output, exact versions/URLs, T01/T02/T05/T11 video/ảnh trước sau, cases fail và console notes. Agent tiếp tục debug từ evidence, không yêu cầu làm lại toàn bộ cases đã có evidence đủ.

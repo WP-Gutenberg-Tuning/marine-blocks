@@ -200,6 +200,19 @@ Do not make this plugin own the primary SKVN visual system.
 - Block Copy/Paste uses public Gutenberg serialization, parsing, insertion,
   plugin/SlotFill, and notice APIs only. It must not override native clipboard
   events or depend on private editor DOM/UI.
+- Content-only actions (plan057, source in 1.3.19): `Copy content` /
+  `Paste content only` are a `BlockSettingsMenuControls` fill inside the
+  per-block ⋮ menu, gated by the same `block_clipboard` option (default false).
+  They support Product/Post Collection and Slider/Slide roots, copy only the
+  documented content allowlist, keep destination style/layout/preset/overlay,
+  require exact block name plus exact tree shape (Grid↔Carousel of one
+  Collection allowed), validate query slugs/URLs/rich text before writing, and
+  dispatch one public `updateBlockAttributes(..., { uniqueByBlock: true })`.
+  Transport is ordinary Gutenberg plain-text serialize/parse of a projection
+  tree; no custom JSON/MIME/envelope, storage, endpoint, CSS or frontend asset.
+  The older whole-block Copy/Paste utility keeps its behavior unchanged.
+  Pure tests: `tools/tests/block-content-copy.test.mjs`. Build/lint, menu,
+  clipboard permission, Undo/Redo and Save/reopen evidence remain pending.
 - The toggle controls editor UI and frontend styling, but compatibility data
   must remain registered so disabling the feature cannot invalidate blocks or
   discard saved hover values.
