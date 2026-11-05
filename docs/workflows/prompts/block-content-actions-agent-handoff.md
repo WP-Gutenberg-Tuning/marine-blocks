@@ -1,6 +1,6 @@
 # Prompt — Block Content Actions / plan057
 
-Copy phần dưới sang agent coding. Prompt có gate do SemVer/start và execution policy chưa được duyệt tại lúc viết. Không xóa gate hoặc điền approval thay human.
+Copy phần dưới sang agent coding. **Human đã duyệt scope/start/current1.3.19 và source commit ngày2026-11-05**, xem057§17. Thực hiện CODE_NOW sau technical preflight, không hỏi lại approval.
 
 ```text
 Bạn làm việc trong D:\Github\skvn-marine. Research/plan source of truth:
@@ -10,14 +10,14 @@ Bạn làm việc trong D:\Github\skvn-marine. Research/plan source of truth:
 
 AUTHORIZATION PREFLIGHT:
 - Current lúc viết prompt: V1 /1.3.19 — Plugin Design Sidebar Foundation.
-- Human đã chốt menu ⋮ CỦA TỪNG BLOCK như screenshot, giữ style đích, khác loại báo lỗi, tách right-click sau2.0; đã yêu cầu research/plan và commit docs.
-- Chưa xác nhận execution policies §11–14, SemVer/start của057. Trước code kiểm decision mới trong session/repo. Nếu đã được human duyệt thì dùng decision đó, không hỏi lại. Nếu chưa, chỉ làm P0/read-only audit, trình đúng các gate còn thiếu theo memo §15 và chờ; không code, bump, hoặc tự cộng scope1.3.19. Không coi user dán prompt này tự động xác nhận một version chưa ghi.
-- Khi human xác nhận, ghi rõ version/scope/start/stackref (candidate riêng, chưa có stack mapping), sync các docs theo AGENTS; nếu bổ sung current1.3.19 thì giữ current và không bump như human quyết định. Không đóng milestone/carry acceptance cũ.
+- Human đã chốt menu ⋮ CỦA TỪNG BLOCK như screenshot, giữ style đích, khác loại báo lỗi, tách right-click sau2.0.
+- Human2026-11-05 đã duyệt nguyên gói057 §11–14: Product/Post Collections + Slider/Slide, query là content, empty hợp lệ ghi đè, exact block type/tree shape, giữ style đích. Cho coding ngay trong1.3.19 như scope bổ sung, KHÔNG BUMP, cho source commit prefix feature patch:. Approval source of truth057§17; memo§15 là lịch sử, không hỏi lại version/start hoặc chọn1.8.0.
+- Stack ref: scope addition của current M1 follow-up, không tạo milestone stack mới. Giữ current1.3.19, metadata, carry acceptance và lịch sử; không chuyển/đóng milestone hoặc archive tension. Technical P0 vẫn cần evidence runtime API, không phải product approval gate.
 
-SAU KHI GATES ĐỦ:
+THỰC HIỆN — CODE_NOW:
 Thực hiện P0–P5, không viết lại plan dài rồi hỏi duyệt từng bước. Trước tiên ghi exact WP/Gutenberg/runtime public API và core schema version. @wordpress/scripts không phải runtime version. Thiếu API thì báo đúng dependency; không hack private DOM, không đổi vị trí sang menu toàn editor/header riêng.
 
-Scope proposal: Product/Post Collection + Slider/Slide; mỗi lần một root; core heading/paragraph/button/image và structural wrappers chỉ trong nested adapter. Không ship chỉ Collections rồi coi Slider xong. Kiểm exact block name và exact tree shape; Grid↔Carousel cùng Collection giữ layout đích; khác shape/unknown node từ chối nguyên thao tác. Theo allowlist, empty/default, query/media/rich text policy §11; không tự mở rộng hỗ trợ mọi block hoặc cross-site migration.
+Scope đã duyệt: Product/Post Collection + Slider/Slide; mỗi lần một root; core heading/paragraph/button/image và structural wrappers chỉ trong nested adapter. Không ship chỉ Collections rồi coi Slider xong. Kiểm exact block name và exact tree shape; Grid↔Carousel cùng Collection giữ layout đích; khác shape/unknown node từ chối nguyên thao tác. Theo allowlist, empty/default, query/media/rich text policy §11; không tự mở rộng hỗ trợ mọi block hoặc cross-site migration.
 
 Dùng public BlockSettingsMenuControls đúng runtime, nhóm Content actions với Copy content/Paste content only trong menu ⋮ có sẵn. Reuse block_clipboard gate default false; không đổi utility Copy/Paste whole blocks cũ, không thêm setting/storage/dependency/frontend asset/endpoint. Đọc clipboard chỉ khi click Paste, không hover/menu open; không override Ctrl+C/V hoặc thêm contextmenu handler. English+i18n.
 
@@ -27,5 +27,5 @@ Files dự kiến src/core-controls/block-content/*, core-controls/index.ts, opt
 
 Agent được chạy test logic có ý nghĩa, không được chạy build/lint theo AGENTS. Cuối lượt output command human build/lint trong057 §14. Command treo/timeout dừng ngay, không retry/poll. Trước onsite cập nhật runbook URLs/setup/cases. Report source tests tách runtime/menu/clipboard/history/Save evidence, không tự PASS hoặc release.
 
-Khi source xong, self-review allowlist/no-style/atomicity/version compatibility; cập nhật IDs. Nếu human đã cho phép source commit trong lệnh start thì commit đúng files với feature patch: add block content actions (hoặc tên human chỉ định), không commit build người khác. Nếu chỉ được docs commit thì không suy quyền source commit. Final gồm commit/files, tests đã chạy, build/onsite còn chờ và evidence human cần gửi.
+Khi source xong, self-review allowlist/no-style/atomicity/version compatibility; cập nhật IDs. Human đã cho source commit: commit đúng files với feature patch: add block content actions, không commit build người khác. Final gồm commit/files, tests đã chạy, build/onsite còn chờ và evidence human cần gửi. Không tự deploy hoặc claim runtime PASS.
 ```

@@ -1,6 +1,6 @@
 # 057 — Block Content Actions trong menu ⋮
 
-Ngày tạo: **2026-11-05**. Status: **Detailed execution proposal — chưa triển khai**. Research/plan/handoff được human yêu cầu và cho commit; approval code/version/start chưa có. Bản chi tiết tại §10–16 ưu tiên hơn proposal lịch sử nếu có khác biệt.
+Ngày tạo: **2026-11-05**. Status: **Approved for implementation trong V1 /1.3.19 — chưa có source**. Human duyệt toàn gói §11–14 và start coding trong current1.3.19, không bump; cho agent coding và commit `feature patch:`. Bản chi tiết tại §10–16 cùng approval§17 ưu tiên hơn proposal lịch sử nếu có khác biệt.
 
 Đây là tài liệu làm việc cho các thảo luận tiếp theo về copy nội dung giữa các block. Cập nhật quyết định, rationale, câu hỏi và evidence tại đây; không tạo một spec song song từ các lượt chat sau.
 
@@ -164,7 +164,7 @@ Discussion update: human chưa chốt custom menu, tooltip/hint hoặc phương 
 
 ## 11. Scope và policy đề xuất cho đợt đầu
 
-**Mọi policy mới trong §11–14 là execution proposal, chưa human approval.** Có thể duyệt nguyên gói hoặc sửa từng mục; agent sau không tự coi research là quyết định sản phẩm.
+**Human đã duyệt nguyên gói §11–14 ngày2026-11-05**, cho coding+commit trong current1.3.19, không bump; chi tiết approval§17. Các chữ “proposal” bên dưới giữ rationale thiết kế; không còn chặn approval cho gói này. Những nhánh ghi rõ ngoài scope/chưa hỗ trợ vẫn giữ nguyên; runtime API/evidence chưa được chứng minh bởi approval.
 
 ### 11.1. Boundary / supported blocks
 
@@ -283,7 +283,7 @@ source /home/shinkuro/.nvm/nvm.sh && nvm use 20 && cd /mnt/d/Github/skvn-marine/
 
 Nếu registry PHP đổi thì lint file đó theo lệnh trên; nếu bootstrap đổi thì thêm `php -l skvn-marine-blocks.php`. Không bump/build trong lượt docs. Command treo/timeout thì dừng ngay, không retry/poll theo AGENTS.
 
-## 15. Decision memo — execution gate còn mở
+## 15. Decision memo — lịch sử trước approval§17
 
 1. **Vấn đề:** UX menu đã chốt nhưng content policy, implementation scope và SemVer/start chưa được human xác nhận.
 2. **Phương án:** A — duyệt gói §11–14, bổ sung current1.3.19 bằng ngoại lệ development-scope như Spacer: làm sớm nhưng tăng scope đang chờ onsite. B — duyệt gói nhưng xếp milestone MINOR mới, candidate1.8.0: đúng feature-version rule nhưng thực hiện sau các1.4–1.7 đã có. Nếu cần mốc khác phải đối chiếu roadmap, không chen đè.
@@ -300,3 +300,17 @@ Prompt: `docs/workflows/prompts/block-content-actions-agent-handoff.md`. Onsite 
 Human làm rõ model là **DeepSeek Flash4.1**, Nemotron chưa rõ variant/provider. Khuyến nghị thực dụng của agent: dùng DeepSeek Flash4.1 cho implementation theo work packages và review độc lập trước merge/release; đây là suy luận cho task, không benchmark đối đầu Nemotron. [DeepSeek V4.1 Flash release](https://api-docs.deepseek.com/news/news260910/) và [1017 update](https://api-docs.deepseek.com/news/news261017/) mô tả agent/coding updates; alias/provider có thể route snapshot khác nên phải ghi exact model ID/snapshot. [NVIDIA model catalog](https://build.nvidia.com/models?q=NeMo) có nhiều biến thể Nemotron, không thể xếp cả họ bằng một tên. Không lấy vendor benchmark làm bằng chứng model sẽ giữ đúng invariant repo này.
 
 Discussion2026-11-05: human yêu cầu research, plan chi tiết, commit docs và prompt cho agent khác thực hiện. Chưa trao quyền code057 ở milestone cụ thể; agent không spawn subagent chỉ để thực hiện commit docs thông thường.
+
+## 17. Approval / execution authorization — human2026-11-05
+
+Human trả lời lựa chọn: **“Duyệt gói, làm trong 1.3.19 như scope bổ sung, không bump; cho agent coding và commit feature patch:”**.
+
+- Duyệt scope và policies §11–14, thực hiện P0–P5 cho Product/Post Collections + Slider/Slide. Exact type và tree shape; giữ style đích; query là content; empty hợp lệ ghi đè; native projection transport/allowlist và atomic Undo theo plan. Không cần hỏi lại các quyết định này.
+- Version/start: **V1 /1.3.19 — Plugin Design Sidebar Foundation**, scope addition được human duyệt, bắt đầu implementation theo handoff. Không chuyển current, không bump metadata hoặc archive milestone/tensions. Stack ref: scope addition của current M1 follow-up, không tạo stack milestone mới.
+- Feature thông thường tăng MINOR; human chọn ngoại lệ bổ sung development milestone đang mở như055. Phương án candidate1.8.0 trong memo§15 không được chọn và không reserve version đó.
+- Cho coding agent commit nguồn đã tự kiểm với **`feature patch: add block content actions`** (prefix bắt buộc `feature patch:`). Không commit build/source của người khác; build/lint do human chạy theo AGENTS.
+- P0 vẫn phải xác minh exact runtime/version/public API trước dùng; không hỏi lại product approval vì thiếu API evidence. Nếu technical dependency thực sự chưa có thì báo đúng phần thiếu, không tự đổi scope/menu/transport.
+- Right-click058 vẫn Deferred sau2.0. Không deploy, release, nghiệm thu hoặc đánh dấu CCP-* PASS từ approval này. Source/tests/build/onsite evidence vẫn cần ghi riêng.
+- Prompt bàn giao đã cập nhật thành lệnh CODE_NOW với authorization này. Agent hiện tại chỉ cập nhật/commit docs để human chuyển agent khác thực hiện; chưa code plugin.
+
+Approval này supersedes mọi câu “chưa cho code/chưa xếp version/start” ở phần lịch sử đầu tài liệu và §15–16. Acceptance implementation vẫn Chưa làm cho đến khi có source/evidence.
