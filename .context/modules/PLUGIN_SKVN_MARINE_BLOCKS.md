@@ -14,6 +14,8 @@ Plugin product UI and frontend default copy use English as the source language. 
 
 ## [manual] Architecture
 
+Responsive Spacer2026-11-05: human cho plan055 implementation+commit trong current1.3.19. Static `skvn-marine/responsive-spacer`, native Inspector, optional responsive overrides/reset, frontend CSS-only tại `assets/css/responsive-spacer.css`; editor mint frame và padding cap200 chỉ minh họa. Source `src/responsive-spacer/`, PHP/JS registration; không require/include hoặc storage mới. 13 Node tests PASS phạm vi5 Spacer +8 frame mô phỏng, build/lint/onsite chưa chạy. Spec `planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md`, runbook `docs/testing/responsive-spacer-1.3.19.md`. Px inputs là ngoại lệ hẹp cho utility đã human duyệt, không đổi preset spacing của các block khác.
+
 Architecture: **Block-centric feature modules with minimal shared services**.
 
 Each block owns feature-specific logic:

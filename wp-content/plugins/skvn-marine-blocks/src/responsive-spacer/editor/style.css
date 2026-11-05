@@ -1,0 +1,53 @@
+/* Editor chrome only, extracted into the registered style-index.ts.css bundle. */
+.skvn-editor-preview-frame.skvn-editor-preview-frame--spacer {
+	--skvn-editor-frame-bg: #f0fdfa;
+	--skvn-editor-frame-border: #99d5ca;
+	--skvn-spacer-preview-text: #134e4a;
+	--skvn-spacer-preview-muted: #3f625d;
+	color: var(--skvn-spacer-preview-text);
+	text-align: center;
+	height: auto;
+	min-width: 0;
+}
+
+.skvn-editor-preview-frame--spacer > .skvn-editor-preview-frame__label {
+	color: var(--skvn-spacer-preview-text);
+}
+
+.skvn-editor-preview-frame--spacer > .skvn-spacer-preview__summary {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 6px 12px;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.skvn-spacer-preview__summary > span {
+	border: 1px solid transparent;
+	border-radius: 4px;
+	padding: 2px 6px;
+	overflow-wrap: anywhere;
+}
+
+.skvn-spacer-preview__summary > .skvn-spacer-preview__current {
+	background: #ccfbf1;
+	border-color: #115e59;
+	color: #115e59;
+	font-weight: 600;
+}
+
+.skvn-editor-preview-frame--spacer > .skvn-spacer-preview__indicator {
+	box-sizing: content-box;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+	overflow-wrap: anywhere;
+}
+
+.skvn-editor-preview-frame--spacer > .skvn-spacer-preview__note {
+	color: var(--skvn-spacer-preview-muted);
+	font-size: 12px;
+	line-height: 1.5;
+}

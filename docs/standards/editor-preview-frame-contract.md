@@ -30,6 +30,7 @@ Tên loại block là chrome editor, không serialize thành heading trên websi
 |---|---|---|---|
 | Collection Carousel | `#f6f8fa` | `#dce4e9` | Product/Post Collection ở mode Carousel |
 | Grid | `#eff8fc` | `#c9e3ef` | Product/Post Collection ở mode Grid và Product Category Grid |
+| Utility / Responsive Spacer | `#f0fdfa` | `#99d5ca` | Plan055 human duyệt implementation trong1.3.19 ngày2026-11-05, visual/contrast onsite pending |
 | Slider / Step Slider | **Chưa chốt** | **Chưa chốt** | Audit và đưa phương án riêng trước khi gán màu |
 
 Giá trị là baseline đã duyệt, chưa có visual/contrast PASS trên mọi environment; nếu cần đổi palette thì ghi evidence và decision mới. Màu theo family, không theo từng block hoặc nội dung Product/Post; không tự coi mọi block dùng Swiper là Collection Carousel. Màu luôn kèm tên loại block, không là tín hiệu duy nhất. Nền/viền khung không override card typography/image/background tokens.
@@ -37,6 +38,8 @@ Giá trị là baseline đã duyệt, chưa có visual/contrast PASS trên mọi
 Khi triển khai nhiều consumer, dùng editor-scoped CSS variables cho các cặp màu, đặt tên theo source naming hiện hành trước migration1.4.0. Không thêm option DB/theme dependency chỉ để chọn màu chrome editor.
 
 ## Spacing và width ownership
+
+Responsive Spacer exception: khung label/summary/indicator căn giữa và luôn chọn được kể cả height0. Vùng indicator padding-top/bottom=min(effectiveHeight,200)/2, số hiển thị giữ giá trị thật; >200 có cap note. Không khẳng định tổng khung cao đúng spacing frontend; H frontend không bị cap. Palette text `#134e4a`, secondary `#3f625d`, current device chip nền `#ccfbf1`/text-border `#115e59`; native focus giữ nguyên. CSS editor owner `src/responsive-spacer/editor/style.css`, không serialize frame/chrome xuống frontend. Regression và evidence riêng theo RS-* plan055.
 
 - Ý định “mỗi block margin5px” được duyệt thành **hai khung preview kề nhau có khoảng hở thực tế tối thiểu10px** theo chiều dọc.
 - Không áp `margin: 5px` bốn phía và không thay margin mọi Gutenberg block. Giữ alignment Normal/Wide/Full, chiều rộng do canvas/parent sở hữu.

@@ -203,7 +203,19 @@ function skvn_marine_blocks_register_blocks() {
 		);
 	}
 
+	// Small static block: its frontend needs CSS only, never the editor bundle.
+	$spacer_style = __DIR__ . '/assets/css/responsive-spacer.css';
+	if ( file_exists( $spacer_style ) ) {
+		wp_register_style(
+			'skvn-marine-responsive-spacer',
+			plugins_url( 'assets/css/responsive-spacer.css', __FILE__ ),
+			array(),
+			filemtime( $spacer_style )
+		);
+	}
+
 	$blocks = array(
+		'responsive-spacer',
 		'slider',
 		'slide',
 		'accordion',
@@ -226,7 +238,7 @@ function skvn_marine_blocks_register_blocks() {
 			}
 
 			if (
-				in_array( $block, array( 'slider', 'slide', 'feature-showcase' ), true ) &&
+				in_array( $block, array( 'slider', 'slide', 'feature-showcase', 'responsive-spacer' ), true ) &&
 				wp_style_is( 'skvn-marine-blocks-editor', 'registered' )
 			) {
 				$args['editor_style_handles'] = array( 'skvn-marine-blocks-editor' );

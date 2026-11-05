@@ -2,6 +2,9 @@ import { registerBlockType } from '@wordpress/blocks';
 
 import './core-controls';
 import './design-sidebar';
+import spacerMetadata from './responsive-spacer/block.json';
+import { Edit as SpacerEdit } from './responsive-spacer/edit';
+import { save as spacerSave } from './responsive-spacer/save';
 
 import accordionMetadata from './accordion/block.json';
 import { Edit as AccordionEdit } from './accordion/edit';
@@ -45,6 +48,12 @@ import { registerProductCollectionVariations } from './product-collection/variat
 import productCategoryGridMetadata from './product-category-grid/block.json';
 import { Edit as ProductCategoryGridEdit } from './product-category-grid/edit';
 import './product-category-grid/style.css';
+
+registerBlockType( spacerMetadata.name, {
+	...spacerMetadata,
+	edit: SpacerEdit,
+	save: spacerSave,
+} );
 
 registerBlockType( accordionMetadata.name, {
 	...accordionMetadata,

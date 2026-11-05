@@ -9,6 +9,8 @@
 
 Current milestone: **V1 / 1.3.19 — Plugin Design Sidebar Foundation**
 
+Scope addition2026-11-05: human duyệt Responsive Spacer plan055, cho implementation và commit `feature patch:` trong current1.3.19; không chuyển milestone/bump metadata. Source/acceptance riêng RS-*; build/lint/onsite chưa nghiệm thu. Spec `.context/planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md`.
+
 Human start 2026-11-04: giao agent Sol coding theo plan 048, Q1=A/Q2=A. 1.3.18 được chuyển ưu tiên, **DEFERRED_WITH_CARRY_OVER**, không phải toàn bộ PASS; checklist/evidence giữ trong MILESTONES_HISTORY và carry register 1.3.19. Loading/navigation 046 vẫn thuộc 1.3.18, source/test/debt riêng, chưa nghiệm thu. Các đoạn checkpoint dưới là lịch sử trước lệnh start này. Metadata 1.3.19 là milestone development build, không phải release approval.
 
 Milestone source of truth: `.context/MILESTONES.md`.

@@ -51,6 +51,8 @@ Before coding any branding change, update or verify this document first. If a ne
 | WindPress integration | `wp-content/themes/skvn-marine/inc/windpress.php` | None | Tailwind is not the production brand source of truth |
 | Plugin icon | `wp-content/plugins/skvn-marine-blocks/assets/icon-256x256.png` | None | Plugin identity only |
 | Plugin banner | `wp-content/plugins/skvn-marine-blocks/assets/banner-772x250.png` | None | Plugin identity only |
+| Responsive Spacer editor frame | Plugin `src/responsive-spacer/editor/style.css` | `docs/standards/editor-preview-frame-contract.md`, plan055 | Mint utility palette, editor-only; human cho implementation2026-11-05, visual/contrast onsite pending; không theme token/DB setting |
+| Responsive Spacer runtime sizing | Plugin `assets/css/responsive-spacer.css` | `src/responsive-spacer/model.ts` / `save.tsx` | CSS-only responsive height, không màu/nền/nhãn preview frontend; packaged assets owner plugin |
 
 ## Customization Order
 

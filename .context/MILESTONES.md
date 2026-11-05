@@ -15,6 +15,8 @@ Stack ref: **M1 follow-up** — roadmap 039; 1.3.18 deferred checkpoint archived
 
 AGENTS.md current milestone phải match file này.
 
+Responsive Spacer scope addition — human2026-11-05: duyệt plan055, thực hiện và commit trong current **1.3.19**, prefix `feature patch:`. Feature mới thông thường tăng MINOR; human chọn ngoại lệ bổ sung development milestone đang mở, không đổi Version Naming Rule/current hoặc release status. Static block có source Inspector responsive values/inherit/reset, mint frame/capped padding200, frontend uncapped CSS-only. RS-UI-01–03/RS-UX-01–05/RS-TECH-01–03 **Đã có source / Chờ kiểm chứng onsite**; RS-TECH-04 chờ human build/lint/artifact. 13 Node tests PASS phạm vi model/viewport/CSS-contract + shared frame mô phỏng, không runtime PASS. Plan: `planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md`; runbook `docs/testing/responsive-spacer-1.3.19.md`. Giữ toàn bộ DS/TD/carry acceptance.
+
 Design Sidebar visual-controls follow-up: [plan054](planning/054_DESIGN_SIDEBAR_VISUAL_CONTROLS_PLAN.md) đang planning, Q1–Q3 chờ human chốt. Scope đề xuất presentation existing consumers trong current1.3.19, chưa code/approve runtime, không tự mở Category Floating hoặc đổi Theme Design persistence. Giữ DS/TD/SR2/carry acceptance.
 
 ### Editor preview presentation register — 2026-11-05
