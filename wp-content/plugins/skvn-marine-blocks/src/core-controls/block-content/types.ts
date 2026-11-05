@@ -29,6 +29,7 @@ export interface ContentField {
  * straight in.
  */
 export interface TreeBlock {
+	isValid?: boolean;
 	name: string;
 	attributes: Record< string, unknown >;
 	innerBlocks: TreeBlock[];
@@ -41,6 +42,7 @@ export interface BlockPatch {
 }
 
 export type ContentFailure =
+	| 'binding'
 	| 'root-type'
 	| 'unsupported-node'
 	| 'shape'

@@ -9,6 +9,8 @@
 
 ## Bảng nhanh
 
+Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05): xem [Agent pitfalls AP-08–10](../../.context/PITFALLS.md#ap-08--guard-chỉ-tồn-tại-ở-copyroot-paste-và-descendants-đi-vòng) và [repair plan057 §19–25](../../.context/planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md#19-review-repair-plan--2026-11-05-baseline-0a53a2d). Clipboard ingress/descendant guards bị bỏ sót, pure tests thiếu actual call path, styled-span policy bị đổi bằng test sai. Repair có source và11 mocked controller tests PASS; runtime/onsite chưa PASS.
+
 | Pitfall | Triệu chứng | Layer sở hữu | Case |
 |---|---|---|---|
 | Swiper JS không kèm core CSS | Slider trắng / slide xếp dọc sau init | WordPress enqueue | [CASE-001](slider/001_SWIPER_JS_WITHOUT_CORE_CSS.md) |

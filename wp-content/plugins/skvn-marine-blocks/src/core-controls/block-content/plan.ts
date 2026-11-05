@@ -8,6 +8,8 @@
  */
 
 import type { BlockPatch, ContentResult, ContentField, TreeBlock } from './types';
+import { validateTree, MAX_NODES, MAX_DEPTH } from './validation';
+export { MAX_CLIPBOARD_LENGTH, MAX_NODES, MAX_DEPTH } from './validation';
 import {
 	contentFieldSpecs,
 	emptyValueFor,
@@ -16,11 +18,6 @@ import {
 	itemLimit,
 	normalizeFieldValue,
 } from './fields';
-
-export const MAX_CLIPBOARD_LENGTH = 1048576;
-export const MAX_NODES = 200;
-export const MAX_DEPTH = 20;
-
 export type DefaultsFor = ( name: string ) => Record< string, unknown >;
 
 function ownValue(
@@ -166,6 +163,8 @@ export function buildProjection(
 	block: TreeBlock,
 	defaultsFor: DefaultsFor
 ): ContentResult< TreeBlock > {
+	const validation = validateTree( block );
+	if ( ! validation.ok ) return { ok: false, code: validation.code, detail: validation.detail };
 	if ( ! isSupportedRoot( block.name ) ) {
 		return { ok: false, code: 'root-type', detail: block.name };
 	}
@@ -286,6 +285,10 @@ export function buildPatches(
 	dest: TreeBlock,
 	defaultsFor: DefaultsFor
 ): ContentResult< BlockPatch[] > {
+	for ( const tree of [ source, dest ] ) {
+		const validation = validateTree( tree );
+		if ( ! validation.ok ) return { ok: false, code: validation.code };
+	}
 	if ( source.name !== dest.name || ! isSupportedRoot( source.name ) ) {
 		return { ok: false, code: 'root-type', detail: source.name };
 	}

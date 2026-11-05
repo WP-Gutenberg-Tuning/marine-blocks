@@ -2,6 +2,10 @@
 
 Status2026-11-05: **CÓ SOURCE — CHƯA RUNTIME PASS**. Human duyệt plan057 §11–14 và cho coding+commit trong current V1 / 1.3.19 như scope bổ sung, không bump; approval §17. Source/unit tests đã có; build/lint, menu/clipboard, Undo/Redo và Save/reopen vẫn **Chờ kiểm chứng**. File này không phải evidence PASS và không thay release approval.
 
+Repair update sau review `0a53a2d`: human cho thực hiện plan, R1–R4 đã có source sửa;057§25 là execution ledger mới nhất. `node tools/tests/block-content-controller.test.mjs` **11/11 PASS** (WP store/parser/clipboard mock, DOMParser JSDOM thật), TypeScript syntax check PASS; chưa build/lint/typecheck/runtime. Model suite cần human chạy lại `node tools/tests/block-content-copy.test.mjs` (Node24); không claim toàn bộ suite PASS. Các đoạn “chưa sửa”/span rejection phía dưới là evidence baseline trước repair, không phải trạng thái mới.
+
+Sau build: chạy thêm R01–R06 theo057§22. Text limit1048576 đo UTF-16 code units; span font/color/class được unwrap, semantic text/link/br giữ; benign omitted closing inline tag được browser canonicalize, unsupported meaningful node/comments/head content/bound markers reject. Browser/CSP không cho DOMParser thì fail closed. Không dùng mock parser test làm evidence real serialize/parse.
+
 ## 1. P0 — runtime/API/version evidence (local)
 
 Ghi lại trước khi dùng API, theo plan057 §10.1 và §17:
@@ -93,6 +97,18 @@ Kết quả 2026-11-05: **16/16 pass** (Node 24.20.0, `stripTypeScriptTypes` + `
 Gợi ý thứ tự: T01 → T02 → T04 → T05 (history/Undo) → T03/T06 (reject/empty) → T07/T08 (permission/race) → T09/T10 → T11 (Save/reopen/frontend).
 
 ## 6. Evidence ledger
+
+Review `0a53a2d` ngày2026-11-05 tìm thấy bốn **FAIL source**, repair chưa làm: clipboard source binding bypass, descendant mode/controlled guard thiếu, Paste bypass limits, styled span bị reject trái spec. Chi tiết/regression R01–R06: [plan057 §19–24](../../.context/planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md#19-review-repair-plan--2026-11-05-baseline-0a53a2d). Phải chạy thêm matrix này cùng T01–T11 sau repair. Bảng source/16 tests và các mô tả behavior phía trên là checkpoint trước review; không phải evidence các guard đã đủ hoặc span rejection là policy được duyệt.
+
+| Repair | Hiện trạng | Evidence cần bổ sung |
+|---|---|---|
+| CCP-R1 / R01 | FAIL source; chưa sửa | Production transport/controller reject bound source, zero mutation |
+| CCP-R2 / R02 | FAIL source; chưa sửa | Ancestor/descendant mode/ownership và after-await guard, actual runtime API |
+| CCP-R3 / R03 | FAIL source; chưa sửa | Boundary limits ở cả Copy/Paste, fail trước lookup/mutation |
+| CCP-R4 / R04 | FAIL source; chưa sửa | Styled spans giữ semantic text, bỏ presentation; real parser round-trip |
+| R05/R06 | Chờ kiểm chứng | Undo/no-op/empty/style latest, Save/reopen/desktop/mobile |
+
+Phiên review: test runner bị `spawn EPERM`; hai fixture model độc lập chứng minh bound source vẫn tạo patch và202-node Paste bypass. Không gộp kết quả này với report16/16 phiên coding hoặc gọi là clipboard/runtime PASS. Target onsite vẫn là private/draft fixture trên site human chọn theo §4; chưa có edit/preview URLs, không thao tác public homepage.
 
 | Ngày | Hạng mục | Kết quả | Ghi chú |
 |---|---|---|---|

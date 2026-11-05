@@ -8,9 +8,11 @@
  */
 
 import { createBlock, getBlockType, parse, serialize } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
-import type { TreeBlock } from './types';
+import type { ContentFailure, TreeBlock } from './types';
 import { isSupportedRoot } from './fields';
+import { validateTree, MAX_CLIPBOARD_LENGTH } from './validation';
 
 type UnknownBlock = {
 	name: string;
@@ -29,9 +31,20 @@ const FALLBACK_NAMES = [
 ];
 
 export function toTree( block: UnknownBlock ): TreeBlock {
+	const attributes = { ...block.attributes };
+	// WP 7.1 uses RichTextData for core rich-text attributes. Older runtimes
+	// return strings; never coerce arbitrary clipboard objects to text.
+	if ( typeof RichTextData === 'function' ) {
+		for ( const key of Object.keys( attributes ) ) {
+			if ( attributes[ key ] instanceof RichTextData ) {
+				attributes[ key ] = ( attributes[ key ] as RichTextData ).toHTMLString();
+			}
+		}
+	}
 	return {
 		name: block.name,
-		attributes: block.attributes || {},
+		isValid: block.isValid,
+		attributes,
 		innerBlocks: ( block.innerBlocks || [] ).map( toTree ),
 	};
 }
@@ -49,6 +62,7 @@ function toCreatedBlocks( node: TreeBlock ): UnknownBlock {
  * style/layout attributes must not reach the clipboard.
  */
 export function serializeProjection( node: TreeBlock ): string {
+	if ( ! validateTree( node, isSupportedName ).ok ) throw new Error( 'Invalid content tree' );
 	return serialize( [ toCreatedBlocks( node ) as never ] );
 }
 
@@ -91,7 +105,8 @@ export function isSupportedName( name: string ): boolean {
  */
 export function parseDocument(
 	text: string
-): { ok: boolean; value?: TreeBlock; detail?: string } {
+): { ok: boolean; value?: TreeBlock; detail?: string; code?: ContentFailure } {
+	if ( text.length > MAX_CLIPBOARD_LENGTH ) return { ok: false, code: 'limit' };
 	if ( text.indexOf( '<!-- wp:' ) === -1 ) {
 		return { ok: false, detail: 'markup' };
 	}
@@ -114,27 +129,10 @@ export function parseDocument(
 		return { ok: false, detail: root.name };
 	}
 
-	const invalid = findInvalidNode( root );
-
-	if ( invalid ) {
-		return { ok: false, detail: invalid };
+	const validation = validateTree( root, isSupportedName );
+	if ( ! validation.ok ) {
+		return { ok: false, code: validation.code, detail: validation.detail };
 	}
 
 	return { ok: true, value: toTree( root ) };
-}
-
-function findInvalidNode( node: UnknownBlock ): string | null {
-	if ( ! isSupportedName( node.name ) || node.isValid === false ) {
-		return node.name;
-	}
-
-	for ( const child of node.innerBlocks || [] ) {
-		const invalid = findInvalidNode( child );
-
-		if ( invalid ) {
-			return invalid;
-		}
-	}
-
-	return null;
 }

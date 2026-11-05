@@ -8,6 +8,28 @@
 
 ## Agent Pitfalls (lỗi quy trình của AI agent)
 
+### AP-08 — Guard chỉ tồn tại ở Copy/root, Paste và descendants đi vòng
+
+**Xảy ra:** 2026-11-05, review Content Actions commit `0a53a2d`.
+**Lỗi của coding agent:** Có helper kiểm bindings/limits và có permission check nhưng không nối vào mọi ingress/node: native clipboard Paste bỏ qua binding nguồn; buildPatches bỏ limits; descendant chỉ canEditBlock, thiếu mode/controlled ownership. Đây là lỗi thực hiện requirement đã có, không phải human thiếu spec hoặc runtime test chưa chạy.
+**Evidence:** `src/core-controls/block-content/transport.ts:117–123`, `controller.ts:170–213`, `plan.ts:284–309` (plugin-relative, baseline trên). Review fixture bound paragraph vẫn trả content patch; Slide +201 paragraphs Copy=false nhưng Paste=true/201 patches. Local WP7.1 canEditBlock chỉ kiểm preview/lock.edit, không tổng hợp editing mode. Chi tiết [plan057 §19–24](planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md#19-review-repair-plan--2026-11-05-baseline-0a53a2d).
+**Tránh:** Lập bảng mỗi invariant × ingress (Copy editor/native Copy/Paste) × root/ancestor/descendant × trước/sau await. Validate raw metadata trước projection loại bỏ nó; một owner limits áp cả planner/transport. Guard quyền phải dùng đúng semantic selectors ở từng node, kiểm lại ngay trước mutation. Test forbidden payload qua production controller/transport và assert zero writes, không chỉ gọi helper đúng input.
+**Fixed:** Human start repair2026-11-05; validation raw ingress/planner và guard root/ancestor/descendant đã có source (`validation.ts`, `editor-guard.ts`); controller tests11/11 PASS phạm vi mocked WP APIs. Model rerun/onsite chưa PASS; plan057§25 giữ baseline evidence và giới hạn.
+
+### AP-09 — Test xanh vì không đi qua đường thực thi có lỗi
+
+**Xảy ra:** Cùng review `0a53a2d`; 16 pure tests trước đó không bao phủ transport/controller. Test limit chỉ đi Copy nên không phát hiện Paste bỏ limits; bindings/ownership không đi qua actual ingress.
+**Lỗi của agent:** Dừng self-review ở các module riêng, thiếu đối chiếu end-to-end source path. Report đã trung thực chưa runtime PASS, nhưng ghi P5 source xong khi invariant ở source vẫn chưa đủ. Thiếu runtime evidence không giải thích được lỗi integration có thể phát hiện bằng source/call-path tests.
+**Tránh:** Với mỗi guard, phải có test gọi entry point thật mà user dùng, bắt guard fail và assert không mutation/lookup ngoài ý muốn. Tách pure model, mocked controller, actual parser/serializer và onsite/history evidence. Không dùng số tests hoặc transpile syntax làm bằng chứng coverage. Ghi riêng tool `spawn EPERM` và không gọi đó là product test FAIL/PASS.
+**Fixed:** Đã thêm `tools/tests/block-content-controller.test.mjs`,11/11 PASS trên production call path với store/clipboard/Gutenberg parser mocked, HTML parser JSDOM thật. Không thay actual parser/Undo/onsite evidence; model suite cần human chạy lại theo057§25.
+
+### AP-10 — Đổi spec bằng cách viết test cho behavior sai; tự viết HTML sanitizer
+
+**Xảy ra:** `fields.ts` trong `0a53a2d` reject mọi span, test cũng assert span phải reject, trong khi057§11.3 yêu cầu loại font/color presentation và giữ semantic content. HTML scanner/regex tự viết còn trái ràng buộc dùng public API đã audit.
+**Hậu quả:** Nội dung Gutenberg thông thường có inline color/font không copy được; test xanh đang khóa lỗi vào implementation. Đây là sai policy của agent, không phải unsupported meaningful content được human đồng ý bỏ.
+**Tránh:** Viết expected từ spec/fixture người dùng, không từ code vừa viết. Phân biệt span trình bày (unwrap, giữ text/semantic children) với construct có nghĩa không hỗ trợ (reject toàn thao tác). Audit public rich-text/HTML parser theo runtime, kiểm entity/link/escaping và actual serialize/parse; không regex strip HTML hoặc mutate registry toàn editor. Thiếu API evidence thì báo technical blocker, không âm thầm thu hẹp requirement.
+**Fixed:** `inline-html.ts` thay scanner bằng public browser DOMParser + dựng cây allowlist mới; tests giữ styled span text/semantic/link và decoded URL, không source styles. Public browser API rationale/benign HTML canonicalization ghi057§25; actual Gutenberg round-trip và frontend chờ human, không coi tests mock là runtime PASS.
+
 ### AP-06 — Bỏ visual cũ trước khi chứng minh replacement được nạp
 
 **Xảy ra:** 2026-11-05, chuyển khung Product Carousel từ body preview ra root để bao heading/intro (plan053).

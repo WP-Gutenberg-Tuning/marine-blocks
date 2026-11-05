@@ -3,23 +3,29 @@
 // not browser clipboard, menu, Undo or Save evidence.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { stripTypeScriptTypes } from 'node:module';
+import { stripTypeScriptTypes, createRequire } from 'node:module';
 import vm from 'node:vm';
 import test from 'node:test';
 
 const root = new URL( '../../wp-content/plugins/skvn-marine-blocks/', import.meta.url );
+const require = createRequire( new URL( 'package.json', root ) );
+const { JSDOM } = require( 'jsdom' );
+const { DOMParser } = new JSDOM( '' ).window;
 
 function executable( path ) {
 	const source = readFileSync( new URL( path, root ), 'utf8' )
 		// Drop top-level `import ... from '...';` (single or multi-line).
 		.replace( /^import[\s\S]*?;\r?\n/gm, '' )
+		.replace( /^export \{[^\n]+\} from[^\n]+\r?\n/gm, '' )
 		.replace( /^export\s/gm, '' );
 	return stripTypeScriptTypes( source );
 }
 
 const bundle = [
 	'src/core-controls/block-content/types.ts',
+	'src/core-controls/block-content/inline-html.ts',
 	'src/core-controls/block-content/fields.ts',
+	'src/core-controls/block-content/validation.ts',
 	'src/core-controls/block-content/plan.ts',
 ]
 	.map( executable )
@@ -27,7 +33,8 @@ const bundle = [
 
 const api = vm.runInNewContext(
 	bundle +
-		'\n({ buildProjection, buildPatches, contentSignature, countNodes, treeDepth, itemLimit, sanitizeInlineHtml, toPlainText, isSafeUrl, contentFieldSpecs, isSupportedRoot, isAllowedChild, MAX_NODES, MAX_DEPTH })'
+		'\n({ buildProjection, buildPatches, contentSignature, countNodes, treeDepth, itemLimit, sanitizeInlineHtml, toPlainText, isSafeUrl, contentFieldSpecs, isSupportedRoot, isAllowedChild, MAX_NODES, MAX_DEPTH })',
+	{ DOMParser }
 );
 
 const plain = ( value ) => JSON.parse( JSON.stringify( value ) );
@@ -413,7 +420,7 @@ test( 'rich text keeps semantic inline tags and removes inline presentation', ()
 	assert.equal( result.ok, true );
 	assert.match( result.value, /<strong>Bold<\/strong>/ );
 	assert.match( result.value, /<em>italic<\/em>/ );
-	assert.match( result.value, /<br \/>/ );
+	assert.match( result.value, /<br\s*\/?>/ );
 	assert.match( result.value, /<a href="https:\/\/example.test\/q" target="_blank" rel="sponsored noopener noreferrer">link<\/a>/ );
 
 	const styled = api.sanitizeInlineHtml( '<strong style="color:red">Bold</strong>' );
@@ -421,20 +428,41 @@ test( 'rich text keeps semantic inline tags and removes inline presentation', ()
 	assert.equal( styled.value, '<strong>Bold</strong>' );
 } );
 
-test( 'rich text rejects unsupported markup instead of stripping it silently', () => {
+test( 'rich text unwraps presentation spans but rejects meaningful unsupported markup', () => {
 	const span = api.sanitizeInlineHtml( '<span style="font-family:serif">text</span>' );
-	assert.equal( span.ok, false );
-	assert.equal( span.code, 'rich-text' );
+	assert.equal( span.ok, true );
+	assert.equal( span.value, 'text' );
 
 	const div = api.sanitizeInlineHtml( '<div>block</div>' );
 	assert.equal( div.ok, false );
 
 	const unbalanced = api.sanitizeInlineHtml( '<strong>open' );
-	assert.equal( unbalanced.ok, false );
-	assert.equal( unbalanced.detail, 'unclosed' );
+	// The HTML parser safely canonicalizes an omitted closing inline tag.
+	assert.equal( unbalanced.ok, true );
+	assert.equal( unbalanced.value, '<strong>open</strong>' );
 
 	const comment = api.sanitizeInlineHtml( '<!-- note -->text' );
 	assert.equal( comment.ok, false );
+} );
+
+test( 'Paste rejects bindings before they can be stripped from source content', () => {
+	const source = slider( [ block( 'skvn-marine/slide', {}, [
+		paragraph( 'Bound' ),
+	] ) ] );
+	source.innerBlocks[ 0 ].innerBlocks[ 0 ].attributes.metadata = {
+		bindings: { content: { source: 'core/post-meta', args: { key: 'example' } } },
+	};
+	const dest = slider( [ block( 'skvn-marine/slide', {}, [ paragraph( 'Target' ) ] ) ] );
+	assert.equal( api.buildPatches( source, dest, defaultsFor ).ok, false );
+} );
+
+test( 'Paste applies the same node/depth limits as Copy', () => {
+	const wide = block( 'skvn-marine/slide', {}, Array.from( { length: 201 }, () => paragraph( 'Text' ) ) );
+	assert.equal( api.buildPatches( wide, wide, defaultsFor ).code, 'limit' );
+	let nested = paragraph( 'Deep' );
+	for ( let i = 0; i < 20; i++ ) nested = block( 'core/group', {}, [ nested ] );
+	const deep = block( 'skvn-marine/slide', {}, [ nested ] );
+	assert.equal( api.buildPatches( deep, deep, defaultsFor ).code, 'limit' );
 } );
 
 test( 'link URLs are checked before any write', () => {

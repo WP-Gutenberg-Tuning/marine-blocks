@@ -1,5 +1,7 @@
 # Prompt — Block Content Actions / plan057
 
+**Repair update2026-11-05:** Human đã cho thực hiện057§19–24; R1–R4 có source sửa, execution ledger057§25 là checkpoint mới nhất. Agent tiếp theo đọc057§19–25, AP-08–10 và runbook R01–R06, tiếp tục từ source/evidence hiện có. Không hỏi lại scope/version/start hoặc tự claim runtime PASS. Prompt implementation bên dưới là lịch sử trước review, không phải lệnh viết lại feature từ đầu.
+
 Copy phần dưới sang agent coding. **Human đã duyệt scope/start/current1.3.19 và source commit ngày2026-11-05**, xem057§17. Thực hiện CODE_NOW sau technical preflight, không hỏi lại approval.
 
 ```text

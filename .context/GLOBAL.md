@@ -58,6 +58,8 @@ Planning snapshots live in `.context/planning/` and use a three-digit ordering p
 
 Active planning (root — load when task liên quan):
 
+Content Actions repair2026-11-05: human đã cho thực hiện057§19–24; R1–R4 có source repair (raw clipboard bindings, descendant permissions/modes/ownership, Paste limits, browser HTML parser/styled spans). Execution057§25: controller tests11/11 PASS phạm vi WP store/parser/clipboard mock + JSDOM HTML thật; model suite cần human chạy lại, build/lint/onsite chưa PASS. Đọc `.context/PITFALLS.md` AP-08–10 và runbook R01–R06; giữ current1.3.19/no bump, right-click058 Deferred.
+
 - `.context/planning/058_FUTURE_CANDIDATE_EDITOR_CONTEXT_MENU_AFTER_2_0.md` — human2026-11-05 tách right-click khỏi057, deferred sau khi qua2.0. Khi đó agent tổng hợp các tính năng đề xuất, trình human chốt mốc/SemVer/thứ tự; không tự gán2.0.1 hoặc implement. Giữ CCP-TECH03 Deferred.
 
 - `.context/planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md` — human2026-11-05 duyệt gói§11–14 và start coding+commit `feature patch:` trong current1.3.19 như scope addition, không bump; approval§17. Product/Post Collections + Slider/Slide; menu ⋮ từng block, exact type/shape, query/content/empty policies, giữ style, native projection clipboard, async revalidation/Undo. P0 API/version evidence và source/runtime acceptance chưa làm; không hỏi lại approval. Right-click058 Deferred sau2.0. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`, runbook `docs/testing/block-content-actions.md`.

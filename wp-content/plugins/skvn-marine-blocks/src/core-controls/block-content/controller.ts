@@ -13,6 +13,8 @@ import { store as noticesStore } from '@wordpress/notices';
 
 import { readClipboardText, writeClipboardText } from './clipboard';
 import { isSupportedRoot } from './fields';
+import { guardEditorTree, treeIdentity } from './editor-guard';
+import type { ContentEditor, EditorBlock } from './editor-guard';
 import {
 	buildPatches,
 	buildProjection,
@@ -25,21 +27,18 @@ import {
 	parseDocument,
 	serializeProjection,
 	toTree,
+	isSupportedName,
 } from './transport';
 import type { BlockPatch, ContentResult, TreeBlock } from './types';
 
-type WpBlock = {
-	clientId: string;
-	name: string;
-	attributes: Record< string, unknown >;
-	innerBlocks: WpBlock[];
-};
+type WpBlock = EditorBlock;
 
 type TargetInfo = {
 	ok: boolean;
 	reason?: string;
 	tree?: TreeBlock;
 	signature?: string;
+	identity?: string;
 };
 
 const TEXT_DOMAIN = 'skvn-marine-blocks';
@@ -76,53 +75,12 @@ export function hasContentActionsApi(): boolean {
 				typeof editor.getBlockEditingMode === 'function' &&
 				typeof editor.areInnerBlocksControlled === 'function' &&
 				typeof editor.canEditBlock === 'function' &&
+				typeof editor.getBlockParents === 'function' &&
 				typeof actions.updateBlockAttributes === 'function'
 		);
 	} catch {
 		return false;
 	}
-}
-
-function hasBindings( node: TreeBlock ): boolean {
-	const metadata = node.attributes?.metadata;
-
-	if ( metadata && typeof metadata === 'object' ) {
-		const bindings = ( metadata as { bindings?: unknown } ).bindings;
-
-		if (
-			bindings &&
-			typeof bindings === 'object' &&
-			Object.keys( bindings as Record< string, unknown > ).length > 0
-		) {
-			return true;
-		}
-	}
-
-	return ( node.innerBlocks || [] ).some( hasBindings );
-}
-
-function isControlled( clientId: string ): boolean {
-	const editor = select( blockEditorStore ) as unknown as {
-		areInnerBlocksControlled?: ( id: string ) => boolean;
-		getBlockParents?: ( id: string ) => string[];
-	};
-
-	if ( typeof editor.areInnerBlocksControlled !== 'function' ) {
-		return true;
-	}
-
-	if ( editor.areInnerBlocksControlled( clientId ) ) {
-		return true;
-	}
-
-	const parents =
-		typeof editor.getBlockParents === 'function'
-			? editor.getBlockParents( clientId )
-			: [];
-
-	return parents.some( ( parent ) =>
-		Boolean( editor.areInnerBlocksControlled?.( parent ) )
-	);
 }
 
 function getBlock( clientId: string ): WpBlock | undefined {
@@ -145,71 +103,16 @@ function readSource( clientId: string ): TargetInfo {
 		return { ok: false, reason: 'unsupported' };
 	}
 
-	const tree = toTree( block );
-
-	if ( hasBindings( tree ) ) {
-		return { ok: false, reason: 'binding' };
-	}
-
-	return { ok: true, tree };
+	const editor = select( blockEditorStore ) as unknown as ContentEditor;
+	const reason = guardEditorTree( block, editor, isSupportedName );
+	if ( reason ) return { ok: false, reason };
+	return { ok: true, tree: toTree( block ), identity: treeIdentity( block, editor ) };
 }
 
-/** Write view: used by Paste, which mutates the selected subtree. */
 function readTarget( clientId: string ): TargetInfo {
 	const source = readSource( clientId );
-
-	if ( ! source.ok || ! source.tree ) {
-		return source;
-	}
-
-	const editor = select( blockEditorStore ) as unknown as {
-		getBlockEditingMode: ( id: string ) => string;
-		canEditBlock: ( id: string ) => boolean;
-	};
-
-	if ( isControlled( clientId ) ) {
-		return { ok: false, reason: 'controlled' };
-	}
-
-	if ( editor.getBlockEditingMode( clientId ) !== 'default' ) {
-		return { ok: false, reason: 'mode' };
-	}
-
-	const block = getBlock( clientId );
-	const blocked = block ? subtreeLock( block, editor ) : 'missing';
-
-	if ( blocked ) {
-		return { ok: false, reason: blocked };
-	}
-
-	return {
-		ok: true,
-		tree: source.tree,
-		signature: contentSignature( source.tree, defaultsFor ),
-	};
-}
-
-/**
- * Paste writes attributes on nested nodes too, so every descendant must be
- * content-editable. `canEditBlock` covers preview mode and `lock.edit`.
- */
-function subtreeLock(
-	block: WpBlock,
-	editor: { canEditBlock: ( id: string ) => boolean }
-): string | null {
-	if ( ! editor.canEditBlock( block.clientId ) ) {
-		return 'locked';
-	}
-
-	for ( const child of block.innerBlocks || [] ) {
-		const blocked = subtreeLock( child, editor );
-
-		if ( blocked ) {
-			return blocked;
-		}
-	}
-
-	return null;
+	if ( ! source.ok || ! source.tree ) return source;
+	return { ...source, signature: contentSignature( source.tree, defaultsFor ) };
 }
 
 /** Path → clientId map for the selected root and its subtree. */
@@ -233,6 +136,8 @@ function clientIdsByPath( clientId: string ): Map< string, string > {
 
 function failureMessage( result: ContentResult< unknown > ): string {
 	switch ( result.code ) {
+		case 'binding':
+			return __( 'Bound content cannot be copied or pasted.', TEXT_DOMAIN );
 		case 'shape':
 			return __(
 				'The source and destination block structures do not match.',
@@ -266,6 +171,8 @@ function failureMessage( result: ContentResult< unknown > ): string {
 }
 
 function targetFailureMessage( reason?: string ): string {
+	if ( reason === 'limit' ) return failureMessage( { ok: false, code: 'limit' } );
+	if ( reason === 'binding' ) return failureMessage( { ok: false, code: 'binding' } );
 	if ( reason === 'locked' || reason === 'mode' || reason === 'controlled' ) {
 		return __( 'The selected block cannot be edited.', TEXT_DOMAIN );
 	}
@@ -352,7 +259,7 @@ export async function pasteBlockContent( clientId: string ): Promise< void > {
 	const parsed = parseDocument( text );
 
 	if ( ! parsed.ok || ! parsed.value ) {
-		notify( 'warning', __( 'No compatible block content found.', TEXT_DOMAIN ) );
+		notify( 'warning', failureMessage( parsed ) );
 		return;
 	}
 
@@ -361,6 +268,14 @@ export async function pasteBlockContent( clientId: string ): Promise< void > {
 			'warning',
 			__( 'Content cannot be pasted into this block type.', TEXT_DOMAIN )
 		);
+		return;
+	}
+
+	// Validate fields/shape before any taxonomy lookup. Rebuild with latest
+	// destination below, after await, so style-only edits are never restored.
+	const preview = buildPatches( parsed.value, initial.tree, defaultsFor );
+	if ( ! preview.ok ) {
+		notify( 'warning', failureMessage( preview ) );
 		return;
 	}
 
@@ -386,6 +301,7 @@ export async function pasteBlockContent( clientId: string ): Promise< void > {
 	if (
 		! current.ok ||
 		! current.tree ||
+		current.identity !== initial.identity ||
 		current.signature !== initial.signature
 	) {
 		notify(

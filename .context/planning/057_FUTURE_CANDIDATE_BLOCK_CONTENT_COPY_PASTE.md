@@ -341,3 +341,149 @@ Acceptance IDs (§14) — **trạng thái source, không phải PASS**:
 | CCP-UI02 | Chờ kiểm chứng | Save/reopen/frontend desktop/mobile |
 
 Không đánh dấu PASS, không nghiệm thu, không release từ ledger này.
+
+## 19. Review repair plan — 2026-11-05, baseline `0a53a2d`
+
+Human yêu cầu lập plan sửa chi tiết và ghi pitfall sau review. Đây là lỗi implementation/test coverage của coding agent, không phải thay đổi yêu cầu hoặc thiếu chỉ dẫn của human. §19–24 ưu tiên hơn nhận định đủ source/P5 xong ở §18 đối với bốn finding bên dưới. **Lượt này chỉ sửa docs; chưa sửa source, chưa commit repair, chưa build/lint hoặc nghiệm thu.** Giữ current V1 /1.3.19, scope addition đã duyệt tại §17, không bump/chuyển milestone. Không hỏi lại scope/version/start của feature; plan này không tự mở right-click058 hoặc đổi transport.
+
+### 19.1 Findings và evidence
+
+Các đường dẫn source trong §19–24 tương đối với `wp-content/plugins/skvn-marine-blocks/`, line là baseline `0a53a2d` (sẽ đổi sau repair).
+
+| ID / mức | Nhóm | Hành vi mong đợi | Hiện trạng | Việc cần sửa | Cách kiểm | Evidence |
+|---|---|---|---|---|---|---|
+| CCP-R1 / P1 | Technical | Clipboard nguồn có binding/entity/unsupported node phải reject toàn bộ trước projection/mutation | FAIL source | Validate cây nguồn thô, giữ metadata đến khi kiểm xong | Native Copy bound paragraph trong Slide rồi Paste: zero mutation | `transport.ts:117–123` chỉ kiểm registered/isValid; `controller.ts:86–101,150` chỉ kiểm binding của block đọc từ editor. Review fixture `buildPatches()` nhận nguồn bound vẫn trả patch content |
+| CCP-R2 / P1 | Technical + Editor UX | Root/ancestor/descendant đều phải có quyền và editing mode/entity ownership hợp lệ ở thời điểm ghi | FAIL source | Guard đầy đủ mọi node liên quan, dùng lại khi availability và sau await | Root default, child disabled/controlled/locked; zero mutation; thay guard trong lúc chờ cũng abort | `controller.ts:170–174` kiểm mode/controlled root; `:196–213` descendant chỉ gọi canEditBlock. Local WP7.1 `D:/Github/minhhaifish/wp-includes/js/dist/block-editor.js:15126` chỉ kiểm preview/lock.edit |
+| CCP-R3 / P2 | Technical | Copy lẫn Paste đều áp dụng 200 nodes/depth20 và text limit | FAIL source | Bounded traversal tại ingress và planner, không chỉ Copy | Boundary 200/201 nodes, depth20/21 và text limit | `plan.ts:284–309` không kiểm limits ở buildPatches. Review: 202-node tree Copy=false nhưng Paste=true/201 patches |
+| CCP-R4 / P2 | Editor UX + Technical | Rich text có font/color span vẫn copy được text/semantic markup, loại presentation | FAIL source | Thay scanner HTML tự viết bằng public parser/rich-text pipeline đã audit, phân biệt presentation với meaningful constructs | `<span style="color:red">Text <strong>bold</strong></span>` giữ Text/bold, không style; cả Copy content và native Copy | `fields.ts:19–31,355` reject span; test cũ cố định span phải fail, trái §11.3 |
+
+Block UI: không thêm visual/layout scope. CCP-UI02 vẫn phải kiểm content/link/media/style sau Save/reopen/frontend desktop/mobile vì Paste có thể thay dữ liệu được render. Menu grouping, one Undo/Redo, core image link coupling và actual serialize/parse từ plan gốc vẫn chưa được chứng minh; không coi review bốn finding này là chứng nhận phần còn lại.
+
+### 19.2 Mức bằng chứng hiện có
+
+- Hai tái hiện độc lập bằng Node `stripTypeScriptTypes` + VM trên `types/fields/plan.ts`: nguồn có `metadata.bindings.content` vẫn tạo patch; cây Slide +201 paragraphs Copy reject nhưng Paste tạo201 patches. Đây là model/source evidence, không phải clipboard/browser runtime.
+- Review runner `node --test tools/tests/block-content-copy.test.mjs` bị `spawn EPERM`; không coi là test logic fail hoặc PASS. Kết quả16/16 trong §18 là report phiên coding trước, không phải lần review chạy lại thành công.
+- R2 đã đối chiếu selector implementation local WP7.1; chưa tái hiện thao tác UI onsite. R4 được chứng minh bởi source và test hiện có; chưa có browser rich-text round-trip evidence.
+
+## 20. Thứ tự và thiết kế repair
+
+### G0 — Khóa baseline và tạo regression trước khi sửa
+
+1. Đọc protocol, §11–14/17/19–24 và `.context/PITFALLS.md` AP-08–10. Ghi HEAD/working tree; giữ nguyên build,056,GLOBAL/MILESTONES edits không thuộc repair. Không reset/clean hoặc stage toàn repo.
+2. Giữ16 tests cũ trừ expectation span sai phải thay có lý do. Thêm tests gọi đúng Paste controller/transport bằng dependency seams nhỏ, không sao chép logic guard vào test. Mocks chỉ mô phỏng clipboard/store/lookup; gọi production validator/controller thực.
+3. Chứng minh tests R1–R4 thất bại trên baseline hoặc lưu actual/expected nếu harness runtime chưa chạy được. Ghi tool/environment blocker chính xác, không retry command treo/timeout và không thay expected để tests xanh.
+4. Runtime/API preflight: local WP7.1 là evidence của local, onsite cần exact version riêng; `@wordpress/scripts ^30.6.0` không phải version Gutenberg. Không dùng API private hoặc âm thầm tăng minimum WP6.5. Nếu API public cần dùng thiếu trên runtime mục tiêu, báo dependency và giữ action fail-closed với lý do; không ship đường Paste bỏ guard.
+
+### G1 — Một contract validate source, áp dụng cho mọi ingress (R1)
+
+- Thêm validator cây dùng chung trong module block-content (có thể `validation.ts`), trả discriminated result/code/path; không side effect. Kiểm exact registered names/adapter/parent-child contract, invalid node, bound metadata, entity/controller references và limits trước khi projection bỏ metadata.
+- `parseDocument()` phải kiểm trên parsed blocks còn metadata/isValid, rồi mới chuyển sang TreeBlock/projection. Nếu `toTree()` bỏ `isValid`/metadata kiểm tra cần thiết thì đổi contract để validate trước, không cố tái dựng thông tin đã mất. Parser success/registered name không đồng nghĩa source an toàn.
+- Dùng contract tương ứng cho Copy từ editor và Paste từ native Copy. Bound node ở bất kỳ depth reject cả root; không strip bindings rồi coi nguồn hợp lệ. Full native Copy hợp lệ vẫn được lấy content allowlist; unknown style keys thông thường không tự làm payload invalid.
+- `buildPatches()` không được là bypass: validate cấu trúc/allowlist/limits của input mà nó chấp nhận. Entity ownership từ store chỉ có thể kiểm trên editor state; metadata/entity references từ payload phải kiểm tại transport, không giả lập clipboard có clientId/store ownership.
+- Toàn bộ source validation hoàn thành trước taxonomy lookup và trước mọi attribute write. Lỗi trả English+i18n notice phù hợp; không log payload/URL.
+
+### G2 — Guard đầy đủ quyền, mode và ownership (R2)
+
+- Viết hàm guard editor tree riêng, duyệt root, toàn bộ ancestors và descendants liên quan. Kiểm các public selectors đã audit: existence, canEditBlock, getBlockEditingMode, areInnerBlocksControlled; kiểm binding/invalid/registered state liên quan. Parent move/remove lock riêng vẫn cho content edit nếu public content permissions cho phép.
+- Policy bảo thủ theo plan gốc: chỉ editing mode đã audit là writable; `disabled` reject, không tự mở contentOnly hoặc bypass controlled entities. Không coi canEditBlock là tổng hợp mọi permission/mode/ownership.
+- Dùng guard cho availability và chạy lại sau tất cả await ngay trước mutation; cached enabled state không cho phép ghi. Capture snapshot content/shape và mapping clientIds; nếu target bị thay/xóa/reparent hoặc permission/ownership thay đổi thì abort. Không dùng global selection mù quáng cho menu List View có target khác selection; kiểm menu target đúng hợp đồng runtime.
+- Style-only change giữ giá trị mới nhất; content change abort. Không cầm attrs đầy đủ cũ để restore sau await. Copy cũng áp dụng eligibility/ownership policy đã chốt, không biến readSource thành đường vòng qua scope forbidden.
+- Zero mutations trên mọi rejection; giữ một public multi-block action cho paste thành công. Không partial write, không private history flags hoặc rollback bằng replaceBlocks.
+
+### G3 — Limits trước mọi recursion không giới hạn (R3)
+
+- Kiểm text limit trước parse; giữ semantics hiện hành của hằng số text limit và ghi rõ byte hay JS string units trong runbook. Không claim byte limit nếu chỉ đo string.length; không đổi threshold âm thầm trong repair.
+- Sau parse, chạy iterative hoặc bounded traversal kiểm <=200 nodes và depth<=20 (root depth1), stop ngay ở node201/depth21. Không countNodes/treeDepth/toTree recurse toàn bộ rồi mới reject. Parser nội bộ vẫn có chi phí riêng; guard này không được mô tả là chặn mọi parser DoS.
+- Dùng bounded validation trước Copy projection, trước Paste mapping/signature/shape recursion và trong planner public entry. Cùng giá trị giới hạn ở một owner, không duplicate số trong controller/test.
+- Chặn source hoặc destination vượt giới hạn trước taxonomy requests và dispatch; trả notice size/limit khác mismatch. Kiểm đầu vào và sau awaited state refresh vì cây đích có thể lớn lên trong thời gian chờ.
+
+### G4 — Rich-text policy đúng spec (R4)
+
+- Bỏ `scanInlineMarkup`/regex attribute parser làm HTML sanitizer. Audit public `@wordpress/rich-text` và HTML APIs thực tế: local `rich-text.js` có create/toHTMLString/removeFormat; sự tồn tại export chưa chứng minh đủ policy hoặc minimum compatibility. Không thêm dependency package để né audit; imports WordPress externals theo pipeline hiện hành.
+- Pipeline: parse HTML bằng API public phù hợp → nhận diện supported semantic formats/link và presentation-only wrappers → loại font/color/class/style/data/event presentation → serialize semantic content. Không dùng regex strip HTML/innerHTML injection, không mutate source hoặc registry formats toàn editor.
+- Span chỉ mang presentation được unwrap và giữ children/text/order; nested strong/em/link/br phải còn ý nghĩa. Unsupported meaningful nodes như embed/image trong inline, binding semantics hoặc construct không giữ được thì reject toàn payload. Không unwrap mọi unknown node và làm mất dữ liệu âm thầm.
+- Kiểm URLs sau HTML entity decoding theo parser; chỉ safe scheme/relative policies đã audit, safe target/rel; giữ ký tự `<`, `&`, dấu nháy, Unicode và line breaks đúng nghĩa. Không double encode hoặc nối words khi flatten heading/br. Không tự thay policy của PHP renderer.
+- Với fixture màu/font, cả Copy projection → serialize → parse → Paste và native Copy → Paste đều giữ semantic content, không source style. Nếu API public chưa đủ chứng minh policy, ghi technical blocker cụ thể; không đổi requirement thành reject mọi styled span và coi xong.
+
+### G5 — Review tích hợp và cập nhật evidence
+
+- Test production call path controller/transport + validator, không chỉ helper. Mỗi reject assert mutation count0, taxonomy không chạy nếu payload invalid, target attrs/history không đổi; mỗi success assert chỉ allowlisted diff, đúng target, một mutation.
+- Actual Gutenberg parser/serializer fixtures chạy trong môi trường có registered plugin/core block types; test stubs không thay round-trip thật. Core schema defaults/empty overwrite, image link coupling, same type/shape, mixed semantic spans phải kiểm lại.
+- Human chạy build/lint theo runbook; agent không chạy qua tool. Onsite T01–T11 + R01–R04 bên dưới, prior edit → paste → Undo/Redo và Save/reopen/frontend. Không deploy/publish hoặc coi source repair là runtime PASS.
+- Khi implementation được thực hiện: ghi source commit, tests/environment/limitations theo từng ID; chỉ commit files repair được giao, không build người khác. Lượt lập plan này không commit source và không cấp release approval.
+
+## 21. Files và thứ tự thay đổi dự kiến
+
+| File | Mục tiêu |
+|---|---|
+| `src/core-controls/block-content/types.ts` | Kết quả validation/code/path, giữ raw metadata/validity cần thiết |
+| `src/core-controls/block-content/validation.ts` (nếu tách) | Bounded source/tree validation, adapter/shape contract dùng chung |
+| `src/core-controls/block-content/transport.ts` | Raw parsed-node validation trước toTree/projection; actual round-trip |
+| `src/core-controls/block-content/plan.ts` | Enforce input contract/limits, không bypass qua buildPatches; giữ empty/no-op/style semantics |
+| `src/core-controls/block-content/controller.ts` | Guard root/ancestors/descendants, after-await revalidation trước single dispatch |
+| `src/core-controls/block-content/fields.ts` hoặc module rich-text nhỏ | Public parser/rich-text pipeline, bỏ scanner tự viết; span presentation policy |
+| `src/core-controls/block-content/index.tsx` | Chỉ sửa nếu cần nối availability/error contract; giữ menu ⋮ và existing gate |
+| `tools/tests/block-content-copy.test.mjs` + focused integration harness nếu cần | Regression model + production controller/transport paths, boundary/mixed formatting |
+| Runbook / plan057 / module context | Evidence/status đúng từng R-ID và acceptance gốc |
+
+Không đổi attributes/block.json/save markup, query engine, PHP renderers, namespace, options/default gate, frontend assets/CSS, theme hoặc utility clipboard cũ để vá những lỗi trên.
+
+## 22. Regression matrix bắt buộc
+
+| ID | Fixture và thao tác | Expected / evidence |
+|---|---|---|
+| R01a / CCP-R1 | Native Copy Slide có paragraph bound ở depth>=2; Copy content từ cây này | Cả hai reject trước write; attrs diff rỗng; không mất binding nguồn |
+| R01b / CCP-R1 | Entity/unknown/invalid nested node; hợp lệ nhưng source style khác target | Forbidden reject toàn bộ; case valid chỉ content đổi; không false reject vì style |
+| R02a / CCP-R2 | Root default + child disabled/controlled; ancestor disabled/controlled; child content lock | Zero mutation cho từng case; kiểm mode/ownership thực trên version onsite |
+| R02b / CCP-R2 | Trong clipboard/taxonomy await, đổi child mode/ownership, xóa/thay node hoặc reparent target | Abort và notice; không viết vào node mới; style-only update giữ |
+| R02c / CCP-R2 | Chỉ lock move/remove; List View menu target khác global selection | Vẫn edit content nếu API cho phép; đúng menu target hoặc abort rõ |
+| R03a / CCP-R3 | Source/dest 200 và201 nodes; depth20 và21; root depth1 | Trong giới hạn hợp lệ; vượt reject trước unbounded traversal/lookup/write; Copy và Paste cùng policy |
+| R03b / CCP-R3 | Text đúng limit và vượt1 unit; cây lớn thêm sau await | Size/limit notice, zero write; ghi rõ unit đo; không log clipboard |
+| R04a / CCP-R4 | Plain, colored/font spans, nested spans + strong/em/a/br, Unicode/entities | Giữ nghĩa/text/order/link; không font/color/class/style; Copy content lẫn native Copy |
+| R04b / CCP-R4 | Unsafe/encoded URL, malformed/unsupported meaningful HTML | Reject toàn root; không source-style leak; không silent data loss |
+| R05 / CCP-TECH04/06 | Real serialize/parse; empty/default/zero; content identical; prior edit rồi multi-node paste | Empty overwrite, no-op0mutation/history, một Undo/Redo giữ edit trước, giữ style latest |
+| R06 / CCP-UI02 | Save draft/reopen rồi preview desktop/mobile cùng fixture R04 | Text/link/media đúng, layout/style đích giữ, không recovery prompt; screenshot/console evidence |
+
+Harness unit/mock chỉ chứng minh logic/call ordering; R05 history và R06 phải có runtime evidence. Nếu thiếu API/site fixture, ghi Chờ kiểm chứng hoặc blocker, không PASS bằng test source grep.
+
+## 23. Acceptance và tiêu chí đóng repair
+
+- CCP-R1–R4 hiện **FAIL source**, repair **Chưa làm**. Mapping: R1/R2→CCP-TECH05/06; R3→CCP-TECH04/05; R4→CCP-TECH04 và Editor UX; R05/R06 giữ CCP-UX03/06, CCP-UI02. Không xóa hoặc đổi PASS lịch sử của scope khác.
+- Đóng source repair khi regression ban đầu fail và sau sửa pass, production ingress/controller path được kiểm, self-review không còn bypass; source commit và evidence ledger được ghi. Vẫn ghi runtime Chờ kiểm chứng nếu human chưa test.
+- Nghiệm thu đầy đủ khi human build/lint + onsite evidence đủ theo IDs. Không tự đóng1.3.19 hoặc nghiệm thu toàn Content Actions chỉ vì bốn finding được sửa.
+
+## 24. Pitfall và bàn giao
+
+Agent tiếp theo phải đọc `.context/PITFALLS.md` AP-08–10 trước repair. Không viết lại feature từ đầu theo prompt implementation cũ; sửa baseline `0a53a2d` theo G0→G5, giữ policies057§11–14/17. User request hiện tại là **plan + pitfall**, không phải lệnh sửa source trong lượt docs này. Khi được giao repair, dùng scope/version authorization hiện có, không hỏi lại quyết định sản phẩm đã chốt.
+
+## 25. Repair execution — human start2026-11-05
+
+Human tiếp tục: **“Thực hiện luôn theo plan”**. §19–24 giữ làm spec/history; các câu chỉ docs/chưa sửa source là checkpoint trước start này. Giữ current1.3.19/no bump. Source sửa trên `0a53a2d`, chưa build/lint/onsite/release.
+
+### Source và evidence
+
+| ID | Source repair | Evidence và giới hạn |
+|---|---|---|
+| CCP-R1 | `validation.ts` kiểm raw bindings/isValid/allowed parent-child/registration trước `toTree`; transport, Copy và planner đều áp dụng contract | Controller test native bound source reject trước lookup/write; vẫn cần native Gutenberg parser fixture onsite |
+| CCP-R2 | `editor-guard.ts` kiểm root/ancestors/descendants canEdit/mode/controlled/bound/valid; Copy/Paste cùng guard; snapshot parent chain + child clientIds và content, recheck sau await | Test ancestor/child disabled/controlled/locked, state changes trong cả clipboard/taxonomy await, replacement/reparent abort; style latest được giữ. Runtime selectors/Undo vẫn chờ onsite |
+| CCP-R3 | Iterative bounded validation trước projection/mapping/shape recursion; planner kiểm source và target; text guard trước parse | Boundary200/201nodes,depth20/21; cây tăng sau await abort; text1048576 UTF-16 code units, không claim bytes. Không claim bảo vệ chi phí parser nội bộ |
+| CCP-R4 | `inline-html.ts` dùng public browser DOMParser + DOM construction/serialization, bỏ scanner/regex HTML; styled span unwrap, semantic/link/br giữ; unknown meaningful nodes/bound markers/comments/head content reject | JSDOM20.0.3 từ dependency tree hiện có: mixed Unicode/entities, encoded unsafe links, Copy/Paste style stripping, heading newline. Không thêm dependency hoặc mutate global WP format registry |
+
+**HTML API rationale:** chọn public browser HTML API thay phụ thuộc global WordPress registered format types; parser không được coi là sanitizer. Code dựng cây mới chỉ chứa semantic tags/text/safe attrs rồi đọc serialization; không insert raw parsed nodes vào editor, không gán innerHTML nguồn. [DOMParser docs](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString) mô tả separate document, scripts inert nhưng có thể có resource requests và không an toàn nếu chuyển raw nodes vào live document; [innerHTML getter](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) chỉ serialize descendants. Không claim parse không network hoặc tự loại XSS. Missing DOMParser/Trusted Types refusal trả failure. API browser độc lập WordPress major, không bump Requires WP6.5; actual onsite/browser/CSP vẫn cần kiểm.
+
+Browser HTML parser canonicalizes benign omitted inline closing tags (`<strong>open` → `<strong>open</strong>`); không giữ scanner cũ chỉ để bắt unbalanced string. Unsupported meaningful DOM constructs vẫn reject. `<br>` và `<br />` là cùng break; tests kiểm semantics, không khóa spelling serializer cũ. Điều này làm rõ “malformed” R04: không nhận unsafe/unsupported meaning, không tự implement strict HTML grammar validator. Heading flatten dùng decoded text, br→newline, tránh nối words/double encode.
+
+### Tests đã chạy
+
+- G0: thêm regression vào test model, chạy trực tiếp `node tools/tests/block-content-copy.test.mjs`: **15/18 PASS,3 FAIL đúng baseline** (bound source, Paste limits, styled span). Đây là evidence trước repair.
+- Lần tiếp theo của model test sau thay parser mất hơn thời gian quan sát không output; agent gửi stop theo protocol, tool trả process đã kết thúc **14/18 PASS,4 FAIL**: root failure code, missing error detail, br spelling, comment ngoài body. Source/test sửa bốn chỗ này; **không retry command này**, bàn giao human chạy lại. Không claim18/18 PASS.
+- `node tools/tests/block-content-controller.test.mjs`: **11/11 PASS** sau sửa. Chạy production validator/transport/controller với WP store, Gutenberg parse/serialize và clipboard **mocked**; HTML DOMParser dùng JSDOM thật. Bao gồm raw forbidden source, ancestor/descendant guard, state race/reparent/replacement, bounded limits, one mutation/no-op/empty/multi-node/style latest, styled span semantic/link/entity và RichTextData cases. Không chứng minh browser clipboard, real Gutenberg round-trip hoặc actual Undo.
+- TypeScript `transpileModule` syntax check tất cả11 TS/TSX block-content files PASS trước vòng test cuối; không phải full typecheck/build/lint. Không chạy build/lint/WSL.
+
+### Status bàn giao
+
+R1–R4: **Đã có source repair**, regression controller PASS phạm vi mock nêu trên; model suite chạy lại, real Gutenberg round-trip/permissions/Undo/menu/Save-reopen và frontend vẫn **Chờ kiểm chứng**. Baseline FAIL record không xóa; không đổi toàn acceptance thành PASS. G5 source self-review có evidence; runtime acceptance chưa đóng.
+
+Human chạy model test (Node có `stripTypeScriptTypes`, như Node24 phiên coding), build/lint theo runbook, rồi T01–T11 và R01–R06 trên draft/private fixtures. Gửi exact WP/Gutenberg/browser versions, edit/preview URLs, output và attr/video evidence. Không publish/deploy tự động. Commit prefix theo scope authorization057§17: `feature patch: repair block content actions validation`.
+
+Compatibility self-review: local WP7.1 `blocks.js:2040–2057` cho thấy core rich-text attrs là `RichTextData`, không luôn string. Transport dùng public export `RichTextData.toHTMLString()` sau raw validation, không coerce arbitrary objects. Runtime cũ chưa có export giữ đường string; không tăng minimum WP. Regression thứ11 kiểm production transport/controller bằng class mock; actual core schema round-trip và asset dependency wp-rich-text vẫn cần human build/onsite.
