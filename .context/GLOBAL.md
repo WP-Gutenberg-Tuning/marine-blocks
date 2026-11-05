@@ -58,6 +58,10 @@ Planning snapshots live in `.context/planning/` and use a three-digit ordering p
 
 Active planning (root — load when task liên quan):
 
+- `.context/planning/058_FUTURE_CANDIDATE_EDITOR_CONTEXT_MENU_AFTER_2_0.md` — human2026-11-05 tách right-click khỏi057, deferred sau khi qua2.0. Khi đó agent tổng hợp các tính năng đề xuất, trình human chốt mốc/SemVer/thứ tự; không tự gán2.0.1 hoặc implement. Giữ CCP-TECH03 Deferred.
+
+- `.context/planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md` — human2026-11-05 chốt Content actions trong menu ⋮ từng block trước, right-click tách058. Research + execution proposal§10–16 có public API/version gate, allowlist, nested shape, projection clipboard, async validation/Undo, P0–P5 và acceptance. Product policies/SemVer/start còn chờ duyệt; không code/bump. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`, runbook `docs/testing/block-content-actions.md`. Human cho commit docs.
+
 - `.context/planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md` — human2026-11-05 duyệt implementation+commit trong current1.3.19. Responsive Spacer static có source: mint frame, centered indicator padding=min(H,200)/2, frontend H không cap; breakpoint768/1024, default30, inherit/reset/zero. 13 Node tests PASS (5 Spacer +8 frame mô phỏng), chưa human build/lint/onsite; runbook `docs/testing/responsive-spacer-1.3.19.md`.
 
 UI asset pitfall bắt buộc tham khảo khi đổi visual owner/bundle: `.context/PITFALLS.md` AP-06/AP-07 và `docs/debug-casebook/gutenberg/008_EDITOR_FRAME_CSS_EXTRACTED_NOT_ENQUEUED.md`; CSS tồn tại trong build không chứng minh editor đã nạp. Root frame053 từng mất màu/viền vì extraction/enqueue mismatch, source fix có nhưng onsite chưa xác nhận.

@@ -33,6 +33,10 @@ Cập nhật 2026-11-04: đoạn trên là checkpoint planning cũ; plan 046 đ�
 
 Execution update 2026-11-04 (UX hotfix 046): human đã yêu cầu bắt đầu, cung cấp DOM `https://minhhaifishery.com/home/`. §11 execution record có source rèm Smooth opt-in 750ms/main Hero ready/fallback1500, pre-init Hero, gate autoplay và vá step1/show-after0. 8 lifecycle VM tests PASS; build/lint và onsite LDR-01–09 chưa kiểm chứng. Snapshot Smooth onsite=false; không tự đổi options. Giữ skeleton/debt/current/version; chưa commit/deploy. Snapshot planning ở phần UX hotfix phía trên là lịch sử, không còn là gate implementation; không mở scope Editor UX 045.
 
+### Review sau khi qua2.0 — feature proposals và Editor Context Menu (2026-11-05)
+
+Human tách Content actions thành hai plan: [057](planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md) dùng menu ⋮ sẵn có của từng block, ưu tiên trước (SemVer/start TBD); [058](planning/058_FUTURE_CANDIDATE_EDITOR_CONTEXT_MENU_AFTER_2_0.md) right-click **Deferred sau khi qua2.0**. Khi đạt trigger này, agent phải tổng hợp các tính năng đề xuất đang chờ rồi trình human chốt scope/SemVer/thứ tự thực hiện. Không coi vừa bắt đầu2.0 là đã qua2.0; không tự gán2.0.1/2.1.0 hoặc start. Giữ CCP-TECH03 ở058, không mất acceptance. Update2026-11-05: human yêu cầu và cho commit research/plan/handoff docs;057§10–16 có proposal P0–P5, API/version gate, acceptance và memo scope/start còn mở. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`; runbook `docs/testing/block-content-actions.md`. Không đổi current/bump hoặc thêm057 vào1.3.19 khi chưa được human duyệt riêng.
+
 ### Follow-up đã lưu cho 2.0.0 — GP layout dependency (2026-11-04)
 
 Mục tiêu human bổ sung: **không phải chỉnh sửa thủ công toàn site khi migrate khỏi GeneratePress**. GP-LAYOUT-02 trong plan 013/runbook yêu cầu compatibility/mapping cho content và settings cũ, không cần resave từng page/post; nếu cần data migration phải có dry-run/report, chạy lại an toàn và rollback. Kiểm inventory URL/fixtures trên staging clone; mọi ngoại lệ cần báo trước cutover. Theo dõi từ 2.0.0 tới standalone gate 3.0.0; không tự cho phép rewrite dữ liệu hoặc thay current.
