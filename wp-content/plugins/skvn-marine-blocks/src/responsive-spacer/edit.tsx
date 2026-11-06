@@ -1,21 +1,30 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useEditorPreviewFrame } from '../shared/editor-preview-frame';
 import { deviceLabels, SpacerControls, type SpacerControlsProps } from './controls';
 import { isValidHeight, previewPadding, resolveHeights, type SpacerDevice } from './model';
 import { useCanvasDevice } from './viewport';
+import '../shared/editor-preview-frame/style.css';
 import './editor/style.css';
 
+const deviceEmoji: Record< SpacerDevice, string > = {
+	desktop: '🖥️',
+	tablet: '📟',
+	mobile: '📱',
+};
+
 export function Edit( props: SpacerControlsProps ) {
-	const ref = useEditorPreviewFrame();
+	// Static editor chrome spacing: no geometry observers for this utility.
+	const ref = useRef< HTMLDivElement >( null );
 	const device = useCanvasDevice( ref );
 	const heights = resolveHeights( props.attributes );
 	const height = heights[ device ];
 	const labels = deviceLabels();
 	const blockProps = useBlockProps( {
 		ref,
-		className: 'skvn-editor-preview-frame skvn-editor-preview-frame--spacer',
+		// Editor-only alignment; save() keeps the original decorative spacer.
+		className: 'alignfull skvn-editor-preview-frame skvn-editor-preview-frame--spacer',
 	} );
 	return <>
 		<InspectorControls>
@@ -29,6 +38,7 @@ export function Edit( props: SpacerControlsProps ) {
 				{ ( [ 'desktop', 'tablet', 'mobile' ] as SpacerDevice[] ).map( ( tier ) => {
 					const inherited = tier !== 'desktop' && ! isValidHeight( props.attributes[ `${ tier }Height` ] );
 					return <span key={ tier } className={ tier === device ? 'skvn-spacer-preview__current' : undefined } aria-current={ tier === device ? 'true' : undefined }>
+						<span aria-hidden="true">{ deviceEmoji[ tier ] } </span>
 						{ labels[ tier ] }: { heights[ tier ] }px{ inherited ? ` (${ __( 'inherited', 'skvn-marine-blocks' ) })` : '' }
 					</span>;
 				} ) }

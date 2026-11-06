@@ -129,3 +129,19 @@ source /home/shinkuro/.nvm/nvm.sh && nvm use 20 && cd /mnt/d/Github/skvn-marine/
 Registry PHP đã đổi description nên lệnh lint trên bao phủ `modules/core-control/registry.php`. Command treo/timeout thì dừng ngay, không retry/poll.
 
 Human gửi lại: build/lint output, exact versions/URLs, T01/T02/T05/T11 video/ảnh trước sau, cases fail và console notes. Agent tiếp tục debug từ evidence, không yêu cầu làm lại toàn bộ cases đã có evidence đủ.
+
+## 8. Menu placement / style follow-up — CCP-MENU01–05
+
+Spec/decision: plan057§28–30 (2026-11-06). **Đã có source alignment/style**, chưa build/onsite: bỏ MenuGroup lồng, dùng labelled group không thêm padding ngang; heading Marine Blocks có style editor-only qua handle `skvn-block-content-actions-editor` khi gate bật. Vị trí vẫn ở Slot native sau Visibility/Hide trên local WP7.1; CCP-MENU02 chưa đạt, không coi đây là fallback đã human duyệt. Screenshot ban đầu là baseline FAIL, chưa có ảnh sau sửa. Target dùng draft/private edit URL của§4; chưa có URL cụ thể, human cung cấp khi onsite, không publish fixture.
+
+Preconditions: ghi build/commit + WP/Gutenberg/browser/OS versions; build/lint thành công, assets đúng build. Gate on; fixture có Product/Post Collections và Slider/Slide. Kiểm gate off sau cùng; không đổi production settings ngoài fixture được cho phép.
+
+1. Mở ⋮ từng root hỗ trợ: một nhóm giữa nhóm nội dung (sau Add note nếu có) và Group/nhóm cấu trúc; heading `Marine Blocks`, đúng hai action. Nếu insertion point khác target thì CCP-MENU02 FAIL, dù style đúng. Chụp toàn menu và ghi native items đang ẩn.
+2. So với Copy/Group native: hai custom actions cùng cột chữ và hit area, không thêm inset như submenu. Ghi computed padding/margin + bounding rect khi debug; ảnh trước/sau cùng viewport. Heading nền#F0F9FF/chữ#075985,12px/600 trong normal mode; native item hover/focus/disabled không bị recolor.
+3. Dùng keyboard mở/di chuyển/activate/đóng menu (Tab/arrows/Enter/Escape theo native menu), rồi mouse và touch viewport390px: heading không nhận focus/click; focus order trùng thứ tự nhìn thấy, Escape trả focus đúng trigger, không mất/cắt focus ring. Kiểm zoom200% và forced-colors: chữ đọc được, không overflow, separators/label vẫn phân biệt nhóm.
+4. Kiểm List View/menu target, unsupported block, multi-select, disabled/locked mode và gate off/reload: không thao tác nhầm global selection, không duplicate items/heading hoặc separator rỗng. Menu native và plugin khác vẫn dùng được.
+5. Smoke T02/T05: paste giữ style, empty overwrite, no-op không history, một Undo/Redo cho paste. Không có shortcut hint mới; thử Ctrl+C/V khi nhập text vẫn native. Shortcut content actions Deferred, không test một phím chưa triển khai như tính năng đã có.
+
+Evidence: edit URL riêng tư + build/versions/viewport, full-menu screenshots (normal/narrow/forced-colors), keyboard video, DOM/style notes nếu inset còn, notices/console và kết quả mỗi CCP-MENU ID. PASS khi đạt expected trong đúng environment; thiếu evidence ghi Chờ kiểm chứng, không bỏ FAIL vị trí bằng workaround thị giác. G0 API feasibility thuộc agent research trước source repair, không yêu cầu human chứng minh API.
+
+Source check2026-11-06: TSX transpile syntax PASS, không full typecheck/build. PHP/CSS chưa lint/browser. Không đổi handlers/guards/controller nên không rerun model/controller chỉ vì wrapper/style. Gate off/reload phải không có inline style handle trên editor; gate on handle phải nằm trong chrome document. So ancestor native `.components-menu-group` (local padding8px) với custom group (không thêm inset); native/custom buttons cần cùng x/width. Kiểm group đứng đầu/cuối/giữa native/plugin items để không có separator trùng; border nội bộ chỉ khi có sibling tương ứng, outer group giữ separator native.

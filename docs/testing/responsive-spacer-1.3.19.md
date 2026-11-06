@@ -45,6 +45,8 @@ Sau build, kiểm `build/responsive-spacer/block.json`, selector `.skvn-editor-p
 
 ## Evidence human gửi lại
 
+Follow-up2026-11-06 — preview chrome (055§13), source chưa nghiệm thu: dùng draft Home trong screenshot human; ghi exact edit URL/build/WP/browser khi test. Sau build/reload kiểm frame mở theo root canvas như khung Category, margin trên/dưới10px, không dính Slider/Heading; nhãn 🖥️/📟/📱, screen reader chỉ đọc text. Đo computed margins/frame-parent rect/scrollWidth-clientWidth tại desktop có scrollbar,390px,zoom200%; frame không vượt parent. Kiểm Group/Columns hẹp, hai Spacer, parent gap0/24 (có thể cộng thêm, không hứa tổng10px). Switch device/đổiH0/60/200/400, Undo/save/reopen: indicator/cap giữ đúng, frontend H/saved markup không đổi, không invalid-block. Gửi ảnh trước/sau + rect/styles/console. Editor lag chưa chẩn đoán, không dùng lượt này claim đã fix lag.
+
 - URL/post ID, build/commit, WP/browser/theme, viewport actual widths.
 - Screenshot frame mint Desktop/Tablet/Mobile, H0/200/400, canvas320px và selected focus.
 - Video ngắn inheritance/reset/Undo/save-reopen; console notes và lỗi invalid-block nếu có.

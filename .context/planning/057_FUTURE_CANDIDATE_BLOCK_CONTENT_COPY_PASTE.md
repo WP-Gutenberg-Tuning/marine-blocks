@@ -497,3 +497,149 @@ Human gửi output chạy model suite sau commit repair `8ee4a3f`: Node **24.16.
 ## 27. Product documentation / sale point — 2026-11-06
 
 Human xác nhận feature này là một trong các sale points, yêu cầu doc và tổng hợp trước, trình bày sau vào giai đoạn marketplace. Đã lưu brief SP-01 trong [marketplace selling points register](../../docs/product/marketplace-selling-points.md): problem/value, workflow, supported types/shape, scope limits, evidence và các bước còn cần trước public claim. Đây là tổng hợp nội bộ, chưa phải listing/copy/visual marketing hoặc release approval. Technical discussions/spec vẫn cập nhật tại057; register dẫn về đây, không là spec song song. Không đổi current1.3.19 hoặc launch gate sau1.5.x; chưa chọn marketplace/date/public version.
+
+## 28. Menu placement / indentation feedback — 2026-11-06 (docs only)
+
+Human yêu cầu ghi nhận và phản biện, **chưa code**. Screenshot `codex-clipboard-2154b6a1-2735-47d3-b13b-41085e921e07.png` trong chat: heading CONTENT ACTIONS và hai actions thụt vào so với native items; nhóm xuất hiện sau Hide, trước Create pattern. Không suy build/commit hoặc version onsite từ ảnh; phiên bản local bên dưới chỉ là source đối chiếu.
+
+### State delta và evidence
+
+- State A mong muốn: hai action cùng cột chữ, cùng bề rộng vùng tương tác với native items; một nhóm riêng giữa Add note và Group, separator trên/dưới.
+- State B quan sát: nhãn/actions có thêm inset, nằm trong đoạn Group / Lock / Rename / Hide. Vị trí này làm yếu liên hệ với nhóm Copy / Cut / Duplicate và có thể bị hiểu là cấp con.
+- Plugin `src/core-controls/block-content/index.tsx`, `ContentActionsMenuItems`: trả một `MenuGroup` có label, bên trong Fill `BlockSettingsMenuControls`.
+- Local WordPress7.1 `D:/Github/minhhaifish/wp-includes/js/dist/block-editor.js:58344–58380`: Slot đã render một `MenuGroup`, thứ tự ConvertToGroup → Lock → Rename → Visibility → fills → BlockModeToggle. Đây là bằng chứng nested group và vị trí fills trong bản local; **nguyên nhân CSS inset còn cần DOM/computed styles onsite để prove**. Không khẳng định thiếu một prop hoặc đổi priority là chuyển được lên trước Group; source đường hiện tại đặt toàn bộ fills sau Visibility.
+
+### Phản biện đề xuất của human
+
+Đề xuất vị trí sau Add note / trước Group hợp lý về phân nhóm: kết thúc thao tác nội dung rồi mới đến tổ chức/cấu trúc block. Hai separators làm ranh giới dễ đọc và tên Marine Blocks giúp phân biệt với native Copy. Đây là **UX target đề xuất**, chưa phải cam kết khả thi qua public API đang dùng.
+
+Điểm cần cân nhắc:
+
+1. Heading `Content action (Marine blocks)` dài, dễ xuống dòng trong menu hẹp; dùng plural `Content actions` cho hai lệnh, brand viết đúng `Marine Blocks`. Đề xuất heading ngắn `Marine Blocks`, giữ hai action rõ nghĩa bên dưới; phương án đầy đủ `Content actions (Marine Blocks)` chỉ chọn nếu kiểm menu hẹp vẫn gọn.
+2. Native Copy đã ở trên; `Copy content` cần phân biệt bằng grouping và phản hồi thành công/error. Không thêm một hàng submenu chỉ để giảm chiều cao: tăng bước thao tác. Heading là nhãn không tương tác, không nhận keyboard focus.
+3. Không cố định vị trí bằng CSS order, dịch chuyển DOM, patch core hoặc dựa vào chữ Add note/Group: có thể lệch keyboard order, biến mất theo quyền/mode/version, hoặc lỗi bản dịch. Trước implementation phải nghiên cứu public extension point đúng runtime/versions hỗ trợ. Nếu không có cách an toàn, trình bày giới hạn và phương án giữ insertion point native nhưng sửa alignment; không âm thầm coi đó là đạt target trước Group.
+4. Separator/spacing có đúng một owner; tránh lồng thêm MenuGroup chỉ để có label/separator. Sửa alignment phải giữ toàn bộ chiều rộng hit area/focus ring và thứ tự focus theo thứ tự nhìn thấy. Chưa chọn implementation cụ thể trong lượt này.
+
+Đề xuất hình thức (chưa human duyệt):
+
+```text
+Add note
+────────────────────────────
+MARINE BLOCKS                 ← heading, không click
+Copy content
+Paste content only
+────────────────────────────
+Group
+```
+
+### Acceptance / follow-up
+
+| ID | Nhóm | Mong đợi / hiện trạng / việc tiếp theo | Cách kiểm / evidence | Status |
+|---|---|---|---|---|
+| CCP-MENU01 | Editor UX | Nhãn và hai actions không inset như cấp con; hiện screenshot lệch | DOM/computed padding của native item và plugin item; ảnh cùng viewport, focus ring/hit area | FAIL theo human screenshot; chưa sửa |
+| CCP-MENU02 | Editor UX + Technical | Nhóm độc lập sau nhóm nội dung, trước Group là target; hiện Fill sau Hide | Research extension API theo actual WP/Gutenberg versions; kiểm mode/quyền và native items ẩn; ghi rõ khả thi/giới hạn trước coding | Chưa làm research đầy đủ; chưa duyệt cách triển khai |
+| CCP-MENU03 | Editor UX + Technical | Heading ngắn, brand rõ, separators không trùng; keyboard/touch hoạt động | Menu hẹp, Tab/arrows/Enter/Escape, label không focus, order nhìn thấy trùng focus; gate off không để separator rỗng | Đề xuất; chờ chốt wording và runtime kiểm |
+
+Block UI/frontend: N/A vì phản hồi này chỉ liên quan editor menu. Không đổi content policies, clipboard/validation/Undo contract, milestone hoặc evidence logic tests. Không đánh dấu toàn Content Actions PASS; không sửa source/CSS/build, không commit trong lượt ghi nhận này.
+
+## 29. Human decision — menu position/style; shortcut deferred (2026-11-06)
+
+Human yêu cầu lưu quyết định và lên kế hoạch làm, chưa yêu cầu triển khai source. Phần “chưa human duyệt” tại§28 là checkpoint trước quyết định này. Giữ current **V1 /1.3.19**, sửa presentation của Content Actions hiện có; không bump metadata, đổi namespace, mở right-click058 hoặc public launch.
+
+### Quyết định UX được lưu
+
+- Một nhóm độc lập trong menu ⋮ từng block: **sau nhóm thao tác nội dung kết thúc bằng Add note, trước nhóm tổ chức block bắt đầu bằng Group**. Đây là vị trí theo nhóm ngữ nghĩa, không tìm DOM bằng chuỗi tiếng Anh. Nếu Add note/Group không hiện do version/quyền/mode, không tạo native item giả; cần kiểm ranh giới nhóm tương đương qua API.
+- Heading **Marine Blocks** (đúng hoa/thường, không ép uppercase), chữ **#075985**, nền **#F0F9FF**, font **12px**, weight **600**. Đây là specification cho normal color mode, không phải màu mới cho toàn plugin.
+- Chỉ hàng heading có nền; hai action `Copy content` / `Paste content only` giữ màu, hover, disabled, focus và hit area native. Cùng cột chữ với native menu items; heading không lồng như submenu, không click, không hover, không nhận focus. Không thêm icon chưa có thiết kế, pill, shadow hoặc vạch màu trạng thái chọn.
+- Separator trên/dưới nhóm, mỗi ranh giới đúng một separator; padding ngang theo native menu của runtime, không hard-code thêm inset lồng nhau. Giữ chiều rộng menu native; heading cho phép wrap khi zoom/text scaling thay vì truncate/overflow. Trong forced-colors dùng system colors/border nếu cần; nhận diện vẫn dựa vào text và separators, không chỉ màu.
+- **Shortcut Deferred**: chưa chọn phím, chưa có target version; giữ menu-only. Không đăng ký hoặc hiển thị `Ctrl+Shift+C/V`, không bắt `keydown`/ghi đè shortcut trình duyệt. Hai tổ hợp bị tranh chấp với Inspect/plain-text paste; cần audit OS/browser/editor và focus scope nếu mở lại. Đây là defer độc lập, không chặn menu repair.
+
+```text
+Add note
+────────────────────────────
+Marine Blocks                ← chữ xanh đậm / nền xanh rất nhạt
+Copy content                 ← native item
+Paste content only           ← native item
+────────────────────────────
+Group
+```
+
+### Giới hạn kỹ thuật giữ nguyên
+
+Vị trí UX đã chốt không chứng minh API hiện tại hỗ trợ vị trí đó. Local WP7.1 Slot đặt fills sau Visibility (§28). [SlotFill documentation](https://developer.wordpress.org/block-editor/reference-guides/components/slot-fill/) giải thích render vào Slot; tài liệu tổng quát này không là bằng chứng có insertion point trước Group trong mọi version. G0 bên dưới phải đối chiếu actual version/export/source; không dùng priority giữa các fills để suy có thể vượt native items nằm trước Slot.
+
+Không patch WordPress/GeneratePress, private/unstable APIs, monkey patch exports, MutationObserver di chuyển item, CSS order/absolute positioning hoặc dựng lại toàn bộ native menu. Không đổi min WP hoặc thêm dependency chỉ để đạt vị trí. Nếu public API không có chỗ chèn phù hợp, ghi bằng chứng và đề xuất fallback giữ native insertion point; **không tự thay quyết định vị trí hay đánh dấu CCP-MENU02 PASS**. Chỉ phần alignment/style có thể chuẩn bị độc lập; báo rõ phần vị trí còn bị chặn khi bàn giao.
+
+### Kế hoạch triển khai
+
+| Bước | Công việc / file dự kiến | Kết quả cần có / điều kiện đi tiếp |
+|---|---|---|
+| G0 — preflight | Đọc§28–29; kiểm actual WP/Gutenberg/browser versions, package/tooling và source menu/Slot. Đối chiếu API public đúng phiên bản; kiểm toolbar/List View menu target | Bảng extension point → vị trí thật → version hỗ trợ → props target/onClose → giới hạn. Chốt khả thi trước Group bằng evidence; nếu không khả thi, báo giới hạn và phương án cụ thể trước sửa vị trí |
+| G1 — baseline DOM | Draft fixture, gate on, mở menu của Product/Post Collection + Slider/Slide. So native item và custom item: ancestor groups, padding/margin, bounding rect, focus order và computed styles | Chứng minh nguyên nhân inset, không chỉ suy từ screenshot. Lưu screenshot + DOM/style notes, build/URL/versions; không cần tắt plugin/theme production |
+| G2 — menu composition | `src/core-controls/block-content/index.tsx`: sửa group/heading composition và nối extension point public nếu G0 chứng minh được; giữ đúng menu target và onClose | Một nhóm, một heading, đúng hai actions; không nested inset, không duplicate Fill, không thêm submenu. Giữ gate/default false, support/selection/availability/busy guards; không sửa clipboard/controller để làm UI |
+| G3 — scoped editor style | Tìm editor stylesheet/entry hiện có bằng import graph trước sửa; dùng class `skvn-…` riêng cho heading/group theo identity source hiện hành, CSS chỉ editor | Heading theo màu/type ở trên, native action states giữ; separator/padding một owner, không selector global `.components-menu-group`, không `!important` để che nesting sai. Không enqueue frontend/plugin bundle mới cho feature nhỏ; CSS không phụ thuộc theme/WindPress |
+| G4 — kiểm và regression | Review diff/import scope; chạy hai test suites content model/controller khi thay wiring có nguy cơ ảnh hưởng behavior; human chạy build/lint. Theo runbook§8 cho menu, focus, colors, target, gate, clipboard/Undo | Logic PASS trong phạm vi test riêng; runtime PASS chỉ khi có build/URL/version/ảnh/video. Nếu chỉ sửa markup/CSS, không tạo unit tests snapshot màu/padding chỉ để mirror implementation |
+| G5 — docs / handoff | Cập nhật CCP-MENU01–05, runbook evidence, module pointer; khi được giao commit chỉ stage file scope này | Báo source đã sửa / vị trí thực tế / còn thiếu evidence. Không đóng milestone/release, không commit build hay056 đang ngoài scope. Prefix dự kiến khi được giao implementation+commit: `feature patch: refine content actions menu` |
+
+Files ngoài scope: `fields.ts`, `plan.ts`, `transport.ts`, `validation.ts`, `controller.ts` và query/render/block.json/save/frontend; chỉ mở lại nếu phát hiện regression riêng có evidence. Không thay projection/allowlist/empty overwrite/exact tree/permissions/atomic Undo contract.
+
+### Acceptance bổ sung và trạng thái
+
+| ID | Nhóm | Hành vi mong đợi | Hiện trạng / việc cần sửa | Cách kiểm / evidence |
+|---|---|---|---|---|
+| CCP-MENU01 | Editor UX | Hai actions cùng cột chữ/hit area native, không trông như cấp con | FAIL screenshot§28; chưa sửa source | So DOM/computed inset + screenshot trước/sau; focus ring không bị cắt |
+| CCP-MENU02 | Editor UX + Technical | Nhóm sau nội dung/trước Group theo quyết định | UX đã duyệt; technical feasibility Chưa làm G0, source chưa sửa | API/version evidence + ảnh thứ tự thật; native item ẩn không làm nhóm trôi hoặc để separator rỗng |
+| CCP-MENU03 | Editor UX | Marine Blocks màu/nền/type đã chốt; separator rõ; không có heading tương tác | Design đã duyệt, source Chưa làm | Normal/forced-colors, 200% zoom, viewport390px, mouse/touch/keyboard; không overflow |
+| CCP-MENU04 | Technical | Không đổi native actions, menu target, availability, clipboard/Undo; không ảnh hưởng menu plugin khác | Contract giữ; kiểm sau repair | Gate off/reload; unsupported/multi-select; root locked/disabled; List View target khác selection; copy/paste/no-op/Undo smoke |
+| CCP-MENU05 | Technical | Shortcut chưa được triển khai hoặc quảng bá | Deferred theo human; không có source mới | Diff không thêm shortcut registration/keydown/menu shortcut hints; Ctrl+C/V và browser shortcuts giữ hành vi hiện có |
+
+Block UI/frontend N/A: không đổi output. Editor UX và Technical cần evidence riêng; không suy menu PASS từ model18/18 hoặc controller11/11. Chỉ lập plan trong lượt này, không chạy build/lint/tests hoặc sửa source.
+
+## 30. Menu repair execution / placement feasibility — 2026-11-06
+
+Human yêu cầu **tiến hành** theo§29, current1.3.19, không bump. Đây là execution mới hơn checkpoint planning cuối§29. Không commit trong lượt này; giữ build artifacts và056 ngoài scope.
+
+### G0 — research và giới hạn
+
+Local source: `D:/Github/minhhaifish/wp-includes/version.php:19` = WP7.1; Gutenberg plugin không có trong inventory trước đó. Actual onsite WP/Gutenberg/browser/build chưa được cung cấp. `package.json` dùng `@wordpress/scripts ^30.6.0`, không pin block-editor runtime; WordPress cung cấp public exports.
+
+| Extension point | Vị trí / props / giới hạn kiểm được |
+|---|---|
+| `BlockSettingsMenuControls` public | Local `wp-includes/js/dist/block-editor.js:58305–58390`: props `selectedClientIds`, `selectedBlocks`, `onClose`; Slot tạo MenuGroup, render ConvertToGroup → Lock → Rename → Visibility → fills → BlockModeToggle. Không có prop insertion trước Group trong đường này. Giữ menu clientIds binding, Toolbar/List View target vẫn cần runtime kiểm. |
+| `PluginBlockSettingsMenuItem` public | Local `wp-includes/js/dist/editor.js:83682–83704`: delegate về cùng `BlockSettingsMenuControls`, không mở insertion point khác. [Official reference](https://developer.wordpress.org/block-editor/reference-guides/slotfills/plugin-block-settings-menu-item/) mô tả More Options, không cam kết trước Group. |
+| First-item / note slots | Local source có `__unstable…`/internal slots; không thuộc API public được duyệt. Không dùng để vượt Slot. |
+| Fill priority / filters | Priority giữa fills không vượt native items hard-coded trước `fills`. Chưa tìm thấy public insertion/filter cho ranh giới nội dung → Group trong đường local đã kiểm; không suy mọi future WP đều không hỗ trợ. |
+
+[Official export reference](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#blocksettingsmenucontrols) xác nhận API; local WP7.1 source là evidence đúng version cho ordering, không dùng docs HEAD để chứng minh mọi version. Không đổi minWP6.5; runtime các bản hỗ trợ còn chờ kiểm.
+
+### G1–G3 — source delta / implementation
+
+- Screenshot§28 cho thấy thêm inset. Local `components.js:45205–45243` MenuGroup render `.components-menu-group`; `css/dist/components/style.css:1551–1556` áp padding8px mỗi group trong dropdown. Plugin lồng group thứ hai trong Slot group, tạo thêm lớp padding. Đây là source explanation phù hợp ảnh; chưa có computed DOM onsite để chứng minh toàn cascade.
+- `src/core-controls/block-content/index.tsx`: bỏ inner MenuGroup, thay div `role=group`, i18n `aria-label=Marine Blocks`; heading noninteractive `aria-hidden` vì group đã có accessible name. Hai MenuItem giữ disabled/info/onClick/handlers, không override action padding/width/focus/hover hoặc target/guards.
+- Asset audit: `src/index.ts` → core-controls → block-content. Shared style-index còn chứa block styles, không phải owner chrome-only phù hợp. Dùng scoped `wp_add_inline_style` trong existing editor enqueue callback `modules/core-control/core-control.php`, handle riêng dependency `wp-components`, chỉ gate `block_clipboard` on. Không thêm file/runtime require/include/bundle/frontend asset.
+- CSS chỉ `.skvn-block-content-actions…`: không thêm inset ngang; heading#075985/#F0F9FF,12px600, wrap, forced-colors Canvas/CanvasText. Border/spacing nội bộ chỉ khi có sibling tương ứng; outer MenuGroup giữ separator ngoài. Không global override/!important/viewport units/overflow masking/DOM reordering.
+- **Không chuyển vị trí**: vẫn Slot native sau Hide/Visibility trên localWP7.1. Giữ behavior hiện hữu trong lúc sửa phần độc lập, không thay quyết định trước Group bằng fallback được coi đã approve.
+
+### G4–G5 — verification / acceptance
+
+TSX `transpileModule` syntax **PASS**; không full typecheck/build. Không chạy build/PHP lint theo AGENTS; human chạy runbook§7. Không thay handlers/controller/guards nên không rerun model/controller suites; không thêm snapshot tests mirror CSS. Runbook§8 có DOM/geometry/focus/normal/forced-colors/zoom/narrow/gate/ListView/separator/clipboard smoke. Chưa URL/DOM/browser evidence sau sửa, không onsite PASS.
+
+| ID | Trạng thái hiện hành |
+|---|---|
+| CCP-MENU01 | Đã có source sửa nesting/inset; giữ baseline FAIL. Chờ computed styles + x/width native/custom, focus và ảnh sau build. |
+| CCP-MENU02 | Chưa đạt vị trí; public Slot localWP7.1 không hỗ trợ target đã chốt. Giữ open, cần human quyết fallback hoặc chờ API phù hợp. |
+| CCP-MENU03 | Đã có source heading/style/separators; Chờ normal/forced-colors/390px/200%zoom/keyboard/touch. |
+| CCP-MENU04 | Guards/target/controller không sửa; Chờ regression onsite sau wrapper/style/build. |
+| CCP-MENU05 | Shortcut Deferred; diff không thêm keydown/registration/hint. |
+
+Block UI N/A (không đổi frontend). Editor UX/Technical chưa nghiệm thu. Human gửi build/lint output, exact versions/edit URL, full menu screenshot và keyboard/DOM evidence theo§8; agent tiếp tục từ failure cụ thể. Không deploy/commit/bump metadata.
+
+### Decision memo — vị trí menu còn mở
+
+1. **Vấn đề:** public extension point đã kiểm trên localWP7.1 không chèn được trước Group theo UX đã duyệt.
+2. **Phương án:** A — chấp nhận native sau Visibility với alignment/style đã sửa, đổi lại xa nhóm Copy; B — giữ target trước Group chờ public API, đổi lại acceptance vị trí tiếp tục chưa đạt. Patch/private API/đảo DOM trái constraint§29, không đề xuất.
+3. **Khuyến nghị:** A cho khả năng dùng hiện tại; chỉ đổi acceptance khi human chấp nhận rõ ràng.
+4. **Bằng chứng:** bảng G0 có source version/Slot và official docs; screenshot baseline§28; chưa ảnh runtime sau sửa.
+5. **Tự kiểm chứng:** mở local `block-editor.js:58344` xem Group đứng trước fills (~2phút), `editor.js:83689` xem alternative dùng cùng Slot (~1phút); sau build mở draft kiểm menu (~3phút).
+6. **Đảo ngược:** hai chiều; đổi position khi có public API không thay dữ liệu/clipboard/style đích.
+7. **Default trước nghiệm thu menu repair:** giữ insertion point hiện hữu, không tuyên bố CCP-MENU02 PASS hoặc thay decision§29; bàn giao alignment/style kiểm độc lập, không mở hack mới.

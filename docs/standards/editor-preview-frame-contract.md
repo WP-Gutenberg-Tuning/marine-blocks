@@ -50,6 +50,8 @@ Responsive Spacer exception: khung label/summary/indicator căn giữa và luôn
 
 ## Preview trung thực và accessibility
 
+Spacer follow-up human2026-11-06 (055§13): riêng Spacer dùng margin-block10px tĩnh trên/dưới, editor-only alignfull/width100% theo parent canvas và emoji cạnh device text; không animation/spacing geometry observers. Ngoại lệ này thay minimum-gap adapter cho Spacer, không thay consumer khác. Parent gap có thể cộng thêm; không hứa tổng gap10px. Không serialize alignfull/frame margins; frontend vẫn H.
+
 Giữ thông tin và states đã có; phân biệt nội dung minh họa với kết quả query thật. Không chạy autoplay/Swiper trong editor hoặc thêm query/API chỉ để có khung đẹp. Không dùng fixed height cắt nội dung hay giãn dòng để lấp khoảng trống. Tên dài, ảnh off, query empty/error/loading, slide/step rỗng và số item tối đa phải kiểm theo từng consumer.
 
 Nhãn chrome không biến thành heading nội dung không cần thiết; font/contrast đọc được, focus ring và hit targets không bị border/padding che. Khi đổi layout/thu gọn không làm rơi focus. Frontend markup/CSS/runtime/schema/data persistence giữ nguyên trong task khung editor.

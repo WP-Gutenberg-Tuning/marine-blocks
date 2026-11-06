@@ -8,7 +8,7 @@
  */
 
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
@@ -77,7 +77,16 @@ function ContentActionsMenuItems( {
 	};
 
 	return (
-		<MenuGroup label={ __( 'Content actions', TEXT_DOMAIN ) }>
+		// The Slot already owns a MenuGroup and its horizontal padding. A second
+		// MenuGroup adds another native inset; this labelled group adds none.
+		<div
+			className="skvn-block-content-actions"
+			role="group"
+			aria-label={ __( 'Marine Blocks', TEXT_DOMAIN ) }
+		>
+			<div className="skvn-block-content-actions__heading" aria-hidden="true">
+				{ __( 'Marine Blocks', TEXT_DOMAIN ) }
+			</div>
 			<MenuItem
 				disabled={ ! copy.enabled }
 				info={ copy.enabled ? undefined : copy.reason }
@@ -92,7 +101,7 @@ function ContentActionsMenuItems( {
 			>
 				{ __( 'Paste content only', TEXT_DOMAIN ) }
 			</MenuItem>
-		</MenuGroup>
+		</div>
 	);
 }
 

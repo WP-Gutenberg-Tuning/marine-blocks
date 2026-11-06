@@ -18,6 +18,8 @@ Plugin product UI and frontend default copy use English as the source language. 
 
 ## [manual] Architecture
 
+Spacer preview follow-up2026-11-06:055§13 source editor-only alignfull/width100% parent-owned, margin-block10px tĩnh, useRef thay spacing observer hook (shared helper không sửa), 🖥️/📟/📱 aria-hidden cạnh device text, không animation. Save/schema/frontend H giữ nguyên. Parent gap có thể cộng thêm; ngoại lệ riêng Spacer thay minimum-gap adapter. Geometry/focus/state Chờ kiểm chứng. Editor UI lag là report chưa chẩn đoán, human điều tra sau; không claim đã fix lag.
+
 Content Actions evidence2026-11-06: human model suite18/18 PASS trên Node24.16.0/npm11.13.0 sau repair8ee4a3f;057§26/runbook. Model rerun đã có evidence, supersedes pending rerun bên dưới. Controller11 mocked tests giữ riêng; build/lint/Gutenberg runtime/Undo/Save vẫn chờ, current1.3.19 không đổi.
 
 Content Actions repair2026-11-05: human start057§19–24; R1–R4 có source repair `validation.ts`, `editor-guard.ts`, `inline-html.ts` và transport/planner/controller wiring. Raw binding/validity/limits kiểm trước projection; full tree mode/ownership và identity recheck sau await; browser HTML parser giữ semantic styled spans, bỏ scanner. Execution057§25 + AP-08–10:11 controller tests PASS phạm vi mock WP APIs + JSDOM HTML thật; model rerun/build/lint/onsite chưa PASS. Current1.3.19/no bump; các đoạn pending bên dưới là checkpoint trước implementation.
@@ -196,6 +198,8 @@ Do not make this plugin own the primary SKVN visual system.
 
 ## [manual] Core Control
 
+Content Actions menu repair2026-11-06: human start057§29, execution§30. Source bỏ MenuGroup lồng trong Fill (native Slot đã có group/padding), dùng labelled group + heading Marine Blocks; scoped inline editor CSS qua `skvn-block-content-actions-editor`, dep `wp-components`, chỉ khi gate bật. Vị trí trước Group chưa khả thi qua public Slot localWP7.1: source vẫn native sau Visibility/Hide, CCP-MENU02 chưa đạt, chưa approve fallback. Alignment/style Đã có source, syntax transpile PASS, build/lint/onsite Chờ kiểm chứng; runbook§8. Shortcut Deferred, clipboard/frontend không đổi.
+
 - Decision source: `docs/decisions/core-control-core-button-hover.md`.
 - `Core Control` is a submenu under the existing `SKVN Marine` admin menu and
   is the shared registry/settings surface for optional WordPress core-block
@@ -217,7 +221,8 @@ Do not make this plugin own the primary SKVN visual system.
   Collection allowed), validate query slugs/URLs/rich text before writing, and
   dispatch one public `updateBlockAttributes(..., { uniqueByBlock: true })`.
   Transport is ordinary Gutenberg plain-text serialize/parse of a projection
-  tree; no custom JSON/MIME/envelope, storage, endpoint, CSS or frontend asset.
+  tree; no custom JSON/MIME/envelope, storage or endpoint. Menu presentation
+  has scoped editor-only CSS (057§30); transport adds no frontend asset.
   The older whole-block Copy/Paste utility keeps its behavior unchanged.
   Pure tests: `tools/tests/block-content-copy.test.mjs`. Build/lint, menu,
   clipboard permission, Undo/Redo and Save/reopen evidence remain pending.

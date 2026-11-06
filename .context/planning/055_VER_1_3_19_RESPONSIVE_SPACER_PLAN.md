@@ -218,3 +218,13 @@ User duyệt implementation trong current1.3.19 và commit; không chuyển curr
 - `node --test --experimental-test-isolation=none tools/tests/responsive-spacer.test.mjs tools/tests/editor-preview-frame.test.mjs`: **13/13 PASS**, gồm5 Spacer model/viewport/CSS-contract tests +8 shared frame simulated geometry/lifecycle regression. Lệnh test isolation mặc định bị sandbox `spawn EPERM`; đổi sang cùng tiến trình chạy thành công. Không phải browser geometry, asset delivery hoặc WP serialization PASS.
 - Chưa chạy build/lint/packaging hoặc onsite; không chỉnh generated build files bằng tay. Human build trước sử dụng block/zip. New block metadata chỉ xuất hiện trong build sau human build.
 - Task cần hơn3–5 files vì thêm block hoàn chỉnh (schema, controls, save, CSS, viewport), JS/PHP registrations, tests và context/standards/runbook; không mở consumer/theme ngoài scope.
+
+## 13. Preview follow-up — human2026-11-06
+
+Screenshot Home: Spacer sát Slider/Heading, bị giới hạn content width. Human yêu cầu margin trên/dưới, full available editor width, emoji cạnh device text, không animation; Editor UI lag sẽ tự điều tra sau. Chưa xác định nguyên nhân lag, không claim đã fix performance.
+
+Source current1.3.19: editor-only `alignfull`, width100%/max-width none/margin-inline0 theo parent canvas; Group/Columns vẫn parent-owned, không100vw/margin âm. Không saved align/schema/frontend change. Margin-block10px tĩnh là ngoại lệ riêng Spacer thay minimum-gap adapter§12; parent flex/grid gap có thể cộng thêm, không hứa tổng10px. Shared helper/consumers khác không đổi.
+
+`useRef` thay hook spacing: bỏ geometry ResizeObserver/MutationObserver/requestAnimationFrame của Spacer; viewport matchMedia giữ responsive indicator. Import shared frame CSS trực tiếp. Frame animation/transition none. Emoji 🖥️/📟/📱 aria-hidden cạnh Desktop/Tablet/Mobile; 📟 gợi thiết bị Tablet (glyph tùy OS), accessible text giữ nguyên. Inherit/zero/indicator padding/cap200/save/frontend H không đổi.
+
+RS-UX-01/RS-TECH-03 Đã có source, Chờ geometry/focus root/nested/desktop scrollbar/390px/zoom200%/hai Spacer. Các acceptance khác giữ nguyên, không PASS từ screenshot baseline. Runbook có follow-up; không commit/bump/build tự động hoặc mở scope điều tra lag.
