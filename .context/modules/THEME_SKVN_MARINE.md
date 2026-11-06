@@ -8,6 +8,8 @@ Human decision 2026-11-04: theme giữ identity SKVN Marine. Website được d�
 
 ## [manual] Responsibilities
 
+Archive repair discussion2026-11-06: human yêu cầu WooCommerce + Blog archive trong1.3.x; plan059 là nơi ghi thảo luận, đề xuất sau1.3.23, predecessor/SemVer/start chưa chốt. Audit Shop/product taxonomy và posts-index/category/tag routes/template thực trước design/code; theme owns visuals, WP/Woo giữ native query/routing, không mở archive builder hoặc đổi plugin Collection ownership. Source baseline archive.php/inc/woocommerce.php + plan025; chưa có archive URLs/defect screenshots, AR-* Chưa làm. Current1.3.19 giữ nguyên.
+
 - Theme styles and tokens.
 - GeneratePress child customization.
 - Page templates and full-width layout surfaces.

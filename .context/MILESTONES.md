@@ -1091,6 +1091,22 @@ Acceptance — tất cả **Chưa làm**, chưa có runtime evidence:
 - [ ] MAP-TRACE-01 — Execution plan phải giữ toàn bộ UI-*, ED-*, BE-*, DOC-* trong index; chốt hoặc defer rõ các điểm mở: snapshot revision, chỉnh đồng thời, thẻ rỗng/xóa sạch nội dung, zoom/mobile, grab offset, undo/reorder, thêm List/Buttons. Không tự thêm scope hoặc bỏ acceptance.
 - [ ] Tạo runbook `docs/testing/` trước runtime/onsite: URL, setup/fixtures, steps, expected/pass-fail và evidence; human nghiệm thu trước completion. Version đã chốt; start cần lệnh riêng.
 
+### 1.3.x — WooCommerce + Blog Archive Repair (Future Candidate, SemVer TBD)
+
+Status: **PLANNED — discussion, chưa start**. Human2026-11-06 yêu cầu sửa hai archive trong1.3.x, tạo file để thảo luận trước; chưa chọn predecessor/version cụ thể. **Đề xuất** sau1.3.23 Post Page Basic Design Controls; không tự gán1.3.24, đổi current hoặc bump metadata. Trước implementation xác nhận scope/PATCH rationale, version chưa dùng và start theo AGENTS. Nếu phát sinh feature/controls mới cần đánh giá lại SemVer, không tự coi nhãn1.3.x là ngoại lệ numbering.
+
+Plan `planning/059_FUTURE_CANDIDATE_WOOCOMMERCE_BLOG_ARCHIVE_REPAIR.md`: inventory Shop/product taxonomy + posts index/category/tag; template/route/main-query map, design trước sửa, responsive/cards/sidebar/pagination/empty states. Theme owns visuals; WP/Woo native query/routing giữ owner; không thay bằng plugin Collection query hoặc mở archive builder/facets2.x. Giữ plan025/1.3.5 acceptance và1.3.22–23 regression. AR-* **Chưa làm**; URL/pain points/design/SemVer/start còn mở; không runtime code trong lượt planning.
+
+### 1.4.x — Block Inserter SVG & Organization (Future Candidate, SemVer TBD)
+
+Status: **PLANNED — chưa start**.
+
+Human decision **2026-11-05**: Inserter hiện rối, icon thiếu phân biệt và grouping chưa phù hợp nên chính người dựng plugin cũng hay bấm nhầm. Ghi scope sửa **sau các mục1.4.x đã có**, hiện là sau1.4.3 Interactive Illustrated Map. Thứ tự: 1.4.0 Migration → 1.4.1 Setup UI → 1.4.2 Layout/Quote Validation → 1.4.3 Map → Inserter SVG & Organization. Chưa tự gán1.4.4 hoặc chuyển current1.3.19; số SemVer/start cần xác nhận trước implementation theo Version Naming Rule.
+
+Scope: inventory base blocks/variations/inner blocks; SVG phù hợp công dụng, family nhất quán; grouping theo nhiệm vụ, tên/search rõ; audit entry trùng hoặc không nên chèn độc lập. Giữ saved-content compatibility, namespaces/attrs/defaults khi thay presentation; không patch core/private DOM. Không đồng nhất với Design Sidebar visual controls054 hoặc preview frame053/055; các acceptance đó giữ riêng.
+
+Plan/source evidence/acceptance draft **IO-UX-01–03, IO-TECH-01–02**: `planning/056_FUTURE_CANDIDATE_BLOCK_INSERTER_ORGANIZATION.md`. Tất cả **Chưa làm**; human đã chốt lịch/scope, chưa duyệt SVG/grouping cụ thể hoặc runtime PASS. Mockup toàn Inserter và onsite thử tìm/chọn block trước nghiệm thu; runbook tạo khi mở task. Không bump/build trong lượt note này.
+
 ### 1.5.0 — Woo Catalog Plugin (`woo-catalog`)
 
 Status: **BRAINSTORM / PLANNING IN PROGRESS**

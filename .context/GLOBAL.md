@@ -58,6 +58,8 @@ Planning snapshots live in `.context/planning/` and use a three-digit ordering p
 
 Active planning (root — load when task liên quan):
 
+- `.context/planning/059_FUTURE_CANDIDATE_WOOCOMMERCE_BLOG_ARCHIVE_REPAIR.md` — human2026-11-06 yêu cầu lập file thảo luận sửa WooCommerce/Blog archives trong1.3.x. Đề xuất sau1.3.23, predecessor/SemVer/start chưa chốt; chưa runtime code. Theme visuals/native WP-Woo queries; không archive builder2.x hoặc thay query ownership Collections.
+
 Deploy reminder2026-11-06: human yêu cầu khi deploy phải nhắc chụp Editor UI, phục vụ SP-02 Organized Editor UI (khung làm việc có thứ tự, hạn chế nhầm lẫn). Checklist `docs/workflows/deploy-artifact-workflow.md` + register `docs/product/marketplace-selling-points.md`§5. Thu ảnh trên build deploy/editor load đúng assets, lưu metadata/evidence; tổng hợp nội bộ trước, trình bày marketplace sau. Không suy Inserter056 đã sửa hoặc tự deploy.
 
 Marketplace sale points — human2026-11-06: tổng hợp tại `docs/product/marketplace-selling-points.md`; SP-01 Content Actions đã được human chọn là sale point, brief/value/scope/evidence đã ghi, chưa viết listing hoặc trình bày marketing. Khi chuẩn bị marketplace/public launch phải đọc register, tổng hợp và trình human sau; không tự chọn marketplace/version/date hoặc đổi launch gate.
@@ -70,6 +72,7 @@ Content Actions repair2026-11-05: human đã cho thực hiện057§19–24; R1�
 
 - `.context/planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md` — human2026-11-05 duyệt gói§11–14 và start coding+commit `feature patch:` trong current1.3.19 như scope addition, không bump; approval§17. Product/Post Collections + Slider/Slide; menu ⋮ từng block, exact type/shape, query/content/empty policies, giữ style, native projection clipboard, async revalidation/Undo. P0 API/version evidence và source/runtime acceptance chưa làm; không hỏi lại approval. Right-click058 Deferred sau2.0. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`, runbook `docs/testing/block-content-actions.md`.
 
+- `.context/planning/056_FUTURE_CANDIDATE_BLOCK_INSERTER_ORGANIZATION.md` — human2026-11-05 report Inserter rối/dễ bấm nhầm, yêu cầu SVG đúng nghĩa + grouping/name/entry audit. Xếp 1.4.x sau các scope1.4.0–1.4.3 đã có; SemVer cụ thể TBD/chưa start, không sửa current. Riêng với Design Sidebar visual controls054.
 
 - `.context/planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md` — human2026-11-05 duyệt implementation+commit trong current1.3.19. Responsive Spacer static có source: mint frame, centered indicator padding=min(H,200)/2, frontend H không cap; breakpoint768/1024, default30, inherit/reset/zero. 13 Node tests PASS (5 Spacer +8 frame mô phỏng), chưa human build/lint/onsite; runbook `docs/testing/responsive-spacer-1.3.19.md`.
 
