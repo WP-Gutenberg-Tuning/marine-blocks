@@ -487,3 +487,13 @@ R1–R4: **Đã có source repair**, regression controller PASS phạm vi mock n
 Human chạy model test (Node có `stripTypeScriptTypes`, như Node24 phiên coding), build/lint theo runbook, rồi T01–T11 và R01–R06 trên draft/private fixtures. Gửi exact WP/Gutenberg/browser versions, edit/preview URLs, output và attr/video evidence. Không publish/deploy tự động. Commit prefix theo scope authorization057§17: `feature patch: repair block content actions validation`.
 
 Compatibility self-review: local WP7.1 `blocks.js:2040–2057` cho thấy core rich-text attrs là `RichTextData`, không luôn string. Transport dùng public export `RichTextData.toHTMLString()` sau raw validation, không coerce arbitrary objects. Runtime cũ chưa có export giữ đường string; không tăng minimum WP. Regression thứ11 kiểm production transport/controller bằng class mock; actual core schema round-trip và asset dependency wp-rich-text vẫn cần human build/onsite.
+
+## 26. Human model-test evidence — 2026-11-06
+
+Human gửi output chạy model suite sau commit repair `8ee4a3f`: Node **24.16.0**, npm **11.13.0**; **18 tests /18 PASS /0 fail /0 skipped**, duration473.370251ms. Bao gồm ba regression baseline (binding nguồn, Paste limits, styled span) và các assertions root/detail/br/comments đã sửa. `stripTypeScriptTypes` chỉ báo ExperimentalWarning trong output; không có test failure.
+
+Đã đáp ứng phần “human chạy lại model suite” của§25. Đây là human-reported model/JSDOM evidence, agent không rerun và không suy actual clipboard/Gutenberg parser/history behavior từ nó. Controller11/11 mocked evidence vẫn riêng. CCP-R1–R4 giữ Đã có source repair + logic tests PASS trong phạm vi này; build/lint/typecheck, real parser round-trip, menu/permissions/Undo/Redo/Save/reopen và frontend **Chờ kiểm chứng**. Không chuyển milestone, bump metadata hoặc nghiệm thu/release.
+
+## 27. Product documentation / sale point — 2026-11-06
+
+Human xác nhận feature này là một trong các sale points, yêu cầu doc và tổng hợp trước, trình bày sau vào giai đoạn marketplace. Đã lưu brief SP-01 trong [marketplace selling points register](../../docs/product/marketplace-selling-points.md): problem/value, workflow, supported types/shape, scope limits, evidence và các bước còn cần trước public claim. Đây là tổng hợp nội bộ, chưa phải listing/copy/visual marketing hoặc release approval. Technical discussions/spec vẫn cập nhật tại057; register dẫn về đây, không là spec song song. Không đổi current1.3.19 hoặc launch gate sau1.5.x; chưa chọn marketplace/date/public version.

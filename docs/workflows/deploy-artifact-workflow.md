@@ -6,6 +6,16 @@ Build the deployable SKVN theme and plugin locally, then upload only the require
 
 Server does not need Node/npm for this artifact.
 
+## Post-deploy reminder — Editor UI screenshots
+
+Human request2026-11-06: **khi deploy, agent phải nhắc human chụp ảnh Editor UI** để lưu evidence cho selling point khung làm việc được tổ chức có thứ tự, dễ phân biệt các block/nhóm điều khiển. Ghi nhận SP-02 trong [marketplace selling points register](../product/marketplace-selling-points.md).
+
+- Đưa lời nhắc vào handoff deploy; sau khi human xác nhận deploy và editor load đúng assets, nhắc chụp UI trên chính build đã deploy. Đây là trigger theo workflow, không phải lịch hẹn định kỳ hoặc tự cho phép deploy.
+- Ảnh nên có tổng thể editor, khung block/nhãn loại và nhóm nội dung–query–design/sidebar đang dùng; chọn vài block đại diện. Dùng draft/sample page, giữ đủ ngữ cảnh để thấy bố cục làm việc.
+- Ghi commit/build, WordPress/plugin version, edit URL/page, viewport và block đang chọn cùng đường dẫn ảnh. Có thể lưu dưới `docs/artifacts/marketplace/editor-ui/` khi human cung cấp ảnh.
+- Ảnh dùng để tổng hợp nội bộ trước. UI lỗi/mất khung hoặc grouping chưa hoàn tất phải ghi đúng trạng thái; không dùng ảnh như chứng nhận toàn bộ Editor UX/Inserter đã PASS. Plan056 Inserter SVG/grouping còn scope riêng.
+- Khi chuẩn bị marketplace mới chọn ảnh, viết caption/public copy và trình human duyệt. Không trì hoãn screenshot evidence đến lúc viết listing, không tự publish ảnh.
+
 ## Release Command
 
 Preferred one-command workflow from the repo root:

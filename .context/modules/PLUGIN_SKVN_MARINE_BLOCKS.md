@@ -2,6 +2,10 @@
 
 ## [manual] Role
 
+Deploy/marketplace reminder2026-11-06: SP-02 Organized Editor UI được human chọn vì khung làm việc có thứ tự giúp hạn chế nhầm lẫn. Khi deploy agent nhắc human chụp Editor UI (khung/nhãn block, nhóm công việc/sidebar) trên build thực tế; checklist deploy workflow, brief register§5. Chưa tạo listing/claim usability đo lường; Inserter056 còn scope riêng.
+
+Marketplace positioning2026-11-06: human xác nhận Content Actions là sale point; lưu feature brief và evidence ở `docs/product/marketplace-selling-points.md` SP-01, tổng hợp dần trước khi trình bày vào giai đoạn marketplace. Không tự xuất bản copy, hứa compatibility hoặc đổi public-launch gate. Technical spec vẫn057, acceptance ở runbook.
+
 Custom Gutenberg blocks with logic, and future plugin-owned editor/admin tooling.
 
 Human decision 2026-11-04: product đích **Marine Blocks** (`marine-blocks`, PHP `marine_blocks_`); bộ block chuyên dụng và patterns để dựng/chỉnh sửa/bàn giao website nhanh, không full-FSE supercharger. Plugin ship styling/runtime độc lập WindPress/theme; website dùng WindPress enhance core blocks/patterns. Migration target **1.4.0**, SemVer đã xác nhận, chưa start; source giữ naming hiện tại tới migration. Theme identity giữ nguyên. Xem `.context/planning/047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md` cho mapping, compatibility và acceptance.
@@ -13,6 +17,8 @@ Repair follow-up2026-11-05: human approved plan051 G0–G4 for current1.3.19. So
 Plugin product UI and frontend default copy use English as the source language. Keep user-facing strings translatable with the `skvn-marine-blocks` text domain where applicable; do not translate stored attribute/option keys or enum values. Vietnamese localization follows in a separately scoped phase. Internal documentation may remain in Vietnamese. See `AGENTS.md` §Product language.
 
 ## [manual] Architecture
+
+Content Actions evidence2026-11-06: human model suite18/18 PASS trên Node24.16.0/npm11.13.0 sau repair8ee4a3f;057§26/runbook. Model rerun đã có evidence, supersedes pending rerun bên dưới. Controller11 mocked tests giữ riêng; build/lint/Gutenberg runtime/Undo/Save vẫn chờ, current1.3.19 không đổi.
 
 Content Actions repair2026-11-05: human start057§19–24; R1–R4 có source repair `validation.ts`, `editor-guard.ts`, `inline-html.ts` và transport/planner/controller wiring. Raw binding/validity/limits kiểm trước projection; full tree mode/ownership và identity recheck sau await; browser HTML parser giữ semantic styled spans, bỏ scanner. Execution057§25 + AP-08–10:11 controller tests PASS phạm vi mock WP APIs + JSDOM HTML thật; model rerun/build/lint/onsite chưa PASS. Current1.3.19/no bump; các đoạn pending bên dưới là checkpoint trước implementation.
 

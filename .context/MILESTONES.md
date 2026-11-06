@@ -15,6 +15,8 @@ Stack ref: **M1 follow-up** — roadmap 039; 1.3.18 deferred checkpoint archived
 
 AGENTS.md current milestone phải match file này.
 
+Content Actions evidence2026-11-06: human model suite18/18 PASS (Node24.16.0/npm11.13.0, sau repair8ee4a3f),057§26/runbook. Model rerun pending trong checkpoint dưới đã được đáp ứng; build/lint và runtime CCP-* vẫn Chờ kiểm chứng, không tự nghiệm thu/chuyển1.3.19.
+
 Content Actions repair register2026-11-05: human cho thực hiện057§19–24 sau review `0a53a2d`; CCP-R1–R4 **Đã có source repair / runtime Chờ kiểm chứng** (nguồn clipboard bound, descendant permission/mode/controlled, Paste limits, styled spans). Execution057§25; `.context/PITFALLS.md` AP-08–10. Controller tests11/11 PASS giới hạn mock WP APIs + HTML JSDOM; model suite cần human rerun. Giữ acceptance CCP-* gốc và R01–R06; build/lint/onsite còn chờ. Không bump/chuyển/đóng1.3.19 hoặc tự nghiệm thu.
 
 Content Actions scope addition — human2026-11-05: **duyệt nguyên gói057§11–14, start coding và commit `feature patch:` trong current1.3.19, không bump metadata hoặc chuyển milestone**. Ngoại lệ bổ sung development milestone theo human như055, không thay Version Naming Rule. Scope Product/Post Collections + Slider/Slide, menu ⋮ từng block, exact type/shape, query là content, empty ghi đè, giữ style đích/atomic Undo. Stack ref: scope addition của current M1 follow-up. Approval057§17; P0 runtime API/version preflight và CCP-* **Chưa làm**, không runtime/release PASS. Runbook `docs/testing/block-content-actions.md`; prompt `docs/workflows/prompts/block-content-actions-agent-handoff.md`. Giữ DS/TD/carry acceptance và right-click058 Deferred sau2.0; không hỏi lại scope/version/start đã duyệt.

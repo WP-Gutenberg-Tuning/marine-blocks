@@ -58,6 +58,12 @@ Planning snapshots live in `.context/planning/` and use a three-digit ordering p
 
 Active planning (root — load when task liên quan):
 
+Deploy reminder2026-11-06: human yêu cầu khi deploy phải nhắc chụp Editor UI, phục vụ SP-02 Organized Editor UI (khung làm việc có thứ tự, hạn chế nhầm lẫn). Checklist `docs/workflows/deploy-artifact-workflow.md` + register `docs/product/marketplace-selling-points.md`§5. Thu ảnh trên build deploy/editor load đúng assets, lưu metadata/evidence; tổng hợp nội bộ trước, trình bày marketplace sau. Không suy Inserter056 đã sửa hoặc tự deploy.
+
+Marketplace sale points — human2026-11-06: tổng hợp tại `docs/product/marketplace-selling-points.md`; SP-01 Content Actions đã được human chọn là sale point, brief/value/scope/evidence đã ghi, chưa viết listing hoặc trình bày marketing. Khi chuẩn bị marketplace/public launch phải đọc register, tổng hợp và trình human sau; không tự chọn marketplace/version/date hoặc đổi launch gate.
+
+Content Actions evidence2026-11-06: human model suite18/18 PASS trên Node24.16.0/npm11.13.0 sau repair8ee4a3f; đã đáp ứng rerun model được yêu cầu bên dưới. Plan057§26/runbook ghi evidence; controller11 mocked tests giữ riêng, build/lint và Gutenberg runtime vẫn chờ.
+
 Content Actions repair2026-11-05: human đã cho thực hiện057§19–24; R1–R4 có source repair (raw clipboard bindings, descendant permissions/modes/ownership, Paste limits, browser HTML parser/styled spans). Execution057§25: controller tests11/11 PASS phạm vi WP store/parser/clipboard mock + JSDOM HTML thật; model suite cần human chạy lại, build/lint/onsite chưa PASS. Đọc `.context/PITFALLS.md` AP-08–10 và runbook R01–R06; giữ current1.3.19/no bump, right-click058 Deferred.
 
 - `.context/planning/058_FUTURE_CANDIDATE_EDITOR_CONTEXT_MENU_AFTER_2_0.md` — human2026-11-05 tách right-click khỏi057, deferred sau khi qua2.0. Khi đó agent tổng hợp các tính năng đề xuất, trình human chốt mốc/SemVer/thứ tự; không tự gán2.0.1 hoặc implement. Giữ CCP-TECH03 Deferred.
