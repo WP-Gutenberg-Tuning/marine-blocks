@@ -8,6 +8,10 @@ Human decision 2026-11-04: theme giữ identity SKVN Marine. Website được d�
 
 ## [manual] Responsibilities
 
+Archive shared-card060 update2026-11-07: human duyệt1:1, source optional public plugin presenter/card-only CSS + native template-part adapter. Theme giữ category shell/query-native integration/fallback;5loop actions preserved với known callbacks suppress/restore mỗi item. Missing API/CSS/template fallback5rows cũng1:1.060§11/runbook cho evidence; actual UI/Woo/GP/build chưa kiểm, no ratio setting cho tới scope kế tiếp được chốt.
+
+Archive M1 update2026-11-06: human cho coding chung1.3.20; source inc/woocommerce.php + style.css, không thêm runtime include. Shop/product category/tag: category sidebar desktop/tablet top navigation,5specs/read existing attributes+MOQ meta, native quote/details, empty shell, native Woo placeholder chỉ archive. Query/order/pagination không thay. Current1.3.19 không chuyển/bump; Blog/M2 chưa start. Plan059§10/runbook là execution/evidence mới, supersede checkpoint discussion bên dưới; runtime chưa kiểm chứng.
+
 Archive repair discussion2026-11-06: human yêu cầu WooCommerce + Blog archive trong1.3.x; plan059 là nơi ghi thảo luận, đề xuất sau1.3.23, predecessor/SemVer/start chưa chốt. Audit Shop/product taxonomy và posts-index/category/tag routes/template thực trước design/code; theme owns visuals, WP/Woo giữ native query/routing, không mở archive builder hoặc đổi plugin Collection ownership. Source baseline archive.php/inc/woocommerce.php + plan025; chưa có archive URLs/defect screenshots, AR-* Chưa làm. Current1.3.19 giữ nguyên.
 
 - Theme styles and tokens.

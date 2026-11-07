@@ -58,6 +58,12 @@ Planning snapshots live in `.context/planning/` and use a three-digit ordering p
 
 Active planning (root — load when task liên quan):
 
+060 approval/source update2026-11-07: human duyệt reuse Product Carousel card trên native archive trong1.3.20, ảnh **1:1**; ratio controls scope kế tiếp chưa gánversion. Public presenter/shared CSS handle dependency + theme adapter/fallback có source.060§11–12/runbook:7CSS modelPASS, PHP37/hook-template10/build/onsite pending. Các checkpoint060 proposed bên dưới được supersede; current không chuyển/bump.
+
+- `.context/planning/060_VER_1_3_20_ARCHIVE_PRODUCT_CARD_REUSE_PLAN.md` — human2026-11-07 yêu cầu plan để duyệt reuse Product Carousel card trên archive. Evidence/grouped-vs-flat/+N informational, shared presenter/assets + native archive adapter/fallback, AC-* và approval bundle§10. Chưa code/approve delta;1.3.20 giữ, không chuyển current. Đọc khi thay archive card hoặc shared Collection presenter/assets.
+
+Archive source start2026-11-06: human cho thực hiện Woo Archive M1 chung1.3.20;059§10 + entry1.3.20 MILESTONES là update mới, supersede proposal Woo sau1.3.23 bên dưới. Theme inc/woocommerce.php/style.css có source; native query/CF7 giữ, Blog/M2 chưa start. Current1.3.19 và metadata giữ nguyên theo precedent Category source ngoài current; runtime/AL/AM1/AR Chờ kiểm chứng.
+
 - `.context/planning/059_FUTURE_CANDIDATE_WOOCOMMERCE_BLOG_ARCHIVE_REPAIR.md` — human2026-11-06 yêu cầu lập file thảo luận sửa WooCommerce/Blog archives trong1.3.x. Đề xuất sau1.3.23, predecessor/SemVer/start chưa chốt; chưa runtime code. Theme visuals/native WP-Woo queries; không archive builder2.x hoặc thay query ownership Collections.
 
 Deploy reminder2026-11-06: human yêu cầu khi deploy phải nhắc chụp Editor UI, phục vụ SP-02 Organized Editor UI (khung làm việc có thứ tự, hạn chế nhầm lẫn). Checklist `docs/workflows/deploy-artifact-workflow.md` + register `docs/product/marketplace-selling-points.md`§5. Thu ảnh trên build deploy/editor load đúng assets, lưu metadata/evidence; tổng hợp nội bộ trước, trình bày marketplace sau. Không suy Inserter056 đã sửa hoặc tự deploy.

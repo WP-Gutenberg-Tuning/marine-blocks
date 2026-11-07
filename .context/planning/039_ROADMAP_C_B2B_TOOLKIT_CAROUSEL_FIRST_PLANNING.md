@@ -12,6 +12,8 @@
 
 ## 1. Mục tiêu roadmap C (human đã chốt)
 
+Mapping addition2026-11-06: human cho triển khai Woo Archive M1 (plan059§9–10) **chung1.3.20 Product Category Grid + Category details**, giữ version đã dùng và CG/DS acceptance; theme native archive visuals, không archive builder/query ownership migration. Đây là source scope addition ngoài current1.3.19 theo precedent Category source; không chuyển mốc/bump metadata. Blog archive và Archive M2 chưa start. Giữ AM1/AL/AR evidence riêng.
+
 **Mapping 2026-11-04:** human chốt **1.4.0 — Marine Blocks Identity & Compatibility Migration**, PLANNED chưa start; nền portability phục vụ M6, không kích hoạt toàn bộ M6/M3. [Plan 047](047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md). Setup UI cũ **1.4.0 → 1.4.1**; Layout Blocks Validation & Quote Evaluation/T-2 cũ **1.4.1 → 1.4.2**; giữ acceptance PENDING. Các bảng snapshot cũ bên dưới dùng số trước khi dời, đối chiếu mapping này và MILESTONES.md khi thực thi. Current vẫn 1.3.18, không bump metadata hoặc archive. MINOR mới dành cho scope migration sản phẩm/compatibility; naming đã chốt, start chưa chốt.
 
 **Cập nhật 2026-11-03:** human chốt **1.3.19 → 1.3.22 Product Page Basic Design Controls → 1.3.23 Post Page Basic Design Controls**. Hai mốc mới PLANNED, chưa start; số PATCH là ngoại lệ human xác nhận cho feature mới, không đổi quy tắc SemVer. Scope và acceptance nằm trong `../MILESTONES.md`. Consumer template liên quan M6, nền visual/editor liên quan M3; không kích hoạt toàn bộ hai stack. Giữ PHP/GeneratePress, default chung và override giới hạn; đối chiếu acceptance 1.3.5 trước implementation, không xóa scope cũ. **2.0 bắt đầu migration từng bước**, không phải đã độc lập. Current vẫn 1.3.18.

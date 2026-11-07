@@ -179,6 +179,28 @@ function skvn_marine_blocks_render_collection_post_card( $post, $attributes = ar
  * @return string
  */
 function skvn_marine_blocks_render_collection_product_card( $product, $attributes = array() ) {
+	return skvn_marine_blocks_render_product_card( $product, $attributes, skvn_marine_blocks_collection_layout( $attributes ) );
+}
+
+/**
+ * Public, query-free presenter. Collection callers retain their saved options;
+ * native archive callers use a fixed profile, independent of any saved block.
+ *
+ * @param WC_Product $product Current product supplied by the caller.
+ * @param array $attributes Presentation options (not query arguments).
+ * @param string $context archive|carousel|grid.
+ * @return string Escaped card markup; no list item or carousel container.
+ */
+function skvn_marine_blocks_render_product_card( $product, $attributes = array(), $context = 'grid' ) {
+	if ( ! $product instanceof WC_Product ) {
+		return '';
+	}
+	$is_archive = 'archive' === $context;
+	$archive_data = array();
+	if ( $is_archive ) {
+		$archive_data = skvn_marine_blocks_archive_card_data( $product );
+		$attributes = array( 'productActionMode' => 'quote', 'showImage' => true, 'showProductTags' => true, 'mediaLayout' => 'flush', 'cardContext' => 'archive' );
+	}
 	$product_id  = $product->get_id();
 	$title       = $product->get_name();
 	$url         = get_permalink( $product_id );
@@ -288,6 +310,9 @@ function skvn_marine_blocks_render_collection_product_card( $product, $attribute
 	}
 
 	$card_classes = array( 'skvn-collection-card', 'skvn-collection-card--product' );
+	if ( $is_archive ) {
+		$card_classes[] = 'skvn-collection-card--archive';
+	}
 	// Missing/empty legacy attributes keep their saved ratio/cover behavior.
 	// Explicit presets opt in; do not migrate old content merely by rendering it.
 	if ( isset( $attributes['mediaLayout'] ) && in_array( $attributes['mediaLayout'], array( 'flush', 'padded', 'floating' ), true ) ) {
@@ -405,18 +430,33 @@ function skvn_marine_blocks_render_collection_product_card( $product, $attribute
 	$lead_time = skvn_marine_blocks_parse_csv_meta( get_post_meta( $product_id, '_skvn_lead_time', true ) );
 	$pdf_raw   = get_post_meta( $product_id, '_skvn_spec_sheet_url', true );
 	$pdf_url   = is_string( $pdf_raw ) ? esc_url_raw( $pdf_raw ) : '';
+	if ( $is_archive ) {
+		$moq = $archive_data['moq'];
+		// Catalogue claims are opt-in after site data verification, not inferred from tags.
+		$verified = (bool) apply_filters( 'skvn_marine_blocks_archive_verified_catalog_meta', false, $product );
+		$certs = $verified ? skvn_marine_blocks_archive_meta_values( get_post_meta( $product_id, '_skvn_certifications', true ) ) : array();
+		$lead_time = $verified ? skvn_marine_blocks_archive_meta_values( get_post_meta( $product_id, '_skvn_lead_time', true ) ) : array();
+		$pdf_url = '';
+	}
 
 	ob_start();
 	?>
 	<article class="<?php echo esc_attr( implode( ' ', $card_classes ) ); ?>">
 		<?php if ( $show_image ) : ?>
+			<?php if ( $is_archive ) : ?><div class="skvn-collection-card__media-wrap"><?php endif; ?>
 			<a class="skvn-collection-card__media" href="<?php echo esc_url( $url ); ?>"<?php echo $media_wrapper_style ? ' style="' . esc_attr( $media_wrapper_style ) . '"' : ''; ?>>
 				<?php echo skvn_marine_blocks_get_product_image_html( $product, $media_img_style ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php
 				// Badge overlay: product_tag (Wild Caught, Farmed) — always on image.
-				echo skvn_marine_blocks_render_collection_term_badges( $product_id, 'product_tag', $attributes, 'showProductTags' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					if ( ! $is_archive ) {
+						echo skvn_marine_blocks_render_collection_term_badges( $product_id, 'product_tag', $attributes, 'showProductTags' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
 				?>
 			</a>
+			<?php if ( $is_archive ) : ?>
+				<?php echo skvn_marine_blocks_render_collection_term_badges( $product_id, 'product_tag', $attributes, 'showProductTags' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</div>
+			<?php endif; ?>
 		<?php endif; ?>
 		<div class="skvn-collection-card__body">
 			<h3 class="skvn-collection-card__title<?php echo esc_attr( $title_classes ); ?>">
@@ -426,8 +466,8 @@ function skvn_marine_blocks_render_collection_product_card( $product, $attribute
 				<?php
 				// B1: grouped summary only on Product Carousel. Product Grid keeps
 				// the existing flat chip behavior so shared consumers do not change.
-				if ( 'carousel' === skvn_marine_blocks_collection_layout( $attributes ) ) {
-					$spec_groups = skvn_marine_blocks_collection_spec_groups(
+				if ( $is_archive || 'carousel' === skvn_marine_blocks_collection_layout( $attributes ) ) {
+					$spec_groups = $is_archive ? $archive_data['groups'] : skvn_marine_blocks_collection_spec_groups(
 						$product,
 						skvn_marine_blocks_collection_spec_values_limit( $attributes )
 					);
@@ -435,6 +475,9 @@ function skvn_marine_blocks_render_collection_product_card( $product, $attribute
 						echo '<div class="skvn-collection-card__details' . esc_attr( $details_classes ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						echo skvn_marine_blocks_render_collection_spec_groups( $spec_groups ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						echo '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+					if ( $is_archive && ! $spec_groups ) {
+						echo '<p class="skvn-collection-card__empty-specs">' . esc_html__( 'Specifications available on request', 'skvn-marine-blocks' ) . '</p>';
 					}
 				} else {
 					$chip_values = skvn_marine_blocks_collection_flat_spec_values( $product );
@@ -494,11 +537,75 @@ function skvn_marine_blocks_render_collection_product_card( $product, $attribute
 					<?php esc_html_e( 'Learn more', 'skvn-marine-blocks' ); ?>
 				</a>
 			<?php endif; ?>
+			<?php if ( $is_archive ) : ?>
+				<a class="skvn-collection-card__details-link" href="<?php echo esc_url( $url ); ?>"><?php esc_html_e( 'View details', 'skvn-marine-blocks' ); ?><span class="skvn-collection-card__visually-hidden">: <?php echo esc_html( $title ); ?></span></a>
+			<?php endif; ?>
 		</div>
 	</article>
 	<?php
 
 	return (string) ob_get_clean();
+}
+
+/** Archive metadata keeps all scalar values, including "0". No sample defaults. */
+function skvn_marine_blocks_archive_meta_values( $raw ): array {
+	$options = is_array( $raw ) ? $raw : ( is_scalar( $raw ) ? explode( ',', (string) $raw ) : array() );
+	return skvn_marine_blocks_collection_clean_spec_values( array_values( array_filter( $options, 'is_scalar' ) ) );
+}
+
+/** Full values are the safe default until the site's detail-page route is verified. */
+function skvn_marine_blocks_archive_card_data( $product ): array {
+	$groups = skvn_marine_blocks_collection_spec_groups( $product, PHP_INT_MAX );
+	$moq = array();
+	$ordered = array();
+	$priority = array( 'form', 'product-form', 'size', 'freezing', 'packaging', 'pack', 'packing' );
+	foreach ( $groups as $index => $group ) {
+		$key = sanitize_title( str_replace( '_', '-', $group['label'] ) );
+		if ( 'moq' === $key ) {
+			$moq = array_merge( $moq, $group['values'] );
+			continue;
+		}
+		$rank = array_search( $key, $priority, true );
+		$ordered[] = array( 'rank' => false === $rank ? count( $priority ) : $rank, 'index' => $index, 'group' => $group );
+	}
+	usort( $ordered, static function ( $a, $b ) {
+		return ( $a['rank'] <=> $b['rank'] ) ?: ( $a['index'] <=> $b['index'] );
+	} );
+	$groups = array_column( $ordered, 'group' );
+	$full_details = (bool) apply_filters( 'skvn_marine_blocks_archive_full_specs_available', false, $product );
+	if ( $full_details ) {
+		foreach ( $groups as &$group ) {
+			$group['remaining'] = max( 0, count( $group['values'] ) - SKVN_MARINE_BLOCKS_SPEC_VALUES_LIMIT_DEFAULT );
+			$group['values'] = array_slice( $group['values'], 0, SKVN_MARINE_BLOCKS_SPEC_VALUES_LIMIT_DEFAULT );
+		}
+		unset( $group );
+	}
+	if ( ! $moq ) {
+		$moq = skvn_marine_blocks_archive_meta_values( get_post_meta( $product->get_id(), '_skvn_moq', true ) );
+	}
+	return array( 'groups' => $groups, 'moq' => $moq );
+}
+
+/** Register one shared handle for Collection/editor dependencies and native archives. */
+function skvn_marine_blocks_register_product_card_assets(): bool {
+	$root = dirname( __DIR__, 2 );
+	$path = $root . '/assets/css/product-card.css';
+	if ( ! is_readable( $path ) ) {
+		return false;
+	}
+	if ( ! wp_style_is( 'skvn-marine-product-card', 'registered' ) ) {
+		wp_register_style( 'skvn-marine-product-card', plugins_url( 'assets/css/product-card.css', $root . '/skvn-marine-blocks.php' ), array(), filemtime( $path ) );
+	}
+	return true;
+}
+
+/** Card-only asset: no block editor or Swiper dependency. False enables fallback. */
+function skvn_marine_blocks_enqueue_product_card_assets(): bool {
+	if ( ! skvn_marine_blocks_register_product_card_assets() ) {
+		return false;
+	}
+	wp_enqueue_style( 'skvn-marine-product-card' );
+	return true;
 }
 
 /**
@@ -522,10 +629,18 @@ function skvn_marine_blocks_render_collection_term_badges( $object_id, $taxonomy
 	}
 
 	$link_badges = isset( $attributes['badgeBehavior'] ) && 'archive-link' === $attributes['badgeBehavior'];
+	$many = '';
+	if ( isset( $attributes['cardContext'] ) && 'archive' === $attributes['cardContext'] ) {
+		$long = false;
+		foreach ( $terms as $term ) {
+			$long = $long || strlen( $term->name ) > 30;
+		}
+		$many = count( $terms ) > 3 || $long ? ' skvn-collection-card__badges--many' : '';
+	}
 
 	ob_start();
 	?>
-	<div class="skvn-collection-card__badges">
+	<div class="skvn-collection-card__badges<?php echo esc_attr( $many ); ?>">
 		<?php foreach ( $terms as $term ) : ?>
 			<?php if ( $link_badges ) : ?>
 				<a class="skvn-collection-card__badge" href="<?php echo esc_url( get_term_link( $term ) ); ?>"><?php echo esc_html( $term->name ); ?></a>

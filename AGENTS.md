@@ -9,6 +9,10 @@
 
 Current milestone: **V1 / 1.3.19 — Plugin Design Sidebar Foundation**
 
+Scope addition2026-11-06: human yêu cầu thực hiện plan059§9 và chọn “chung với1.3.20”. Woo Archive M1 bổ sung vào1.3.20 Product Category Grid + Category details; được coding source cùng mốc đó, theo precedent Category source ngoài current. Không tự đóng/chuyển current1.3.19 hoặc bump metadata. Desktop category sidebar trái, tablet navigation trên; native Woo query, theme visuals, CF7/CFDB7 quote giữ nguyên. Blog archive và Archive M2 chưa start. Acceptance AM1/AL/AR và CG/DS độc lập, không runtime PASS từ source. Plan059§10/runbook ghi triển khai và các design defaults cần human review.
+
+Archive card amendment2026-11-07: human duyệt plan060/shared Product Carousel card và start trong scope1.3.20; ảnh **1:1**, cho đổi ratio để scope kế tiếp chưa gánversion/control owner. Không thêm ratio setting bây giờ; preserve native query/fallback/Collection behavior.060§11–12 và runbook là source/evidence ledger, không runtime PASS hoặc chuyển current.
+
 Scope addition2026-11-05 — Content Actions: human duyệt toàn gói plan057 §11–14 (Product/Post Collections + Slider/Slide), bổ sung current1.3.19, không bump metadata/chuyển milestone; cho agent coding và commit prefix `feature patch:`. Menu ⋮ từng block, giữ style đích, exact type/shape, query là content, empty ghi đè; API/runtime preflight và acceptance vẫn phải kiểm. Right-click plan058 Deferred sau2.0. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`; không hỏi lại scope/version/start đã duyệt, không coi approval là runtime PASS.
 
 Scope addition2026-11-05: human duyệt Responsive Spacer plan055, cho implementation và commit `feature patch:` trong current1.3.19; không chuyển milestone/bump metadata. Source/acceptance riêng RS-*; build/lint/onsite chưa nghiệm thu. Spec `.context/planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md`.

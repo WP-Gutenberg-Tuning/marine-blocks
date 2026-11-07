@@ -195,6 +195,23 @@ docs/
 
 ## Target Site Requirements
 
+### Archive shared card — 1.3.20 artifact audit
+
+Plan060 public presenter and optional theme adapter require both files below in the deploy artifacts. Build tooling now asserts them after copying; this is not proof that a zip was built in the current session.
+
+```text
+skvn-marine-blocks/modules/collection-render/cards.php
+skvn-marine-blocks/assets/css/product-card.css
+skvn-marine/inc/templates/archive-product-card.php
+```
+
+After human build/package, verify plugin zip lists the presenter and CSS, and theme zip lists the adapter. Theme includes the adapter through scoped Woo template resolution, not a direct require into plugin internals. Old/missing plugin API or missing standalone stylesheet uses native theme fallback. A mixed deployment still requires smoke testing; no automatic release approval.
+
+```bash
+unzip -l build/skvn-marine-blocks.zip | rg 'modules/collection-render/cards.php|assets/css/product-card.css'
+unzip -l build/skvn-marine.zip | rg 'inc/templates/archive-product-card.php'
+```
+
 Before activating SKVN code on the target site:
 
 ```text

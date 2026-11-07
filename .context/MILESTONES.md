@@ -970,6 +970,14 @@ Acceptance — toàn bộ **Chưa làm**, không có runtime evidence:
 
 ### 1.3.20 — Product Category Grid + Category details
 
+Archive shared-card approval2026-11-07: human duyệt060 với ảnh **1:1**; ratio setting để scope kế tiếp chưa gánversion. Source shared presenter/assets/theme adapter đã thêm;060§11–12/runbook.7CSS cascade modelPASS; combined32PHP/hook-template10 chưa chạy; actual AC/AM1/AL/AR/CG/DS chưa PASS. Không chuyển current/bump metadata hoặc thêm ratio setting hiện tại.
+
+Archive card design proposal2026-11-07: human yêu cầu plan reuse Product Carousel card, **chưa duyệt/code delta**. Plan060 `planning/060_VER_1_3_20_ARCHIVE_PRODUCT_CARD_REUSE_PLAN.md`: shared presenter/assets + native archive adapter/fallback, grouped visible specs/tags và +N policy, AC-* acceptance. Chờ duyệt§10; không thay five-row baseline/AM1 hoặc16model evidence trước approval, không chuyển current/bump.
+
+Archive M1 evidence2026-11-07: human `tools/tests/woo-archive-m1.test.php` **16/16 PASS (mocked model only)**. Scope guards/spec extraction/MOQ/category tree/escaping/native placeholder;059§10 + runbook lưu evidence. PHP/build versions và lint output chưa có; Woo/GP/runtime/AL/AM1/AR vẫn Chờ kiểm chứng. Không đổi CG/DS/current1.3.19 hoặc đánh milestone PASS.
+
+Scope addition / source start2026-11-06: human “Thực hiện” và chọn “chung với1.3.20” cho Woo Archive M1 theo059§9. Bổ sung Shop/product category/tag native archive visuals: desktop category sidebar trái, tablet navigation trên, card5specs và quote CTA. Cùng1.3.20 theo ngoại lệ numbering đã có; không đổi Category CG/DS scope, không tự chuyển current1.3.19/bump metadata hoặc suy nghiệm thu. Blog/M2 chưa start. Source thực hiện trong theme, execution059§10; AM1/AL/AR và runbook `docs/testing/archive-repair-1.3.x.md` Chờ kiểm chứng. Current1.3.19 và carry acceptance giữ nguyên như khi Category source được thêm ngoài current.
+
 Execution plan: `.context/planning/049_VER_1_3_20_PRODUCT_CATEGORY_GRID_EXECUTION_PLAN.md` (2026-11-04). Planning/data/render contract độc lập Carousel; Design integration phụ thuộc Sidebar1.3.19. C0–C6 giữ toàn bộ CG-* và DS áp Category. Human duyệt Q1=A eligibility/count gồm descendants theo catalog/stock policy; Q2=A card gọn, 3/2/1 cột theo container có controls, image/name bật và description/count/CTA tùy bật; Q3=B rich text native an toàn, excerpt riêng ở card. Chi tiết defaults/links tại049 §6. Category details Save category/Page Save khác Theme Design Save riêng. Chưa start1.3.20.
 
 Carry-in từ đổi thứ tự 2026-11-04: tích hợp nền Sidebar 1.3.19 khi Category có source; kế thừa acceptance vị trí controls/Category details không lẫn Design, keyboard/sidebar hẹp, preview → save/reopen → frontend với inherited token/block override, nội dung dài/thiếu ảnh/responsive. Giữ DS-01–07 áp dụng cho consumer Category và toàn bộ CG-*; không yêu cầu tạo Category trước trong 1.3.19.
@@ -1094,6 +1102,8 @@ Acceptance — tất cả **Chưa làm**, chưa có runtime evidence:
 ### 1.3.x — WooCommerce + Blog Archive Repair (Future Candidate, SemVer TBD)
 
 Status: **PLANNED — discussion, chưa start**. Human2026-11-06 yêu cầu sửa hai archive trong1.3.x, tạo file để thảo luận trước; chưa chọn predecessor/version cụ thể. **Đề xuất** sau1.3.23 Post Page Basic Design Controls; không tự gán1.3.24, đổi current hoặc bump metadata. Trước implementation xác nhận scope/PATCH rationale, version chưa dùng và start theo AGENTS. Nếu phát sinh feature/controls mới cần đánh giá lại SemVer, không tự coi nhãn1.3.x là ngoại lệ numbering.
+
+Update2026-11-06 (supersedes Woo scheduling above): human đã cho thực hiện Woo Archive M1 **chung1.3.20**. Woo M1 không còn đợi sau1.3.23; source start/acceptance theo entry1.3.20 và059§10. **Blog archive** vẫn PLANNED/SemVer TBD, chưa start; **Archive M2** chưa start. Không chuyển current1.3.19 hoặc coi source là PASS.
 
 Plan `planning/059_FUTURE_CANDIDATE_WOOCOMMERCE_BLOG_ARCHIVE_REPAIR.md`: inventory Shop/product taxonomy + posts index/category/tag; template/route/main-query map, design trước sửa, responsive/cards/sidebar/pagination/empty states. Theme owns visuals; WP/Woo native query/routing giữ owner; không thay bằng plugin Collection query hoặc mở archive builder/facets2.x. Giữ plan025/1.3.5 acceptance và1.3.22–23 regression. AR-* **Chưa làm**; URL/pain points/design/SemVer/start còn mở; không runtime code trong lượt planning.
 

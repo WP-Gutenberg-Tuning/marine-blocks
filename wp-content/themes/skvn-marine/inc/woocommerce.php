@@ -65,6 +65,10 @@ function skvn_marine_woocommerce_loop_quote_link( $html, $product, $args ) {
 			array_map( 'sanitize_html_class', preg_split( '/\s+/', $args['class'] ) )
 		);
 	}
+	if ( skvn_marine_is_native_product_archive() ) {
+		// The link navigates to a quote, so Woo's AJAX-cart handler must not intercept it.
+		$classes = array_diff( $classes, array( 'ajax_add_to_cart', 'add_to_cart_button' ) );
+	}
 
 	return sprintf(
 		'<a href="%1$s" class="%2$s" aria-label="%3$s">%4$s</a>',
@@ -467,5 +471,235 @@ function skvn_marine_tab_articles(): void {
  * @return string
  */
 function skvn_marine_woocommerce_placeholder( string $html, $size, $classes ): string {
+	if ( skvn_marine_is_native_product_archive() ) {
+		return $html;
+	}
 	return '<div class="skvn-product-placeholder" aria-label="' . esc_attr__( 'Hình sắp cập nhật', 'skvn-marine' ) . '"><span>' . esc_html__( 'Hình sắp cập nhật', 'skvn-marine' ) . '</span></div>';
+}
+
+/** Native archives only; embedded product shortcodes retain their own layout. */
+function skvn_marine_is_native_product_archive(): bool {
+	return function_exists( 'is_shop' ) && ( is_shop() || is_product_category() || is_product_tag() )
+		&& ! ( function_exists( 'wc_get_loop_prop' ) && wc_get_loop_prop( 'is_shortcode' ) );
+}
+
+add_filter( 'body_class', function ( $classes ) {
+	if ( skvn_marine_is_native_product_archive() ) {
+		$classes[] = 'skvn-woo-archive';
+	}
+	return $classes;
+} );
+add_filter( 'generate_sidebar_layout', function ( $layout ) {
+	return skvn_marine_is_native_product_archive() ? 'no-sidebar' : $layout;
+}, 50 );
+
+add_action( 'wp', function () {
+	if ( ! skvn_marine_is_native_product_archive() ) {
+		return;
+	}
+	// Keep Woo's native loop, ordering, notices, pagination and archive header.
+	remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
+} );
+
+add_action( 'woocommerce_before_shop_loop', 'skvn_marine_archive_open', 0 );
+add_action( 'woocommerce_no_products_found', 'skvn_marine_archive_open', 0 );
+add_action( 'woocommerce_after_shop_loop', 'skvn_marine_archive_close', 99 );
+add_action( 'woocommerce_no_products_found', 'skvn_marine_archive_close', 99 );
+add_action( 'woocommerce_before_shop_loop', function () {
+	if ( skvn_marine_is_native_product_archive() ) {
+		echo '<div class="skvn-archive-toolbar">';
+	}
+}, 15 );
+add_action( 'woocommerce_before_shop_loop', function () {
+	if ( skvn_marine_is_native_product_archive() ) {
+		echo '</div>';
+	}
+}, 35 );
+
+/** Open the same shell for normal and empty archives, with one category tree. */
+function skvn_marine_archive_open(): void {
+	if ( ! skvn_marine_is_native_product_archive() ) {
+		return;
+	}
+	$shop_url = wc_get_page_permalink( 'shop' );
+	$current  = is_product_category() ? get_queried_object_id() : 0;
+	// Keep empty/current categories reachable; counts are intentionally not displayed.
+	$terms    = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => false, 'orderby' => 'name' ) );
+	echo '<div class="skvn-archive-layout"><nav class="skvn-archive-categories" aria-label="' . esc_attr__( 'Product categories', 'skvn-marine' ) . '">';
+	echo '<h2>' . esc_html__( 'Categories', 'skvn-marine' ) . '</h2><ul>';
+	printf( '<li><a href="%s"%s>%s</a></li>', esc_url( $shop_url ), is_shop() ? ' aria-current="page"' : '', esc_html__( 'All products', 'skvn-marine' ) );
+	if ( ! is_wp_error( $terms ) ) {
+		// Group once; do not query once per category or take ownership of product queries.
+		$children = array();
+		$ids      = array_fill_keys( wp_list_pluck( $terms, 'term_id' ), true );
+		foreach ( $terms as $term ) {
+			$parent = isset( $ids[ $term->parent ] ) ? $term->parent : 0;
+			$children[ $parent ][] = $term;
+		}
+		$ancestors = $current ? get_ancestors( $current, 'product_cat', 'taxonomy' ) : array();
+		skvn_marine_archive_category_items( $children, 0, $current, $ancestors );
+	}
+	echo '</ul></nav><div class="skvn-archive-results">';
+}
+
+/** Render a native taxonomy tree, guarding malformed cycles without truncating values. */
+function skvn_marine_archive_category_items( array $children, int $parent, int $current, array $ancestors, array $visited = array() ): void {
+	foreach ( $children[ $parent ] ?? array() as $term ) {
+		$id = (int) $term->term_id;
+		if ( isset( $visited[ $id ] ) ) {
+			continue;
+		}
+		$visited[ $id ] = true;
+		$url = get_term_link( $term );
+		if ( is_wp_error( $url ) ) {
+			continue;
+		}
+		printf( '<li%s><a href="%s"%s>%s</a>', in_array( $id, $ancestors, true ) ? ' class="is-current-ancestor"' : '', esc_url( $url ), $id === $current ? ' aria-current="page"' : '', esc_html( $term->name ) );
+		if ( ! empty( $children[ $id ] ) ) {
+			echo '<ul>';
+			skvn_marine_archive_category_items( $children, $id, $current, $ancestors, $visited );
+			echo '</ul>';
+		}
+		echo '</li>';
+	}
+}
+
+function skvn_marine_archive_close(): void {
+	if ( ! skvn_marine_is_native_product_archive() ) {
+		return;
+	}
+	echo '</div></div><section class="skvn-archive-sales"><h2>' . esc_html__( 'Can’t find the product you need?', 'skvn-marine' ) . '</h2>';
+	echo '<p>' . esc_html__( 'Tell our team about your requirements.', 'skvn-marine' ) . '</p>';
+	printf( '<a class="skvn-button skvn-button--primary" href="%s">%s</a></section>', esc_url( home_url( '/request-a-quote/' ) ), esc_html__( 'Contact sales', 'skvn-marine' ) );
+}
+
+add_action( 'woocommerce_after_shop_loop_item', 'skvn_marine_archive_specs', 7 );
+add_action( 'woocommerce_after_shop_loop_item', 'skvn_marine_archive_details', 20 );
+function skvn_marine_archive_details(): void {
+	global $product;
+	if ( skvn_marine_is_native_product_archive() && $product instanceof WC_Product ) {
+		printf( '<a class="skvn-archive-details" href="%s">%s<span class="screen-reader-text">: %s</span></a>', esc_url( get_permalink( $product->get_id() ) ), esc_html__( 'View details', 'skvn-marine' ), esc_html( $product->get_name() ) );
+	}
+}
+
+/** Use the optional public presenter only when its standalone CSS was queued. */
+function skvn_marine_archive_shared_card_ready(): bool {
+	return skvn_marine_is_native_product_archive()
+		&& ! empty( $GLOBALS['skvn_marine_archive_card_assets_ready'] )
+		&& function_exists( 'skvn_marine_blocks_render_product_card' );
+}
+
+add_action( 'wp_enqueue_scripts', function () {
+	if ( skvn_marine_is_native_product_archive()
+		&& function_exists( 'skvn_marine_blocks_render_product_card' )
+		&& function_exists( 'skvn_marine_blocks_enqueue_product_card_assets' ) ) {
+		$GLOBALS['skvn_marine_archive_card_assets_ready'] = skvn_marine_blocks_enqueue_product_card_assets();
+	}
+}, 40 );
+
+add_filter( 'wc_get_template_part', function ( $template, $slug, $name ) {
+	if ( 'content' !== $slug || 'product' !== $name || ! skvn_marine_archive_shared_card_ready()
+		|| ! in_the_loop() || ! is_main_query() ) {
+		return $template;
+	}
+	if ( defined( 'WC_TEMPLATE_DEBUG_MODE' ) && WC_TEMPLATE_DEBUG_MODE ) {
+		return $template;
+	}
+	$woocommerce = function_exists( 'WC' ) ? WC() : null;
+	if ( ! $woocommerce || ! method_exists( $woocommerce, 'plugin_path' )
+		|| wp_normalize_path( $template ) !== wp_normalize_path( $woocommerce->plugin_path() . '/templates/content-product.php' ) ) {
+		// Respect an existing theme/extension override instead of silently replacing it.
+		return $template;
+	}
+	$adapter = get_stylesheet_directory() . '/inc/templates/archive-product-card.php';
+	return is_readable( $adapter ) ? $adapter : $template;
+}, 50, 3 );
+
+/**
+ * Retain Woo's five loop actions for extensions, suppress only known native
+ * presentation callbacks for this item, and restore them even if a hook fails.
+ * Third-party hook markup surrounds the shared article; no claim of pixel parity
+ * for extensions that rely on Woo's old image/title link nesting.
+ */
+function skvn_marine_archive_shared_product_content( $product ): void {
+	$html = skvn_marine_blocks_render_product_card( $product, array(), 'archive' );
+	$callbacks = array(
+		'woocommerce_before_shop_loop_item' => array( 'woocommerce_template_loop_product_link_open' ),
+		'woocommerce_before_shop_loop_item_title' => array( 'woocommerce_show_product_loop_sale_flash', 'woocommerce_template_loop_product_thumbnail' ),
+		'woocommerce_shop_loop_item_title' => array( 'woocommerce_template_loop_product_title' ),
+		'woocommerce_after_shop_loop_item_title' => array( 'woocommerce_template_loop_rating', 'woocommerce_template_loop_price' ),
+		'woocommerce_after_shop_loop_item' => array( 'woocommerce_template_loop_product_link_close', 'woocommerce_template_loop_add_to_cart', 'skvn_marine_archive_specs', 'skvn_marine_archive_details' ),
+	);
+	$restore = array();
+	foreach ( $callbacks as $hook => $functions ) {
+		foreach ( $functions as $callback ) {
+			$priority = has_action( $hook, $callback );
+			if ( false !== $priority ) {
+				$restore[] = array( $hook, $callback, $priority );
+				remove_action( $hook, $callback, $priority );
+			}
+		}
+	}
+	try {
+		do_action( 'woocommerce_before_shop_loop_item' );
+		do_action( 'woocommerce_before_shop_loop_item_title' );
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- public presenter escapes all fields.
+		do_action( 'woocommerce_shop_loop_item_title' );
+		do_action( 'woocommerce_after_shop_loop_item_title' );
+		do_action( 'woocommerce_after_shop_loop_item' );
+	} finally {
+		foreach ( $restore as $item ) {
+			add_action( $item[0], $item[1], $item[2] );
+		}
+	}
+}
+
+/** Read visible Woo attributes; never infer sizes/MOQ from sample data. */
+function skvn_marine_archive_spec_values( $product ): array {
+	$aliases = apply_filters( 'skvn_marine_archive_spec_aliases', array(
+		'form' => array( 'form', 'product-form' ), 'size' => array( 'size' ),
+		'freezing' => array( 'freezing' ), 'packaging' => array( 'packaging', 'pack', 'packing' ),
+		'moq' => array( 'moq' ),
+	) );
+	$values = array_fill_keys( array( 'form', 'size', 'freezing', 'packaging', 'moq' ), array() );
+	foreach ( $product->get_attributes() as $attribute ) {
+		if ( ! $attribute->get_visible() ) {
+			continue;
+		}
+		$key = sanitize_title( str_replace( '_', '-', preg_replace( '/^pa_/', '', $attribute->get_name() ) ) );
+		foreach ( $values as $group => $_unused ) {
+			if ( ! in_array( $key, $aliases[ $group ] ?? array(), true ) ) {
+				continue;
+			}
+			$options = $attribute->is_taxonomy() ? wc_get_product_terms( $product->get_id(), $attribute->get_name(), array( 'fields' => 'names' ) ) : $attribute->get_options();
+			if ( is_wp_error( $options ) ) {
+				continue;
+			}
+			foreach ( $options as $option ) {
+				if ( is_scalar( $option ) && '' !== trim( (string) $option ) ) {
+					$values[ $group ][] = trim( wp_strip_all_tags( (string) $option ) );
+				}
+			}
+		}
+	}
+	$moq = get_post_meta( $product->get_id(), '_skvn_moq', true );
+	if ( empty( $values['moq'] ) && is_string( $moq ) && '' !== trim( $moq ) ) {
+		$values['moq'][] = wp_strip_all_tags( $moq );
+	}
+	return array_map( function ( $items ) { return implode( ', ', array_unique( $items ) ); }, $values );
+}
+
+function skvn_marine_archive_specs(): void {
+	global $product;
+	if ( ! skvn_marine_is_native_product_archive() || ! $product instanceof WC_Product ) {
+		return;
+	}
+	$labels = array( 'form' => __( 'Form', 'skvn-marine' ), 'size' => __( 'Size', 'skvn-marine' ), 'freezing' => __( 'Freezing', 'skvn-marine' ), 'packaging' => __( 'Packaging', 'skvn-marine' ), 'moq' => __( 'MOQ', 'skvn-marine' ) );
+	$values = skvn_marine_archive_spec_values( $product );
+	// Priority 7 follows Woo's link close at 5 and precedes the quote CTA at 10.
+	echo '<dl class="skvn-archive-specs">';
+	foreach ( $labels as $key => $label ) {
+		echo '<div><dt>' . esc_html( $label ) . '</dt><dd>' . ( '' !== $values[ $key ] ? esc_html( $values[ $key ] ) : '<span aria-label="' . esc_attr__( 'Not specified', 'skvn-marine' ) . '">—</span>' ) . '</dd></div>';
+	}
+	echo '</dl>';
 }

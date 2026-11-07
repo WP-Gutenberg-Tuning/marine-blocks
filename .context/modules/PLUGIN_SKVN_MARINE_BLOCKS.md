@@ -2,6 +2,8 @@
 
 ## [manual] Role
 
+Shared product-card API060 approved/source2026-11-07 trong1.3.20: `skvn_marine_blocks_render_product_card` query-free public presenter, existing Collection wrapper giữ flat/grouped/media options; card-only asset `assets/css/product-card.css` import bởi Collection + optional enqueue helper cho theme archive. Archive profile1:1/full specs safe-default, verified meta opt-in/no PDF. Theme adapter không require plugin internals.7CSS modelPASS, PHP/onsite/build pending. Ratio controls next scope deferred, current không chuyển; API consumer theme cần wrapper khi migration1.4.0.
+
 Deploy/marketplace reminder2026-11-06: SP-02 Organized Editor UI được human chọn vì khung làm việc có thứ tự giúp hạn chế nhầm lẫn. Khi deploy agent nhắc human chụp Editor UI (khung/nhãn block, nhóm công việc/sidebar) trên build thực tế; checklist deploy workflow, brief register§5. Chưa tạo listing/claim usability đo lường; Inserter056 còn scope riêng.
 
 Marketplace positioning2026-11-06: human xác nhận Content Actions là sale point; lưu feature brief và evidence ở `docs/product/marketplace-selling-points.md` SP-01, tổng hợp dần trước khi trình bày vào giai đoạn marketplace. Không tự xuất bản copy, hứa compatibility hoặc đổi public-launch gate. Technical spec vẫn057, acceptance ở runbook.

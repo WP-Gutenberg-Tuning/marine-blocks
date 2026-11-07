@@ -61,6 +61,7 @@ function skvn_marine_blocks_register_blocks() {
 	if ( ! function_exists( 'register_block_type' ) ) {
 		return;
 	}
+	$card_style_deps = skvn_marine_blocks_register_product_card_assets() ? array( 'skvn-marine-product-card' ) : array();
 
 	$editor_script = __DIR__ . '/build/index.ts.js';
 	$editor_asset  = __DIR__ . '/build/index.ts.asset.php';
@@ -89,7 +90,7 @@ function skvn_marine_blocks_register_blocks() {
 		wp_register_style(
 			'skvn-marine-blocks-editor',
 			plugins_url( 'build/style-index.ts.css', __FILE__ ),
-			array(),
+			$card_style_deps,
 			filemtime( $editor_style )
 		);
 	}
@@ -198,7 +199,7 @@ function skvn_marine_blocks_register_blocks() {
 		wp_register_style(
 			'skvn-marine-blocks-collection-view',
 			plugins_url( 'build/collection-view.ts.css', __FILE__ ),
-			array(),
+			$card_style_deps,
 			filemtime( $collection_view_style )
 		);
 	}

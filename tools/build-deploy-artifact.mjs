@@ -65,6 +65,9 @@ if (existsSync(resolve(pluginSource, 'assets'))) {
 
 assertExists(resolve(pluginTarget, 'skvn-marine-blocks.php'), 'plugin bootstrap');
 assertExists(resolve(pluginTarget, 'build'), 'plugin build directory');
+assertExists(resolve(pluginTarget, 'modules/collection-render/cards.php'), 'public product card presenter');
+assertExists(resolve(pluginTarget, 'assets/css/product-card.css'), 'standalone product card stylesheet');
+assertExists(resolve(themeTarget, 'inc/templates/archive-product-card.php'), 'native Woo archive card adapter');
 if (existsSync(resolve(pluginSource, 'modules'))) {
 	assertExists(resolve(pluginTarget, 'modules'), 'plugin runtime modules directory');
 }
