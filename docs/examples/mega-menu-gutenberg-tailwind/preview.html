@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gutenberg mega-menu prototype</title>
+<link rel="stylesheet" href="./menu.css">
+<style>
+/* Deliberately AFTER menu.css: reproduce the observed GP/core cascade conflict.
+ * This small fixture is not a copy of the complete WordPress/theme runtime. */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;font-size:17px;line-height:1.5;background:#f8fafc}
+p{margin:0 0 1.5em}
+a{color:#1e73be;text-decoration:underline}
+h3{font-size:29px;line-height:1.2;font-weight:400;margin:0 0 20px;text-transform:none}
+body:not(.wp-admin) .wp-block-heading{font-family:Georgia,serif;letter-spacing:0;color:#082f49}
+.wp-block-button .wp-block-button__link{display:inline-block;padding:10px 20px;font-size:inherit;line-height:inherit}
+a.wp-block-button__link:not(.has-background){color:#fff;background-color:#55555e}
+.preview-notes{max-width:1200px;margin:32px auto;padding:24px;min-height:110vh;color:#526570;line-height:1.6}
+.preview-notes p{margin:0 0 12px}
+</style>
+<script src="./mobile-drawer.js" defer></script></head><body>
+<header>
+<div class="wp-block-group marine-menu-demo bg-white">
+<div class="wp-block-group marine-menu-shell mx-auto w-full px-5 py-5">
+<div class="wp-block-group flex flex-wrap items-center justify-between gap-x-8 gap-y-4"><p class="marine-menu-brand wp-block-site-title"><a href="#">Your site name</a></p>
+
+<div class="wp-block-group marine-menu-links flex flex-wrap items-center gap-x-6 gap-y-3">
+<details open class="wp-block-details marine-menu-disclosure"><summary>Products</summary>
+<div class="wp-block-group marine-menu-panel grid grid-cols-1 gap-8 md:grid-cols-3">
+<div class="wp-block-group min-w-0">
+<h3 class="wp-block-heading marine-menu-heading">Products</h3>
+
+<p class="marine-menu-link"><a href="#replace-grouper-url">Grouper</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-barramundi-url">Barramundi</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-fusilier-url">Fusilier</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-mahi-mahi-url">Mahi-Mahi</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-red-snapper-url">Red Snapper</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-pangasius-url">Pangasius</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-all-products-url">All products</a></p>
+</div>
+
+
+<div class="wp-block-group min-w-0">
+<h3 class="wp-block-heading marine-menu-heading">Food Service</h3>
+
+<p class="marine-menu-link"><a href="#replace-food-service-url">Food service solutions</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-product-formats-url">Product formats</a></p>
+</div>
+
+
+<div class="wp-block-group min-w-0">
+<h3 class="wp-block-heading marine-menu-heading">Capabilities</h3>
+
+<p class="marine-menu-link"><a href="#replace-processing-url">Processing &amp; packing</a></p>
+
+
+<p class="marine-menu-link"><a href="#replace-quality-url">Quality &amp; traceability</a></p>
+</div>
+</div>
+</details>
+
+<p class="marine-menu-toplink"><a href="#replace-about-url">About us</a></p>
+
+<p class="marine-menu-toplink"><a href="#replace-contact-url">Contact</a></p>
+</div>
+
+<div class="wp-block-buttons">
+<div class="wp-block-button marine-menu-cta"><a class="wp-block-button__link wp-element-button" href="#replace-quote-url">Request a quote</a></div>
+</div>
+</div>
+</div>
+</div>
+
+</header>
+<main class="preview-notes"><p>Desktop: click Products. Mobile: open Menu to see the sliding drawer.</p><p>All menu URLs are placeholders. Resize below 768px; try Close, Escape, and the backdrop.</p><p>This viewer uses menu.css directly, with theme-like conflicting styles loaded after it. WordPress/WindPress integration still needs testing.</p></main>
+</body></html>

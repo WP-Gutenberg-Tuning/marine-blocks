@@ -1,0 +1,402 @@
+/* Canonical, unlayered menu CSS. Normal theme rules outside cascade layers
+ * must not outrank the menu merely because its rules were placed in a layer.
+ * Scope every override to the menu; do not reset WordPress/GeneratePress globally.
+ * Run sync-preview.mjs after edits to refresh windpress.css and preview.html.
+ * This standalone file needs no Tailwind compiler. Never paste it into blocks. */
+.marine-menu-demo, .marine-menu-demo * {
+  box-sizing: border-box;
+}
+.marine-menu-demo {
+  color: var(--skvn-color-blue-950, #082f49);
+  font-family: var(--skvn-font-ui, system-ui, sans-serif);
+  border-bottom: 1px solid #e2e8f0;
+}
+.marine-menu-demo .marine-menu-shell {
+  max-width: var(--wp--style--global--wide-size, 1200px);
+}
+.marine-menu-demo .marine-menu-brand {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+.marine-menu-demo .marine-menu-brand a {
+  text-decoration: none;
+  color: inherit;
+}
+.marine-menu-demo .marine-menu-links {
+  margin: 0;
+  min-width: 0;
+}
+.marine-menu-demo .marine-menu-toplink {
+  margin: 0;
+  font-size: .875rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.marine-menu-demo .marine-menu-toplink a {
+  display: block;
+  padding-block: .75rem;
+  text-decoration: none;
+  color: inherit;
+}
+.marine-menu-disclosure {
+  margin: 0;
+  min-width: 0;
+}
+.marine-menu-disclosure > summary {
+  cursor: pointer;
+  border-radius: .5rem;
+  padding-inline: .75rem;
+  padding-block: .75rem;
+  font-size: .875rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.marine-menu-disclosure > summary::marker {
+  color: var(--skvn-color-primary, #1e79be);
+}
+.marine-menu-disclosure[open] > summary {
+  background: var(--skvn-color-fresh-sky, #eaf7ff);
+}
+.marine-menu-panel {
+  border-radius: 1rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e2e8f0;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px #00000014,0 4px 6px -4px #00000014;
+  color: var(--skvn-color-blue-950, #082f49);
+}
+/* Three classes outrank the SKVN heading selector (0,2,1) after layer parity.
+ * Works for both the full header and the panel-only Gutenberg composition. */
+.marine-menu-panel .wp-block-heading.marine-menu-heading {
+  margin: 0;
+  margin-bottom: 1rem;
+  font-size: .75rem;
+  line-height: 1.5;
+  font-weight: 700;
+  font-family: var(--skvn-font-ui, system-ui, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #526570;
+}
+.marine-menu-panel .marine-menu-link {
+  margin: 0;
+}
+.marine-menu-panel .marine-menu-link a {
+  display: block;
+  border-radius: .5rem;
+  padding-inline: .75rem;
+  padding-block: .75rem;
+  font-size: .875rem;
+  line-height: 1.5;
+  font-weight: 500;
+  text-decoration: none;
+  color: inherit;
+}
+.marine-menu-panel .marine-menu-link a:hover {
+  background: var(--skvn-color-fresh-sky, #eaf7ff);
+}
+.marine-menu-demo .marine-menu-cta .wp-block-button__link {
+  border-radius: 9999px;
+  padding-inline: 1.25rem;
+  padding-block: .75rem;
+  font-size: .875rem;
+  line-height: 1.5;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--skvn-color-primary, #1e79be);
+  color: #fff;
+}
+.marine-menu-demo a:focus-visible, .marine-menu-demo summary:focus-visible, .marine-menu-demo button:focus-visible,
+  .marine-menu-panel a:focus-visible {
+  outline: 2px solid var(--skvn-color-primary, #1e79be);
+  outline-offset: 3px;
+}
+/* Width/position belongs to the demo header root; no viewport-width math.
+   * In plugin-panel-only mode the plugin owns popup positioning. */
+@media (min-width: 768px) {
+  .marine-menu-demo {
+    position: relative;
+  }
+  .marine-menu-demo .marine-menu-disclosure > .marine-menu-panel {
+    position: absolute;
+    z-index: 30;
+    inset-inline: 20px;
+    top: 100%;
+    max-width: var(--wp--style--global--wide-size, 1200px);
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+}
+@media (width < 768px) {
+  .marine-menu-demo .marine-menu-links, .marine-menu-demo .marine-menu-disclosure {
+    width: 100%;
+  }
+  .marine-menu-demo .marine-menu-panel {
+    margin-top: .75rem;
+  }
+}
+/* Progressive enhancement: JS moves the original blocks into a native modal.
+   * With JS unavailable, the original in-flow navigation remains usable. */
+.marine-menu-demo .marine-menu-toggle,
+  .marine-menu-demo .marine-menu-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.marine-menu-demo .marine-menu-toggle[hidden] {
+  display: none;
+}
+.marine-menu-demo .marine-menu-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  padding: 24px;
+  width: min(420px, calc(100% - 24px));
+  max-width: calc(100% - 24px);
+  /* Modal intentionally fills the visible viewport height, not page height. */
+  height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  box-sizing: border-box;
+  border: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  box-shadow: -12px 0 40px #082f4926;
+}
+.marine-menu-demo .marine-menu-drawer[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.marine-menu-demo .marine-menu-drawer:not([open]) {
+  display: none;
+}
+.marine-menu-demo .marine-menu-drawer::backdrop {
+  background: #082f4980;
+  animation: marine-menu-backdrop-in 240ms ease-out;
+}
+.marine-menu-demo .marine-menu-drawer.is-closing::backdrop {
+  animation: marine-menu-backdrop-out 180ms ease-in forwards;
+}
+.marine-menu-demo .marine-menu-drawer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.marine-menu-demo .marine-menu-drawer-top h2 {
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.marine-menu-demo .marine-menu-drawer .marine-menu-links {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 100%;
+}
+.marine-menu-demo .marine-menu-drawer .marine-menu-panel {
+  padding: 16px;
+  box-shadow: none;
+}
+.marine-menu-demo .marine-menu-drawer .marine-menu-toplink a {
+  padding-inline: 12px;
+}
+.marine-menu-demo .marine-menu-drawer > .wp-block-buttons {
+  margin: auto 0 0;
+  padding-top: 12px;
+  flex-shrink: 0;
+}
+.marine-menu-demo .marine-menu-drawer .marine-menu-cta,
+  .marine-menu-demo .marine-menu-drawer .marine-menu-cta a {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+@keyframes marine-menu-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes marine-menu-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marine-menu-demo .marine-menu-drawer::backdrop,
+    .marine-menu-demo .marine-menu-drawer.is-closing::backdrop {
+    animation: none;
+  }
+}
+/* Prevent a positioned overlay covering the block editor while editing. */
+.editor-styles-wrapper .marine-menu-demo .marine-menu-disclosure > .marine-menu-panel {
+  position: static;
+  max-width: 100%;
+  margin-top: 12px;
+}
+/* Standalone utility fallbacks. WindPress supplies these in its own path. */
+.marine-menu-demo.m-0,.marine-menu-demo .m-0 {
+  margin: 0;
+}
+.marine-menu-demo.text-lg,.marine-menu-demo .text-lg {
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+.marine-menu-demo.font-bold,.marine-menu-demo .font-bold {
+  font-weight: 700;
+}
+.marine-menu-demo.no-underline,.marine-menu-demo .no-underline {
+  text-decoration: none;
+}
+.marine-menu-demo.min-w-0,.marine-menu-demo .min-w-0 {
+  min-width: 0;
+}
+.marine-menu-demo.text-sm,.marine-menu-demo .text-sm {
+  font-size: .875rem;
+  line-height: 1.5;
+}
+.marine-menu-demo.font-semibold,.marine-menu-demo .font-semibold {
+  font-weight: 600;
+}
+.marine-menu-demo.block,.marine-menu-demo .block {
+  display: block;
+}
+.marine-menu-demo.py-3,.marine-menu-demo .py-3 {
+  padding-block: .75rem;
+}
+.marine-menu-demo.cursor-pointer,.marine-menu-demo .cursor-pointer {
+  cursor: pointer;
+}
+.marine-menu-demo.rounded-lg,.marine-menu-demo .rounded-lg {
+  border-radius: .5rem;
+}
+.marine-menu-demo.px-3,.marine-menu-demo .px-3 {
+  padding-inline: .75rem;
+}
+.marine-menu-demo.rounded-2xl,.marine-menu-demo .rounded-2xl {
+  border-radius: 1rem;
+}
+.marine-menu-demo.border,.marine-menu-demo .border {
+  border-width: 1px;
+}
+.marine-menu-demo.border-solid,.marine-menu-demo .border-solid {
+  border-style: solid;
+}
+.marine-menu-demo.border-slate-200,.marine-menu-demo .border-slate-200 {
+  border-color: #e2e8f0;
+}
+.marine-menu-demo.bg-white,.marine-menu-demo .bg-white {
+  background-color: white;
+}
+.marine-menu-demo.p-6,.marine-menu-demo .p-6 {
+  padding: 1.5rem;
+}
+.marine-menu-demo.shadow-lg,.marine-menu-demo .shadow-lg {
+  box-shadow: 0 10px 15px -3px #00000014,0 4px 6px -4px #00000014;
+}
+.marine-menu-demo.mb-4,.marine-menu-demo .mb-4 {
+  margin-bottom: 1rem;
+}
+.marine-menu-demo.text-xs,.marine-menu-demo .text-xs {
+  font-size: .75rem;
+  line-height: 1.5;
+}
+.marine-menu-demo.uppercase,.marine-menu-demo .uppercase {
+  text-transform: uppercase;
+}
+.marine-menu-demo.tracking-widest,.marine-menu-demo .tracking-widest {
+  letter-spacing: .1em;
+}
+.marine-menu-demo.font-medium,.marine-menu-demo .font-medium {
+  font-weight: 500;
+}
+.marine-menu-demo.rounded-full,.marine-menu-demo .rounded-full {
+  border-radius: 9999px;
+}
+.marine-menu-demo.px-5,.marine-menu-demo .px-5 {
+  padding-inline: 1.25rem;
+}
+.marine-menu-demo.w-full,.marine-menu-demo .w-full {
+  width: 100%;
+}
+.marine-menu-demo.mt-3,.marine-menu-demo .mt-3 {
+  margin-top: .75rem;
+}
+.marine-menu-demo.grid,.marine-menu-demo .grid {
+  display: grid;
+}
+.marine-menu-demo.grid-cols-1,.marine-menu-demo .grid-cols-1 {
+  grid-template-columns: minmax(0,1fr);
+}
+.marine-menu-demo.gap-8,.marine-menu-demo .gap-8 {
+  gap: 2rem;
+}
+.marine-menu-demo.flex,.marine-menu-demo .flex {
+  display: flex;
+}
+.marine-menu-demo.flex-wrap,.marine-menu-demo .flex-wrap {
+  flex-wrap: wrap;
+}
+.marine-menu-demo.items-center,.marine-menu-demo .items-center {
+  align-items: center;
+}
+.marine-menu-demo.justify-between,.marine-menu-demo .justify-between {
+  justify-content: space-between;
+}
+.marine-menu-demo.gap-x-8,.marine-menu-demo .gap-x-8 {
+  column-gap: 2rem;
+}
+.marine-menu-demo.gap-y-4,.marine-menu-demo .gap-y-4 {
+  row-gap: 1rem;
+}
+.marine-menu-demo.gap-x-6,.marine-menu-demo .gap-x-6 {
+  column-gap: 1.5rem;
+}
+.marine-menu-demo.gap-y-3,.marine-menu-demo .gap-y-3 {
+  row-gap: .75rem;
+}
+.marine-menu-demo.mx-auto,.marine-menu-demo .mx-auto {
+  margin-inline: auto;
+}
+.marine-menu-demo.py-5,.marine-menu-demo .py-5 {
+  padding-block: 1.25rem;
+}
+@media(min-width:768px) {
+  .marine-menu-demo.md\:grid-cols-3,.marine-menu-demo .md\:grid-cols-3 {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+}

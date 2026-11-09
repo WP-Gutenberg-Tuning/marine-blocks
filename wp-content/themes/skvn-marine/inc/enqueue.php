@@ -34,9 +34,10 @@ function skvn_marine_enqueue_assets() {
 		wp_enqueue_script(
 			'skvn-marine-animations',
 			$theme_uri . '/assets/js/animations.js',
-			array(),
+			array( 'wp-i18n' ),
 			filemtime( $animations_path ),
 			true
 		);
+		wp_set_script_translations( 'skvn-marine-animations', 'skvn-marine' );
 	}
 }
