@@ -1,5 +1,7 @@
 # WooCommerce Archive + Blog Archive — discussion / repair planning
 
+Human transition2026-11-07: **current V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1**, bắt đầu theo lệnh human.1.3.19 DEFERRED_WITH_CARRY_OVER, full acceptance/evidence tại history và current carry register; không completed/PASS. Các current1.3.19/chưa-chuyển-mốc phía dưới là checkpoint lịch sử. Metadata sync development1.3.20, không release/deploy/git remote push. Card ảnh1:1, ratio controls next scope và Blog/ArchiveM2 chưa start.
+
 Created: **2026-11-06**. Status: **PLANNED — discussion, chưa start implementation**.
 
 Latest2026-11-06: human “Thực hiện”, chọn **chung1.3.20**. Woo Archive M1 được coding source trong1.3.20; execution§10 supersedes checkpoint chưa-start/SemVer/sau1.3.23 bên dưới cho Woo M1. Blog và Archive M2 chưa start. Current1.3.19 giữ theo precedent Category source ngoài current; không tự chuyển mốc/bump metadata.
@@ -236,3 +238,117 @@ Evidence update2026-11-07 (supersedes model pending trên): human đã gửi **1
 Audit W01/W02 một phần: functions.php đã include Woo module, không thêm template override; page-display-controls baseline chỉ force no-sidebar single/pagecanvas, nay archive filter50 riêng. Legacy grid source4297 + human native22.05% đã xác nhận. Source W04–W08 đã thêm; W09 chỉ reuse quote navigation; W10 onsite chưa làm. Không đánh toàn bộ W01–W10/AM1/AL/AR PASS.
 
 Còn kiểm/làm tiếp theo evidence: real taxonomy/spec mapping/empty/many/page2, mobile nav height/disclosure decision, below-grid long-copy split nếu human chọn, actual sort options, loaded CSS/GP geometry, full quote states/submission evidence. Chưa deploy/commit; Blog/M2 không thay.
+
+## 11. Hotfix — heading cùng hàng result count / sorting (2026-11-07)
+
+**Audit correction2026-11-07:** implementation flex bên dưới không đạt horizontal alignment: count lệch +192px so với product column. HF-HDR-01 **FAIL** về trục ngang; không đánh cả gói PASS từ việc controls đã được nâng lên. Repair riêng tại§12; UX mobile proposal riêng tại§13. Giữ phần execution lịch sử bên dưới để truy vết.
+
+**Human đã xác nhận layout và cho triển khai trong current1.3.20**, yêu cầu ghi mục trong plan cũ, không tạo file plan mới. Screenshot Grouper2026-11-07 cho thấy H1 đứng một hàng riêng, result count/sort ở hàng dưới bên trên grid, tạo khoảng trống không cần thiết. Mục tiêu là nâng **Showing all results + Default sorting** ngang H1 Grouper; sidebar Categories vẫn bên trái, không chuyển sidebar lên heading hoặc redesign card.
+
+```text
+Grouper          Showing all 3 results                 [Default sorting ▾]
+
+Categories       [Product card] [Product card] [Product card]
+```
+
+### Công việc / owner
+
+1. Theme `inc/woocommerce.php`: bọc native Woo archive header bằng một heading row qua public `woocommerce_shop_loop_header`; giữ native H1/title filters/descriptions. Render native result-count/ordering trong row đó. Chỉ chuyển callbacks thực sự đang đăng ký, không ép hiện control mà site đã tắt.
+2. Thay hai anonymous toolbar wrappers bằng named helpers. Dùng guarded dispatchers để không render toolbar/count/sort lần nữa ở before_shop_loop sau khi heading row đã render; embedded shortcodes và non-archive contexts vẫn gọi native callbacks như cũ.
+3. Nếu native header hook/callback không có hoặc custom template không gọi header hook, giữ toolbar vị trí cũ làm fallback, không làm biến mất controls. Empty archive không hiện toolbar giả; notices/native query/pagination/form GET semantics giữ.
+4. Theme `style.css`: heading row theo width owner hiện có, normal flow/flex wrap; title/count/sort cùng baseline khi đủ chỗ. Card grid không còn margin dành cho toolbar cũ, sidebar giữ. H1 dài/description thật và mobile có thể xuống dòng; không fixed height/cắt chữ, margin âm, absolute positioning, viewport math hoặc overflow mask. Không JS/bundle mới.
+5. Bổ sung steps/evidence vào runbook archive hiện có; không thêm file plan/test mới cho hotfix hẹp. Review source/diff nhanh; PHP lint và onsite geometry do human theo AGENTS. Không build/lint qua agent, không bump version/commit/deploy tự động.
+
+### Acceptance / evidence
+
+| ID / Nhóm | Expected / states | Hiện trạng / cách kiểm |
+|---|---|---|
+| HF-HDR-01 / Block UI | Desktop Grouper H1 + count + sort cùng hàng, cards bắt đầu cao hơn do bỏ hàng toolbar riêng; Categories vẫn trái | Baseline screenshot FAIL về spacing; sau sửa so cùng viewport và image/grid rect; phải thấy đúng một count/form |
+| HF-HDR-02 / Block UI | Long H1/description, narrow320/390/tablet/zoom200% wrap tự nhiên, không tràn hoặc che chữ/controls | Kiểm heading/control/card rect + scrollWidth≤clientWidth; descriptions không mất, focus/labels dùng được |
+| HF-HDR-03 / Technical | Count/order/page/query/selected option/hidden fields/notices giữ native; empty/custom-template/shortcode fallback không mất controls hoặc duplicate | So URLs/IDs/count/order/page2, one GET form, default/latest; native hook support source guard và onsite versions ghi rõ |
+| HF-HDR-04 / Editor UX | N/A new editor UI; native category title/description edits vẫn phản ánh heading | Không thêm control/settings; nếu có data edits trong test env, save→frontend đúng |
+
+**Status: đã duyệt hướng, chưa source/onsite tại thời điểm viết plan.** Source approval không runtime PASS. Pha này chỉ hotfix header/toolbar; giữ AC/AM1/AL/AR/carry acceptance, card1:1 và ratio follow-up riêng.
+
+Execution2026-11-07: đã thêm source theme PHP/CSS theo mục trên; không tạo file mới. Setup phát hiện priority native `woocommerce_product_taxonomy_archive_header`, bọc header ở priority−1/+1, chỉ chuyển count/ordering callbacks có sẵn; guard dispatchers giữ shortcode/custom-template fallback. Native header/descriptions vẫn render chính nó, không clone H1/form hoặc rewrite template. Heading row flex baseline/wrap; dưới619px container xếp dọc, title/description/controls không fixed height. HF-HDR-01–03 **Đã có source / Chờ kiểm chứng**; HF-HDR-04 N/A new Editor UI. Source reference official Woo archive-product.php + loop/header.php template8.6.0 (https://github.com/woocommerce/woocommerce/tree/trunk/plugins/woocommerce/templates), không xác nhận installed Woo version. Không chạy PHP lint/build hoặc onsite, không commit/deploy/bump. Human lint functions.php/inc/woocommerce.php và test runbook; screenshot baseline là evidence UX request, không PASS tất cả archive features.
+
+## 12. Hotfix riêng — sửa trục heading / toolbar (2026-11-07)
+
+Status: **Human duyệt thực hiện2026-11-07; Đã có source / Chờ kiểm chứng** trong current1.3.20, không bump/file plan mới. Lệnh “Thực hiện” sau proposal áp dụng cả repair§12 và mobile§13.
+
+### Evidence / State Delta
+
+Audit agent trang thật https://minhhaifishery.com/product-category/grouper/, logged-out2026-11-07; tọa độ CSSpx, không suy installed versions/release commit từ URL.
+
+| Viewport | Evidence |
+|---|---|
+|1280×720 | H1/sidebar left72.5; products/first card left344.5; count left536.5: **delta+192px**. Sorting/grid right1192.5. Header width432; computed flex header1 1 224px, toolbar1 1 448px. Body sidebar240px+gap32px. |
+|1024 wide | Count left408.5 vs products left40; categories đã chuyển thành top navigation. Không áp sidebar track xuống mode này. |
+|390 wide | Count/card left30; H1→count→sort→categories→cards.11categories chiếm4hàng/216.5px; card đầu top600.48 trong snapshot. |
+
+clientWidth=scrollWidth lần lượt1265/1009/375: không tràn ngang không đồng nghĩa đúng alignment. Desktop sidebar/card top cùng338.02. Vertical lifting hoạt động, horizontal tracks sai. Ảnh1:1/grouped specs/CTA chưa thấy regression trong audit hẹp. Public2products vs screenshot logged-in3 là private visibility, không chứng minh query lỗi. **HF-HDR-01 FAIL về trục ngang**; acceptance khác chưa được suy PASS.
+
+### Repair / owner / thứ tự
+
+1. Audit scoped cascade; sửa theme `style.css`. Sidebar width240px và gap32px có chung variables/owner; heading row và body grid cùng consume, cùng width/max-width/box-sizing và cùng container threshold1120px. Không thêm viewport width owner.
+2. Desktop sidebar mode: heading grid `240px minmax(0,1fr)` qua shared variables, header cột1/toolbar cột2. Bỏ flex-basis14rem/28rem trong cùng patch. Toolbar nội bộ count-left/sort-right, wrap được. Không margin âm/offset/absolute/transform hoặc overflow mask.
+3. Dưới sidebar threshold: H1/description full-width hàng riêng, toolbar full-width hàng kế. Khi đủ chỗ count-left/sort-right; narrow wrap/stack. Đây là responsive repair đề xuất; không ngầm giữ desktop sidebar space. Không đổi product-column thresholds620/1180 chỉ để sửa toolbar.
+4. Giữ native H1/description/count/order/form và guarded hook/fallback§11; không rewrite PHP đang nâng toolbar đúng nếu chưa có hook defect evidence. Tên dài/description wrap tự nhiên, không fixed height/ellipsis. Không đổi plugin, query, visibility, category routes, quote, card1:1 hoặc skeleton; không JS cho alignment.
+5. Update runbook, self-review diff; human kiểm đúng delivered stylesheet/geometry. CSS-only hotfix không cần plugin rebuild. Nếu phát sinh PHP, human lint theo AGENTS. Không tự commit/deploy/bump, không claim source là runtime PASS.
+
+| ID → Nhóm | Expected / states | Hiện trạng → Kiểm / evidence |
+|---|---|---|
+| HF-AX-01 → Block UI | Count.left=firstCard.left; sort.right=grid.right; H1.left=sidebar.left, tolerance≤1CSSpx | FAIL+192px → rects1280/1440 cùng frame, screenshots/CSS URL/version. |
+| HF-AX-02 → Block UI | Header/body cùng sidebar mode; below threshold H1 rồi full-width toolbar; không clip/overflow | Chưa làm → actual container1119/1120/1121px,320/390/768/1024, long title/description, zoom200%; không nhầm viewport/container. |
+| HF-AX-03 → Technical | Một count/form, native sort/query/GET fields/fallback giữ | Chờ kiểm chứng → Shop/category/tag/empty/custom-header/shortcode theo HF-HDR-03. |
+| HF-AX-04 → Editor UX | N/A new controls | Native data editing giữ; không đổi plugin EditorUI. |
+
+Giữ HF-HDR-02/03 và AL/AM1/AR/AC cũ. Pitfall AP-11 ghi lỗi agent. Rollback chỉ track-sizing patch, không tháo card/API/native hook khác.
+
+## 13. UX mobile/tablet — category disclosure proposal
+
+Status: **Human duyệt thực hiện2026-11-07; Đã có source / Chờ kiểm chứng**, acceptance riêng với§12. Current1.3.20. Memo/default bên dưới giữ lịch sử proposal; lệnh start supersede default chờ duyệt.
+
+### Decision Memo
+
+1. **Vấn đề:** List category luôn mở chiếm216.5px ở390px và đẩy sản phẩm xuống sâu.
+2. **Phương án:** A giữ wrap: đơn giản nhưng nhiều hàng. B disclosure normal-flow: gọn lúc đóng, thêm thao tác mở. C horizontal scroller: một hàng nhưng khó khám phá mục ngoài màn hình, hierarchy/tên dài khó đọc.
+3. **Khuyến nghị:** B ở mobile/tablet không có sidebar; desktop giữ list mở. Một navigation/data tree, không duplicate focusable lists; không drawer/modal/facets.
+4. **Bằng chứng:** Audit§12:11categories/4hàng/216.5px, first card y600.48; screenshot human; source `inc/woocommerce.php` và `.skvn-archive-categories`. y tuyệt đối còn phụ thuộc site chrome, không target y cứng.
+5. **Tự kiểm chứng:** Mở Grouper390px, chụp category/card đầu rồi1024px; xem scoped nav CSS và số đo§12, khoảng5phút. Không dựa premise Woo API major chưa xác nhận.
+6. **Đảo ngược:** Hai chiều; không đổi taxonomy/product/saved blocks. Bỏ enhancement sẽ trở về list mở.
+7. **Default:** Trước khi human duyệt mobile, giữ nav hiện tại. Duyệt alignment không tự duyệt disclosure.
+
+```text
+Home / Grouper
+Grouper
+[ Categories: Grouper                         ▾ ]
+Showing all 2 results
+[ Default sorting                            ▾ ]
+[ Product card                               ]
+```
+
+### Interaction / visual contract đề xuất
+
+- Thứ tự đề xuất: breadcrumb→H1/description→category trigger/list→count/sort→cards. Khác toolbar-before-nav hiện tại: cần duyệt riêng DOM order; không CSS order làm visual/keyboard khác nhau. Alignment§12 không phụ thuộc thay đổi này.
+- Trigger English/i18n `Categories: Grouper`; Shop `Categories: All products`; product-tag archive `Categories: All categories` để không giả category đang chọn. Tên dài wrap; link hiện tại vẫn aria-current=page; ancestor indentation và All products native giữ.
+- Dưới sidebar threshold default đóng; mở list đẩy content xuống trong normal flow, không overlay/animation/nested scroll area. Desktop list luôn mở. Không sticky/header drawer mới.
+- Progressive enhancement: HTML ban đầu list mở; trigger chỉ hiện khi JS sẵn sàng. No-JS mọi link vẫn truy cập được. Button aria-expanded/aria-controls; Enter/Space toggle. Đóng từ button; nếu hỗ trợ Escape trong list thì trả focus về trigger. Resize không giấu focused subtree hoặc để focus vào trigger bị ẩn.
+- Nếu duyệt B, audit theme script handle trước, dùng archive-only theme enhancement nhỏ; không plugin/Swiper/dependency mới. Đồng bộ container mode với CSS layout, không coi viewport1024 là breakpoint thật. Cách sync state/container/focus phải review trước code; không observer mỗi item.
+- Trigger white, navy text, border nhạt theo archive token, radius8px, padding12px16px, min-height44px, width100%, visible focus; chevron decorative. Current link sky/leading marker/semibold giữ; không màu mới. Tablet count-left/sort-right khi đủ chỗ, mobile count rồi full-width select.
+
+### Công việc / acceptance nếu duyệt B
+
+1. Audit hooks/DOM để một nav nằm trước toolbar ở non-sidebar và giữ reading order hợp lý ở desktop/fallback; không clone nav/count/form. Fixture long/nested/current/no categories/tag archive.
+2. Theme PHP accessible/i18n/sanitize/escape, scoped CSS, conditional JS/no-JS fallback. Không đổi query/sort/category-reset policy. Không đổi shared card/plugin.
+3. MN-01 / Block UI: closed/open/current/hierarchy/long labels,320/390/768/1024 và actual sidebar threshold±1px. MN-02 / Technical: keyboard/focus/no-JS/resize, một nav, không console error. MN-03 / Block UI: collapsed list không chiếm chiều cao; cùng viewport first card lên tương ứng phần list đóng, không target y tuyệt đối. MN-04 / Editor UX: N/A controls mới.
+4. Human PHP lint và onsite screenshots closed/open, keyboard/resize notes, native links/order/count/quote smoke. Source/model không thay runtime evidence. Ghi vào runbook hiện có, không tạo plan khác.
+
+### Execution§12–13 — 2026-11-07
+
+- Theme PHP giữ native guarded header/count/order callbacks; thêm `.skvn-archive-shell` bao native header và loop. Category helper render đúng một nav trước toolbar: DOM H1/description→nav→toolbar→results. Thay shell PHP để đáp ứng mobile reading order đã duyệt, không kết luận native hook có defect. Custom-header fallback vẫn nav trước toolbar trong results; empty archive giữ nav/results, không toolbar giả. Không đổi query/visibility/card/plugin.
+- Một outer grid chung track240px+gap32px/container1120 cho header/nav/toolbar/results. Hai div trung gian heading-row/layout dùng display:contents trong shell; semantic header/nav giữ box. Desktop header/toolbar row1, nav/results row2; narrow auto placement đúng DOM. Giữ fallback layout grid/product thresholds620/1180. Bỏ flex14rem/28rem atomically. Desktop row gap32/narrow20px; không offset/viewport units/overflow mask.
+- `assets/js/archive-categories.js`, theme handle `skvn-marine-archive-categories` chỉ native archives, filemtime, không dependency mới. Một ResizeObserver trên site-main đọc mode custom-property do CSS container query sở hữu; không observer per item/viewport breakpoint khác. Resize cùng mode không reset mở/đóng. Focused link giữ list mở khi chuyển mobile; trigger đang focus chuyển desktop trả focus link. Escape đóng/trả focus. No-JS/không ResizeObserver: list mở, trigger ẩn. Không animation/overlay/nested scrolling.
+- English/i18n/escaped labels theo Shop/Category/Tag, unique aria-controls. Trigger white/navy/surface/primary tokens và border rgba archive hiện có;8px radius/44px target. Registry theme sở hữu, không palette mới.
+- **5/5 Node VM state/focus model PASS** bằng `node tools/tests/archive-categories.test.mjs`, Node24.20.0. Initial `node --test` không chạy cases do sandbox spawn EPERM; direct runner không tạo child chạy thành công. Không PHP/browser/CSS/Woo integration PASS. Agent không chạy build/lint/WSL/deploy/commit.
+- HF-AX-01/02 và MN-01/03: Đã có source/Chờ onsite geometry. HF-AX-03/MN-02: Chờ human PHP lint + native Woo/browser keyboard/no-JS/focus checks;5VM tests chỉ model state. HF-AX-04/MN-04 N/A Editor controls. HF-HDR-01 FAIL bản trước giữ evidence; chỉ cập nhật PASS khi có rects bản mới.

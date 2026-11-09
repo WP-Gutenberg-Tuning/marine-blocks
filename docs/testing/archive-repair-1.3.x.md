@@ -6,6 +6,41 @@ Execution2026-11-06: human cho Woo M1 chung1.3.20; source theme inc/woocommerce.
 
 ## Human commands và kiểm sau source
 
+### Hotfix HF-HDR — heading/count/sort cùng hàng (2026-11-07)
+
+**Latest source2026-11-07:** Human duyệt059§12–13. Một outer grid chung header/nav/toolbar/results; mobile DOM H1→Categories→count/sort→cards. Mobile/tablet disclosure default đóng khi JS sẵn sàng, desktop list mở.5/5 VM state/focus modelPASS (`node tools/tests/archive-categories.test.mjs`); không PHP/browser/geometry PASS. Các dòng “chưa sửa/chưa duyệt” bên dưới giữ baseline lịch sử trước start, HF-HDR FAIL cũ chưa thành PASS.
+
+#### HF-AX/MN — kiểm source mới sau upload
+
+Target Grouper, `/shop/`, product-tag, category rỗng/title-description dài trên test site. Preconditions: human PHP lint, theme upload đủ **style.css + inc/woocommerce.php + assets/js/archive-categories.js**; ghi versions/login/build và CSS/script URL/version. Theme packaging copy recursively, không plugin build cho riêng patch này.
+
+1. Desktop1280/1440 có scrollbar, actual container≥1120: đo cùng frame `abs(count.left-firstCard.left)≤1`, `abs(sorting.right-grid.right)≤1`, `abs(H1.left-nav.left)≤1` CSSpx. H1/controls row1, nav/cards row2. Screenshot/rects; không suy từ no-overflow.
+2. Actual container1119/1120/1121 + viewport320/390/768/1024, zoom200%, long title/description/category: không clip/overlap/overflow. Narrow DOM đúng H1→Categories→count/sort→cards; trigger full-width/min44px, select full-width dưới620container; desktop list mở/trigger ẩn. Current/hierarchy giữ, long text wrap.
+3. Tab→Enter/Space toggle, aria-expanded/hidden khớp; Escape từ link đóng/trả focus trigger. Focus link khi desktop→mobile: list giữ mở. Focus trigger khi mobile→desktop: chuyển focus link trước khi ẩn trigger. Resize cùng mode không reset mở/đóng. Một nav/current link, tối đa một count/form; no console error. Script chỉ native archive, không single/shortcode-only.
+4. Disable JS/reload: list mở/trigger ẩn. Restore JS: mobile default đóng; chụp closed/open cùng viewport và so card đầu dịch theo list/gap, không y tuyệt đối. Không overlay/animation/nested scroll.
+5. HF-AX-03 giữ HF-HDR-03 checks bên dưới: native sort/query/GET hidden fields/notices/pagination/private visibility; empty không toolbar giả, balanced shell/sales ở ngoài; custom-header/shortcode fallback không mất/nhân controls; quote/card1:1 giữ. HF-AX-04/MN-04 Editor UX N/A controls mới.
+
+Evidence gửi lại: PHP lint output, desktop/mobile closed/open screenshots, rect deltas/CSS URL và keyboard/no-JS/resize/native sorting/fallback notes. HF-AX/MN **Chờ kiểm chứng**; nếu deploy, nhớ chụp EditorUI trên deployed assets cho selling point SP-02.
+
+Audit2026-11-07: HF-HDR-01 **FAIL trục ngang**. Live logged-out1280×720: H1/sidebar x72.5, first card x344.5, count x536.5 (+192px), sorting/grid right1192.5.1024wide count408.5/products40;390wide count/card30. clientWidth=scrollWidth1265/1009/375; không overflow không đồng nghĩa alignment đúng. Public2products vs logged-in3 là visibility delta. Repair plan059§12, pitfall AP-11; chưa sửa runtime. Mobile disclosure§13 chỉ proposal, chưa được duyệt.
+
+Sau repair, HF-AX-01/02: đo count.left−firstCard.left, sort.right−grid.right và H1.left−sidebar.left tại desktop sidebar mode, mỗi delta≤1CSSpx; lấy rects trong cùng frame. Kiểm actual container1119/1120/1121px, không dùng viewport thay container. Below threshold expected H1/description full-width rồi toolbar full-width. Long title/description, zoom200%,320/390/768/1024/1280/1440 không overlap/clip/overflow. Ghi CSS URL/version và before/after cùng viewport; giữ một count/form và toàn bộ HF-HDR-03 fallback checks. Không suy PHP/query/UX mobile PASS từ CSS alignment.
+
+Plan059§11 đã được human duyệt và có source trong current1.3.20; **chờ onsite**, không file plan mới. Chỉ theme PHP/CSS đổi; không cần plugin rebuild cho riêng hotfix này. Các build/test pending khác không tự được đánh PASS.
+
+```bash
+cd /mnt/d/Github/skvn-marine
+php -l wp-content/themes/skvn-marine/functions.php
+php -l wp-content/themes/skvn-marine/inc/woocommerce.php
+```
+
+1. Cùng viewport screenshot Grouper2026-11-07: H1 “Grouper”, Showing all results và Default sorting phải cùng hàng; sidebar Categories vẫn trái. Grid bắt đầu ngay dưới heading gap, không còn hàng toolbar riêng phía trên cards. DOM đúng một count và một form. Chụp before/after + actual container/title/toolbar/grid rect.
+2. Đổi default/latest, page1/2 khi đủ products; count/IDs/order/selected option và native GET hidden fields đúng, notices không mất. Test Shop/category/tag; không thay query hoặc quote/card1:1. Empty category không xuất toolbar/count giả.
+3. Mobile320/390/tablet/zoom200%, title dài/description có dữ liệu: row tự wrap/stack, không clip/overflow hoặc overlay lên heading. Native description vẫn hiện dưới H1 trong header, không bị xóa/nhân đôi. Keyboard/focus/select labels dùng được; scrollWidth≤clientWidth với scrollbar desktop.
+4. Nếu site dùng old/custom archive không gọi `woocommerce_shop_loop_header`, toolbar phải còn ở trước loop. Shortcode sản phẩm có toolbar riêng không mất count/order dù trang ngoài đã render heading row. Nếu site đã tắt native count/order callback trước setup, không tự bật lại. Ghi actual WP/Woo versions/template override và loaded theme stylesheet URL/version.
+
+Evidence HF-HDR-01–03: lint output, URLs/build/versions, desktop/mobile screenshots và DOM/geometry; hiện source chưa runtime PASS. HF-HDR-04 không thêm editor UI. Không lặp toàn bộ card/model suite chỉ vì đổi vị trí header; nếu phát hiện regression thì mở case tương ứng.
+
 ### Shared card060 — approved/source2026-11-07, ảnh1:1
 
 Second harness repair2026-11-07: human run qua grouped Carousel summary rồi fail assertion `Carousel saved media preset preserved`. Source truyền floating style vào `wc_placeholder_img`; mock trước chỉ trả `<img>` cố định, bỏ `$attributes['style']`. Sửa mock giữ/escape attributes và giữ nguyên assertion class+offset (không nới expected hoặc sửa production). Combined target vẫn37; cần rerun shared-card script, hook10 chỉ chạy nếu chưa có output. Không rebuild vì test-only.

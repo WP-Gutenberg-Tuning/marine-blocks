@@ -2,7 +2,7 @@
 Theme Name: SKVN Marine
 Template: generatepress
 Text Domain: skvn-marine
-Version: 1.3.19
+Version: 1.3.20
 Requires at least: 6.5
 Requires PHP: 7.4
 Update URI: false
@@ -4879,7 +4879,10 @@ body.single-product .content-area {
  * These rules intentionally exclude single/related and embedded shortcodes. */
 body.skvn-woo-archive .site-main {
 	container-type: inline-size;
+	--skvn-archive-sidebar-width: 240px;
+	--skvn-archive-column-gap: 32px;
 }
+body.skvn-woo-archive .skvn-archive-shell,
 body.skvn-woo-archive .skvn-archive-layout,
 body.skvn-woo-archive .skvn-archive-sales {
 	width: 100%;
@@ -4895,6 +4898,31 @@ body.skvn-woo-archive .skvn-archive-layout {
 }
 .skvn-archive-results,
 .skvn-archive-categories { min-width: 0; }
+.skvn-archive-categories { --skvn-archive-sidebar-mode: 0; }
+.skvn-archive-categories__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	width: 100%;
+	min-height: 44px;
+	box-sizing: border-box;
+	padding: 12px 16px;
+	border: 1px solid rgba(51, 65, 85, .16);
+	border-radius: 8px;
+	background: var(--skvn-color-white);
+	color: var(--skvn-color-navy);
+	font: 600 15px/1.5 var(--skvn-font-ui);
+	text-align: start;
+	overflow-wrap: anywhere;
+}
+.skvn-archive-categories__toggle:hover,
+.skvn-archive-categories__toggle:focus { background: var(--skvn-color-surface); color: var(--skvn-color-navy); }
+.skvn-archive-categories__toggle:focus-visible { outline: 3px solid var(--skvn-color-primary); outline-offset: 3px; }
+.skvn-archive-categories__toggle[hidden],
+.skvn-archive-categories > ul[hidden],
+.skvn-archive-categories.is-enhanced > h2 { display: none; }
+.skvn-archive-categories.is-enhanced:not(.is-sidebar) > ul { display: block; margin-top: 12px; }
 .skvn-archive-categories h2 {
 	font: 600 15px/1.5 var(--skvn-font-ui);
 	color: var(--skvn-color-navy);
@@ -4925,6 +4953,31 @@ body.skvn-woo-archive .skvn-archive-layout {
 body.skvn-woo-archive .skvn-archive-toolbar .woocommerce-result-count,
 body.skvn-woo-archive .skvn-archive-toolbar .woocommerce-ordering { float: none; margin: 0; max-width: 100%; }
 .skvn-archive-toolbar select { max-width: 100%; font-family: var(--skvn-font-ui); }
+/* HF-AX: one grid owns header/nav/toolbar/results, including track sizing.
+ * Only structural divs use contents; nav/header retain their semantic boxes. */
+body.skvn-woo-archive .skvn-archive-shell {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 20px var(--skvn-archive-column-gap);
+}
+body.skvn-woo-archive .skvn-archive-shell > .skvn-archive-heading-row,
+body.skvn-woo-archive .skvn-archive-shell > .skvn-archive-layout {
+	display: contents;
+}
+body.skvn-woo-archive .skvn-archive-heading-row > .woocommerce-products-header {
+	min-width: 0;
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+body.skvn-woo-archive .skvn-archive-heading-row .woocommerce-products-header__title { margin: 0; }
+body.skvn-woo-archive .skvn-archive-heading-row > .skvn-archive-toolbar {
+	min-width: 0;
+	margin: 0;
+}
+@container (max-width: 619px) {
+	body.skvn-woo-archive .skvn-archive-toolbar .woocommerce-ordering,
+	body.skvn-woo-archive .skvn-archive-toolbar select { width: 100%; }
+}
 body.skvn-woo-archive .skvn-archive-results > ul.products {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
@@ -4985,12 +5038,22 @@ body.skvn-woo-archive .skvn-archive-sales { margin-block: 48px; padding: 28px; b
 .skvn-archive-sales h2 { font: 600 24px/1.35 var(--skvn-font-ui); color: var(--skvn-color-navy); }
 .skvn-archive-layout a:focus-visible,
 .skvn-archive-layout select:focus-visible,
+.skvn-archive-shell a:focus-visible,
+.skvn-archive-shell select:focus-visible,
 .skvn-archive-sales a:focus-visible { outline: 3px solid var(--skvn-color-primary); outline-offset: 3px; }
 @container (min-width: 620px) {
 	body.skvn-woo-archive .skvn-archive-results > ul.products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @container (min-width: 1120px) {
-	body.skvn-woo-archive .skvn-archive-layout { grid-template-columns: 240px minmax(0, 1fr); gap: 32px; }
+	body.skvn-woo-archive .skvn-archive-layout,
+	body.skvn-woo-archive .skvn-archive-shell { grid-template-columns: var(--skvn-archive-sidebar-width) minmax(0, 1fr); column-gap: var(--skvn-archive-column-gap); }
+	body.skvn-woo-archive .skvn-archive-shell { row-gap: 32px; }
+	body.skvn-woo-archive .skvn-archive-shell .woocommerce-products-header { grid-column: 1; grid-row: 1; align-self: baseline; }
+	body.skvn-woo-archive .skvn-archive-shell .skvn-archive-toolbar { grid-column: 2; grid-row: 1; align-self: baseline; }
+	body.skvn-woo-archive .skvn-archive-shell .skvn-archive-categories { grid-column: 1; grid-row: 2; }
+	body.skvn-woo-archive .skvn-archive-shell .skvn-archive-results { grid-column: 2; grid-row: 2; }
+	.skvn-archive-categories { --skvn-archive-sidebar-mode: 1; }
+	.skvn-archive-categories.is-enhanced > h2 { display: block; }
 	.skvn-archive-categories > ul { display: block; }
 }
 @container (min-width: 1180px) {
