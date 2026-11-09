@@ -49,6 +49,7 @@ export type SliderAttributes = {
 		| 'medium'
 		| 'tall'
 		| 'viewport-below-header';
+	align?: 'none' | 'wide' | 'full';
 	slidesPerView: number;
 	preset: string;
 	responsiveSlides: string;
@@ -76,9 +77,10 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 		( ! hasGovernedSlidesPerView && attributes.slidesPerView > 1 );
 	const effectiveTransitionStyle = attributes.transitionStyle ||
 		( attributes.effect === 'fade' ? 'fade' : 'directional-wipe' );
+	const alignClass = attributes.align ? ` align${ attributes.align }` : '';
 	const blockProps = useBlockProps( {
 		ref: frameRef,
-		className: `skvn-slider skvn-slider--editor skvn-slider--editor-focus skvn-editor-preview-frame skvn-slider--height-${ attributes.heightPreset }${ presetClass }`,
+		className: `skvn-slider skvn-slider--editor skvn-slider--editor-focus skvn-editor-preview-frame skvn-slider--height-${ attributes.heightPreset }${ presetClass }${ alignClass }`,
 	} );
 
 	return (
