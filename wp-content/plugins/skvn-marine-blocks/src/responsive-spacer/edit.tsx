@@ -24,7 +24,7 @@ export function Edit( props: SpacerControlsProps ) {
 	const blockProps = useBlockProps( {
 		ref,
 		// Editor-only alignment; save() keeps the original decorative spacer.
-		className: 'alignfull skvn-editor-preview-frame skvn-editor-preview-frame--spacer',
+		className: 'alignwide skvn-editor-preview-frame skvn-editor-preview-frame--spacer',
 	} );
 	return <>
 		<InspectorControls>

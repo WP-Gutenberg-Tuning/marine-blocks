@@ -1,5 +1,32 @@
 # Responsive Spacer — detailed plan
 
+## Follow-up 2026-11-07 — editor frame width repair (planning only)
+
+**Execution override2026-11-07:** human “ok thực hiện”. Source đã đổi root editor `alignfull` → `alignwide`, bỏ `max-width:none`/`margin-inline:0`; giữ width100% để theo parent constraint và host Wide rules. Chỉ hai file Spacer edit.tsx/editor/style.css thay đổi, không save/schema/frontendCSS/height logic hoặc shared frame/observer changes. 5/5 existing Spacer model/viewport/runtimeCSS tests PASS; TSX/CSS parse + scoped whitespace PASS. Không thêm test mirror class rename. **RS-W01–03: Đã có source / Chờ kiểm chứng**, chưa build/lint/geometry/onsite. Các trạng thái planning/chưa sửa dưới đây giữ lịch sử, superseded bởi override này. Human cần rebuild đúng assets rồi gửi ảnh+root/parent/reference rect theo runbook; không coi parse/model PASS là width PASS.
+
+Current **V1 / 1.3.20**, RS carry-over từ1.3.19; không mở version hoặc sửa runtime trong lượt planning. Human gửi ảnh Spacer mint rộng sát biên canvas, trong khi Category Grid bên dưới có khung Wide gọn hơn; yêu cầu lấy chiều rộng Carousel/Grid làm tham chiếu và lập kế hoạch nhỏ. **Chưa sửa source**, các acceptance RS cũ giữ nguyên và cần kiểm cùng carry register hiện tại trước follow-up khác.
+
+**Evidence/source:** `src/responsive-spacer/edit.tsx` gắn `alignfull` chỉ ở editor. `src/responsive-spacer/editor/style.css` ép `width:100%; max-width:none; margin-inline:0`. Collection `controls.tsx` dùng `alignwide` khi contentWidth=wide; Category Grid có native Wide default. Shared frame CSS chỉ sở hữu màu/viền/padding, không phải owner page width. Đây là khác biệt source đã xác nhận; chưa có DOM/computed/rect từ screenshot nên chưa kết luận có overflow toàn document hoặc rule/theme nào thắng trên site.
+
+### Kế hoạch sửa nhỏ
+
+Evidence bổ sung từ human2026-11-07: DOM root có `block-editor-block-list__block wp-block is-selected alignfull skvn-editor-preview-frame skvn-editor-preview-frame--spacer wp-block-skvn-marine-responsive-spacer`, data-type=`skvn-marine/responsive-spacer`. Xác nhận forced Full thực sự xuất hiện trên cùng root nhận frame, không phải một wrapper cha suy đoán. Indicator có padding-top/bottom30px cho H60; summary Desktop60/Tablet60 inherited/Mobile10. Không thay các giá trị/logic này khi sửa width. DOM không có parent/rect/computed stylesheet, nên chưa chứng minh chính xác kích thước hoặc overflow document. Sửa dự kiến đúng owner: class alignment tại useBlockProps và overrides trong Spacer editorCSS; không đụng padding indicator hoặc wrapper cha/core.
+
+1. **Đo baseline:** trong đúng editor document/iframe, so Spacer với một Carousel/Grid **Wide trong cùng parent**; ghi class, computed width/max-width/margin/padding/box-sizing và rect của root/parent. Phân biệt khung chiếm hết canvas với actual horizontal overflow. Parent canvas/constrained layout là width owner; không copy chiều rộng pixel từ ảnh.
+2. **Sửa editor-only:** bỏ forced `alignfull`, dùng editor-only Wide alignment tương tự Collection/Grid; bỏ các override `max-width:none` và `margin-inline:0` làm mất constraint/căn giữa. Để host wide-size/alignment rules quản lý chiều rộng; nếu cần adapter thì scope riêng Spacer, dùng wide-size token hiện hành của parent/theme với fallback theo contract, width không vượt parent. Không gắn fixed1200px cho mọi môi trường, không đổi shared frame của block khác. Target: cùng hai mép với Wide reference khi cùng parent/settings; trong Columns hẹp phải co theo parent.
+3. **Giữ phần còn lại:** màu mint/border/radius/label, numeric values/inheritance/zero, preview tier, indicator padding/cap200 và frontend height giữ nguyên. Không thêm saved align/schema, không đổi save.tsx/frontendCSS, không reintroduce geometry observers của Spacer (đã bỏ theo follow-up trước). Margin-block10px tĩnh/parent gap là scope riêng, không nhân tiện đổi.
+4. **Kiểm và bàn giao:** static syntax/CSS/asset boundary, human build/lint rồi kiểm hình và rect. CSS sửa phải xuất vào registered style-index.ts.css và được tải trong editor/iframe theo CASE-008; không gọi source/build PASS là visual PASS.
+
+Files dự kiến: Spacer `edit.tsx`, `editor/style.css`; chỉ sửa test width contract liên quan trong `tools/tests/responsive-spacer.test.mjs` nếu đang assert alignfull/max-width none, không mở test suite mirror implementation. Update runbook và execution status của mục này sau khi có lệnh sửa. Không sửa Carousel/Grid để ép chúng theo Spacer.
+
+| ID | Nhóm | Expected | Hiện trạng / việc sửa | Cách kiểm / evidence |
+|---|---|---|---|---|
+| RS-W01 | Editor UX | Frame căn giữa, theo Wide reference cùng parent | FAIL theo ảnh human; repair chưa làm | So hai mép Spacer/reference Wide, tolerance1px sau rounding; screenshot+root/parent rect |
+| RS-W02 | Technical | Không tràn ngang ở canvas/nested | Chờ đo; chưa biết document có overflow thật | 320/390/768/desktop, sidebar mở/đóng, vertical scrollbar, Group/Columns; scrollWidth<=clientWidth, rect nằm trong parent |
+| RS-W03 | Block UI | Frontend/height/data không đổi | Chưa kiểm repair | Save/reopen + H0/60/400 và inherited; không saved alignment/chrome; frontend height đúng RS cũ |
+
+Nguồn test: `docs/testing/responsive-spacer-1.3.19.md` RS-W01–03. Screenshot hiện có không có URL/pageID/build; human điền trước onsite, không mặc định là /home/. Khi chưa có evidence chỉ ghi Chờ kiểm chứng. Đoạn alignfull trong execution lịch sử bên dưới là baseline cần thay theo repair này, không phải invariant phải giữ.
+
 Ngày: **2026-11-05**. Status: **Đã có source / Chờ kiểm chứng onsite**.
 Human duyệt thực hiện plan và commit trong milestone hiện tại ngày2026-11-05. Scope bổ sung vào **V1 / 1.3.19 — Plugin Design Sidebar Foundation** theo chỉ thị rõ, không mở/chuyển milestone hoặc bump metadata. Commit prefix human chọn: `feature patch:`.
 Version rationale: đây là feature mới, thông thường tăng MINOR; human xác nhận ngoại lệ bổ sung vào development milestone1.3.19 hiện hành. Không chiếm các scope đã dành1.3.20–23,1.4.0–3,1.5.0/1.5.3,1.6.0/1.7.0; không đổi Version Naming Rule hoặc release status. Đoạn Future Candidate/TBD của planning checkpoint được thay bằng quyết định này.

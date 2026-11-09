@@ -1,5 +1,18 @@
 # Responsive Spacer — onsite test plan
 
+## Width follow-up — RS-W01–03 (2026-11-07, current1.3.20)
+
+Execution2026-11-07: human cho sửa. Source root bây giờ `alignwide` (editor-only), editorCSS không còn max-width:none/margin-inline:0. H60 vẫn padding30px mỗi phía, save/frontend/schema unchanged.5/5 model/viewport/runtimeCSS tests + TSX/CSS parse PASS; không geometry/browser PASS. **Source ready, chờ human build + onsite RS-W01–03**; đoạn planning phía dưới là baseline cũ. Expected DOM sau build: cùng root có alignwide và frame-spacer, không alignfull. Kiểm stylesheet loaded đúng iframe; không chỉ grep local build.
+
+Human DOM evidence: selected root của `skvn-marine/responsive-spacer` có cả `alignfull` và `skvn-editor-preview-frame--spacer`; indicator H60 dùng padding30px mỗi phía, Desktop60/Tablet60 inherited/Mobile10. Root alignment đã xác nhận; parent/computed/rect và URL/build chưa có. Dùng fixture này khi so trước/sau, không đổi height để làm khung có vẻ gọn hơn.
+
+Planning only; source repair chưa thực hiện. Plan055 đầu file ghi repair nhỏ. Trước follow-up, giữ/chạy các RS carry-over bên dưới, không thay toàn bộ acceptance bằng width check.
+
+- **Target/setup:** trang editor trong screenshot human ngày2026-11-07; URL/pageID/build/WP/browser và iframe mode TBD, ghi trước kiểm. Trên draft test được phép, có Spacer và Carousel hoặc Category Grid Wide trong cùng parent; không so hai block có parent/alignment khác. Có normal parent, Group và Columns hẹp; không chỉnh live site tự động.
+- **Steps:** ghi baseline DOM classes/computed width/max-width/margins/padding/box-sizing + rect Spacer/reference/parent; phân biệt rộng hết canvas với tràn document. Sau human build/deploy đúng assets, lặp desktop có scrollbar,768/390/320px và Inspector mở/đóng. So Wide reference trong cùng parent, thử nested/Columns; nhập H0/60/400, unset overrides rồi Save/reopen và kiểm frontend.
+- **Expected/PASS:** Spacer cùng mép Wide reference trong cùng parent (sai số rounding<=1px), co trong parent hẹp, rect không ra ngoài parent và scrollWidth<=clientWidth. Mint frame/labels/focus không mất; chiều cao/inheritance/cap200/preview tier giữ nguyên. Frontend height/save/schema không đổi, không lưu alignment/chrome editor. Nếu vẫn rộng khác, ghi matched rule/selector; không thêm overflow hidden/clip hoặc đoán cache.
+- **Evidence:** trước/sau screenshot cùng build, URL/pageID/version, root/parent/reference rect và computed styles, stylesheet URL/version + frame selector trong registered CSS/iframe (CASE-008), saved attrs/console. FAIL ghi expected/actual theo RS-W01/02/03; chưa đo là Chờ kiểm chứng, không PASS từ source.
+
 Ngày 2026-11-05. Status: **Đã có source / Chờ kiểm chứng onsite**. Human cho implementation+commit trong **V1 / 1.3.19**; không ghi runtime PASS/deferred acceptance.
 Spec: `.context/planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md` (RS-*).
 
