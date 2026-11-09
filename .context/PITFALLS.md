@@ -197,3 +197,15 @@ Khi `save.tsx` thay đổi output (thêm class, thêm attribute), block đã lư
 ### PP-02 — `view.ts` đọc config từ `data-skvn-*` JSON — attribute phải được thêm vào JSON trong `save.tsx`
 
 Xem DP-01. Nếu `view.ts` cần đọc 1 attribute, attribute đó phải có trong `data-skvn-slider` (hoặc equivalent) JSON được emit bởi `save.tsx`. Chỉ thêm vào `SliderAttributes` type thôi chưa đủ — phải thêm vào object trong `JSON.stringify({...})`.
+
+### DP-03 — Block attribute `align` không được wire vào `edit.tsx` khiến editor kén `max-width: 760px`
+
+**File liên quan:** `src/slider/block.json`, `src/slider/edit.tsx`
+**Xảy ra:** Slider block không có class `alignwide`/`alignfull` và không có attribute `align`, nên rule mặc định của Gutenberg `.block-editor-block-list__layout.is-root-container > :where(...)` áp `max-width: 760px` và `margin: auto`.
+**Hậu quả:** Slider trong editor hẹp 760px, không tận dụng canvas rộng, khác hành vi với Responsive Spacer (hardcode `alignwide`) và Product Category Grid (attribute `align` + `useBlockProps`).
+**Pattern gốc:** Gần DP-01 — chỉ thêm CSS class vào `edit.tsx` mà không đồng bộ attribute `align` vào `block.json`/`SliderAttributes`; hoặc ngược lại, có attribute mà không gán class vào `blockProps`.
+**Checklist khi thêm alignment cho block:**
+1. `block.json` — khai báo `supports.align`
+2. `edit.tsx` — thêm `align` vào type TS + gán class alignment vào `useBlockProps({ className })`
+3. `save.tsx` — không thêm (alignment là editor-only, không lưu vào markup frontend)
+4. Kiểm class alignment xuất hiện trong editor DevTools, không gây block validation failed.
