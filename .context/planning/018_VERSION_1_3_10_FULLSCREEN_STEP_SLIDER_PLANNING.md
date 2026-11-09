@@ -1,12 +1,12 @@
 # V1 / 1.3.10 — Fullscreen Step Slider Planning
 
-Status: PENDING — DEFERRED sang stack item **M5** (roadmap 039), chưa cấp SemVer mới.
+Status: **PLANNED — chưa start**. Human gán **V1 / 1.3.24 — Fullscreen Step Slider** ngày **2026-11-07**: 1.3.10 DEFERRED → M5 (phần Step Slider) → 1.3.24. Kế thừa toàn bộ acceptance/research; current giữ **V1 / 1.3.20**, không bump/build/chuyển mốc. Filename giữ để bảo toàn liên kết; các current/version cũ bên dưới là lịch sử, superseded bởi quyết định này.
 Created: 2026-06-08
 Current milestone: **V1 / 1.3.17** (xem `.context/MILESTONES.md`). Bản ghi này dùng 1.3.10 vì milestone `V1 / 1.3.10 — Fullscreen Step Slider` đã được đăng ký trong `AGENTS.md` §9; stack mapping `1.3.10 → M5` nằm ở `.context/planning/039_ROADMAP_C_B2B_TOOLKIT_CAROUSEL_FIRST_PLANNING.md`.
 
 > Header cũ của file ghi `V1 / 1.5.0` và `Current milestone remains: V1 / 1.2.1`; cả hai dòng đã lỗi thời và được sửa ở đợt nghiên cứu 2026-10-14 (xem §14). Scope và acceptance của các mục 1–13 được giữ nguyên.
 >
-> **Không có SemVer nào được cấp cho M5.** Khi human đưa M5 vào triển khai, agent phải đề xuất SemVer theo `AGENTS.md` §0 và `MILESTONES.md` (`Milestone stack → SemVer`) rồi chờ human xác nhận.
+> **Step Slider đã chốt version 1.3.24** (human2026-11-07, ngoại lệ PATCH cho feature theo precedent1.3.22–23). Không hỏi lại version; start cần lệnh riêng. Không kích hoạt toàn bộ M5.
 
 ## 1. Decision
 

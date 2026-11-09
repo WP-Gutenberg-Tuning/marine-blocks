@@ -1,5 +1,7 @@
 # V1 / 1.3.20 — Product Category Grid + Category details
 
+Human transition2026-11-07: **current V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1**, bắt đầu theo lệnh human.1.3.19 DEFERRED_WITH_CARRY_OVER, full acceptance/evidence tại history và current carry register; không completed/PASS. Các current1.3.19/chưa-chuyển-mốc phía dưới là checkpoint lịch sử. Metadata sync development1.3.20, không release/deploy/git remote push. Card ảnh1:1, ratio controls next scope và Blog/ArchiveM2 chưa start.
+
 Ngày: 2026-11-04. **PLANNED, chưa start/coding.** Current là 1.3.19, agent Sol đang triển khai Sidebar theo 048. Human yêu cầu lập plan song song; không phải lệnh chuyển current. Version 1.3.20 đã chốt, không hỏi lại.
 
 ## 1. Mức độc lập và nguồn quyết định

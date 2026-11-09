@@ -7,7 +7,9 @@
 
 ## 0. Milestone hiện tại
 
-Current milestone: **V1 / 1.3.19 — Plugin Design Sidebar Foundation**
+Current milestone: **V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1**
+
+Human transition2026-11-07: yêu cầu “cho agent push milestone lên1.3.20”, bắt đầu current1.3.20. 1.3.19 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY và carry register current1.3.20 giữ DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Category049 + Woo Archive059/060, card1:1; ratio controls scope kế tiếp, Blog/M2 chưa start. Sync working metadata development1.3.20 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current cũ hoặc không-chuyển-mốc là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests trước follow-up khác.
 
 Scope addition2026-11-06: human yêu cầu thực hiện plan059§9 và chọn “chung với1.3.20”. Woo Archive M1 bổ sung vào1.3.20 Product Category Grid + Category details; được coding source cùng mốc đó, theo precedent Category source ngoài current. Không tự đóng/chuyển current1.3.19 hoặc bump metadata. Desktop category sidebar trái, tablet navigation trên; native Woo query, theme visuals, CF7/CFDB7 quote giữ nguyên. Blog archive và Archive M2 chưa start. Acceptance AM1/AL/AR và CG/DS độc lập, không runtime PASS từ source. Plan059§10/runbook ghi triển khai và các design defaults cần human review.
 
@@ -671,7 +673,8 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 | 1.3.7 | Collection Block UI & Card Styles |
 | 1.3.8 | Slider Parallax |
 | 1.3.9 | Custom Icon Upload |
-| 1.3.10 | Fullscreen Step Slider |
+| 1.3.10 | Fullscreen Step Slider — DEFERRED; scope chuyển sang 1.3.24 |
+| 1.3.24 | Fullscreen Step Slider — human gán 2026-11-07; PLANNED, chưa start; current giữ 1.3.20 |
 | 1.3.11 | Comprehensive Onsite QA (Slider, Collections & Controls) |
 | 1.3.12 | SKVN Team Credits Easter Egg |
 | 1.3.16 | Comprehensive Testing (1.3.x Feature QA) |

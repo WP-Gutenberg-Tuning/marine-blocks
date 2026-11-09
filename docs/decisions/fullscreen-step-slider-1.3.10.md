@@ -2,9 +2,9 @@
 
 Date: 2026-06-08
 Status: ACTIVE
-Milestone: V1 / 1.3.10
+Milestone: V1 / 1.3.24 (origin1.3.10 DEFERRED)
 Lifecycle: active
-Notes: milestone hiện tại (PENDING, chưa bắt đầu). Filename + hậu tố đã đổi từ `fullscreen-step-slider-1.5.0.md` vì milestone này là 1.3.10; 1.5.0 là Woo Catalog Plugin.
+Notes: Human gán1.3.24 ngày2026-11-07, PLANNED/chưa start; current giữ1.3.20. Filename giữ để bảo toàn liên kết (trước đây đổi từ1.5.0); không phải current hoặc implementation approval. Status ACTIVE không là runtime PASS; architecture/research còn mở theo plan018 phải được chốt trước source.
 
 ## Decision
 

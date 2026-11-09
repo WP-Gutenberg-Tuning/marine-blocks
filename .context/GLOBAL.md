@@ -56,7 +56,15 @@ Current module context files:
 
 Planning snapshots live in `.context/planning/` and use a three-digit ordering prefix, starting at `000_`. Implemented or completed plans move to `.context/planning/archives/` (prefix giữ nguyên) — index: `.context/planning/archives/README.md`.
 
+Current2026-11-07: **V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1**, human start/transition.1.3.19 archived **DEFERRED_WITH_CARRY_OVER**, current carry register giữ tất cả acceptance chưa nghiệm thu; không completed/PASS.049 +059/060 là scope, ảnh1:1; ratio controls next scope/Blog/M2 chưa start. Metadata development1.3.20, không release/deploy/git push. CSS7model/baseline16mockPASS giữ riêng; PHP37/hook10/build/onsite chưa hoàn tấtPASS. Chạy deferred tests/runbooks trước follow-up không liên quan. Các current cũ trong checkpoint bên dưới là lịch sử.
+
 Active planning (root — load when task liên quan):
+
+Header menu responsive2026-11-08: Home mobile CSS đã nạp nhưng không có drawer JS (390px/header246px/toggle0/dialog0). Controller đã nối existing theme assets/js/animations.js, inc/enqueue.php wp-i18n/translations;9VM state testsPASS, native browser/PHP lint/deploy pending. WindPress CSS vẫn own styling; không plugin feature, header GP repair hoặc đổi current. Read `docs/examples/mega-menu-gutenberg-tailwind/README.md` + `docs/testing/mega-menu-gutenberg-tailwind-prototype.md` khi sửa menu. Example controller là mirror từ shared runtime, không script bắt human tự gắn trên SKVN nữa.
+
+Spacer width execution2026-11-07: human cho sửa plan055 RS-W01–03; root editor alignwide, bỏ forced max-width:none/margin-inline0 để theo host Wide constraint như Collection/Grid.5existing tests/parse PASS, geometry/build/lint/onsite pending. Height/schema/save/frontend không đổi; previous “planning only” checkpoint bên dưới là lịch sử.
+
+Spacer width follow-up2026-11-07: human report mint frame rộng vượt khung Wide của Carousel/Grid. Plan055 đầu file có repair nhỏ RS-W01–03: bỏ editor forced full/override width, theo parent Wide ownership; giữ heights/save/frontend/no observers. **Planning only, chưa sửa source**; geometry/onsite URL/build pending, runbook Responsive Spacer giữ acceptance carry-over current1.3.20.
 
 060 approval/source update2026-11-07: human duyệt reuse Product Carousel card trên native archive trong1.3.20, ảnh **1:1**; ratio controls scope kế tiếp chưa gánversion. Public presenter/shared CSS handle dependency + theme adapter/fallback có source.060§11–12/runbook:7CSS modelPASS, PHP37/hook-template10/build/onsite pending. Các checkpoint060 proposed bên dưới được supersede; current không chuyển/bump.
 
@@ -106,7 +114,7 @@ Execution053 update 2026-11-05: human đã cho triển khai + agent commit. Coll
 - `.context/planning/028_VER_1_3_7_COLLECTION_UI_CARD_STYLES_PLANNING.md` — collection UI + card styles (implemented; visual lock follow-up = 038).
 - `.context/planning/038_VER_1_3_7_COLLECTION_CAROUSEL_VISUAL_LOCK_PLANNING.md` — Product/Post Collection carousel visual lock: Path B Swiper + Path C scroll-snap plan-B. Carousel scope activated as V1 / 1.3.17 on 2026-10-13; use roadmap 039 and POC-03 for current acceptance.
 - `.context/planning/032_VER_1_3_8_SLIDER_PARALLAX_IMPLEMENTATION_PLANNING.md` — Slider Parallax (1.3.8 PENDING).
-- `.context/planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md` — Step Slider (1.3.10 DEFERRED → stack M5; not completed).
+- `.context/planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md` — Step Slider (1.3.10 DEFERRED → M5 → **1.3.24 PLANNED**, human gán2026-11-07; chưa start, current giữ1.3.20; giữ filename/acceptance cũ, không completed/PASS).
 - `.context/planning/027_VERSION_1_5_0_WOO_CATALOG_PLUGIN_PLANNING.md` — woo-catalog brainstorm (1.5.0).
 - `.context/planning/037_VER_1_5_3_TOC_BLOCK_AND_SHORTCODE_PLANNING.md` — native TOC + heading convergence (1.5.3 PLANNED).
 - `.context/planning/009_VERSION_1_6_0_SKVN_SURFACE_PRESETS_PLANNING.md` — surface presets (1.6.0).

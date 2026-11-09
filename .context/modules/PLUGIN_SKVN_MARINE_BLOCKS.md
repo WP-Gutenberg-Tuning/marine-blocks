@@ -2,6 +2,8 @@
 
 ## [manual] Role
 
+Current transition2026-11-07: human bắt đầu **1.3.20 — Product Category Grid + Category details + Woo Archive M1**.1.3.19 DEFERRED_WITH_CARRY_OVER; acceptance chưa nghiệm thu giữ current carry register/history, không completed/PASS. Metadata development1.3.20, không release/deploy.049/059/060 là scope; ảnh1:1, ratio controls next scope, Blog/M2 chưa start. Checkpoint current1.3.19 bên dưới là lịch sử. Nhắc chạy deferred tests trước follow-up runtime khác.
+
 Shared product-card API060 approved/source2026-11-07 trong1.3.20: `skvn_marine_blocks_render_product_card` query-free public presenter, existing Collection wrapper giữ flat/grouped/media options; card-only asset `assets/css/product-card.css` import bởi Collection + optional enqueue helper cho theme archive. Archive profile1:1/full specs safe-default, verified meta opt-in/no PDF. Theme adapter không require plugin internals.7CSS modelPASS, PHP/onsite/build pending. Ratio controls next scope deferred, current không chuyển; API consumer theme cần wrapper khi migration1.4.0.
 
 Deploy/marketplace reminder2026-11-06: SP-02 Organized Editor UI được human chọn vì khung làm việc có thứ tự giúp hạn chế nhầm lẫn. Khi deploy agent nhắc human chụp Editor UI (khung/nhãn block, nhóm công việc/sidebar) trên build thực tế; checklist deploy workflow, brief register§5. Chưa tạo listing/claim usability đo lường; Inserter056 còn scope riêng.

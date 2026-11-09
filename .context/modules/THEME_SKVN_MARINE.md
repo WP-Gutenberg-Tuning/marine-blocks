@@ -2,11 +2,19 @@
 
 ## [manual] Role
 
+Current transition2026-11-07: human bắt đầu **1.3.20 — Product Category Grid + Category details + Woo Archive M1**.1.3.19 DEFERRED_WITH_CARRY_OVER; acceptance chưa nghiệm thu giữ current carry register/history, không completed/PASS. Metadata development1.3.20, không release/deploy.049/059/060 là scope; ảnh1:1, ratio controls next scope, Blog/M2 chưa start. Checkpoint current1.3.19 bên dưới là lịch sử. Nhắc chạy deferred tests trước follow-up runtime khác.
+
 GeneratePress child theme for SKVN Marine visual system.
 
 Human decision 2026-11-04: theme giữ identity SKVN Marine. Website được dùng WindPress enhance core blocks/patterns; plugin Marine Blocks ship styling/runtime riêng. Trong migration 1.4.0 (SemVer đã xác nhận, chưa start), có thể sửa điểm gọi API plugin hoặc dùng compatibility wrapper, không rename prefix/tokens theme. Quy tắc surface presets độc lập WindPress vẫn áp riêng cho presets. Xem plan `.context/planning/047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md`.
 
 ## [manual] Responsibilities
+
+Header menu responsive repair2026-11-08: user chốt hamburger+drawer toàn menu rồi report Home thiếu responsive.390px onsite header246px/toggle0/dialog0; CSS mới đã nạp nhưng JS companion chưa tích hợp. Existing assets/js/animations.js nay có controller scoped `.marine-menu-demo`, độc lập reveal early-return, native dialog/focus/scroll/resize/reduced-motion; inc/enqueue.php thêm wp-i18n/theme domain translations, giữ handle/filemtime.9Node VM model testsPASS; PHP lint/native browser/site deploy pending. CSS owner vẫn WindPress companion unlayered; example mirror sync từ shared runtime. Không sửa plugin/header GP, không bump/chuyển milestone. Runbook `docs/testing/mega-menu-gutenberg-tailwind-prototype.md`, artifact README có2files cần deploy.
+
+Archive hotfix059§12–13 start2026-11-07: human duyệt “Thực hiện”; outer grid header/nav/toolbar/results chung240px+32px/container1120, narrow DOM H1→Categories→count/sort→cards. Một nav/disclosure theme-only archive-categories.js, CSS mode owner/ResizeObserver/no animation/no-JS open/focus-safe resize.5Node VM state testsPASS, geometry/native Woo/PHP lint pending; AP-11/runbook giữ evidence. Supersede flex§11; không đổi plugin/query/card1:1/version hoặc claim runtime PASS.
+
+Archive heading hotfix2026-11-07 — plan059§11 human duyệt/source: native H1 + result count/sort cùng heading row bằng public Woo header hook và guarded native dispatchers; sidebar giữ, narrow wrap/stack, no query/JS/plugin bundle changes. Old/custom-header/shortcode fallback giữ controls. HF-HDR-* source/onsite status tại runbook archive, chưa runtime PASS hoặc bump/commit/deploy.
 
 Archive shared-card060 update2026-11-07: human duyệt1:1, source optional public plugin presenter/card-only CSS + native template-part adapter. Theme giữ category shell/query-native integration/fallback;5loop actions preserved với known callbacks suppress/restore mỗi item. Missing API/CSS/template fallback5rows cũng1:1.060§11/runbook cho evidence; actual UI/Woo/GP/build chưa kiểm, no ratio setting cho tới scope kế tiếp được chốt.
 

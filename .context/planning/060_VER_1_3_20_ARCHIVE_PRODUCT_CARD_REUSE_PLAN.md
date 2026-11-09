@@ -1,5 +1,7 @@
 # 060 — Archive Product Card: tái sử dụng thiết kế Product Carousel
 
+Human transition2026-11-07: **current V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1**, bắt đầu theo lệnh human.1.3.19 DEFERRED_WITH_CARRY_OVER, full acceptance/evidence tại history và current carry register; không completed/PASS. Các current1.3.19/chưa-chuyển-mốc phía dưới là checkpoint lịch sử. Metadata sync development1.3.20, không release/deploy/git remote push. Card ảnh1:1, ratio controls next scope và Blog/ArchiveM2 chưa start.
+
 Created: **2026-11-07**. Status: **APPROVED FOR IMPLEMENTATION — source in progress, runtime chưa kiểm chứng**.
 
 Human approval2026-11-07: “Tiến hành bám vào plan để làm”, sửa **ảnh1:1**; thay đổi tỉ lệ ảnh để **scope kế tiếp**, chưa chọn version/control surface cho follow-up đó. Approval§10 với amendment này supersedes các đoạn chờ-duyệt bên dưới. Cập nhật plan trước runtime edits;1.3.20 giữ, current không tự chuyển/bump. Không thêm ratio control/schema/setting trong lượt này.

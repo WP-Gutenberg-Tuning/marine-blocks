@@ -1,7 +1,7 @@
 # 039 — Roadmap C: B2B Toolkit, Carousel First (stack — M1 → 1.3.17 IN PROGRESS)
 
 **Status:** Human đã promote/bắt đầu M1 → V1 / 1.3.17 ngày 2026-10-13: Product/Post Carousel Stability & QA. IN PROGRESS; chưa có test PASS hoặc release approval. 5 chỉnh sửa audit PM vẫn hiệu lực.
-**Milestone chính thức hiện tại:** V1 / 1.3.17 — Product/Post Carousel Block UI & Visual QA (IN PROGRESS, started 2026-10-13). 1.3.10 DEFERRED → M5, chưa hoàn thành.
+**Milestone chính thức hiện tại:** V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1 (IN PROGRESS, human start2026-11-07).1.3.19 DEFERRED_WITH_CARRY_OVER; carry register trong MILESTONES.md, snapshot/history giữ checklist, không completed/PASS. Các dòng status/mapping dated cũ bên dưới là lịch sử.
 **Nguồn:** `docs/decisions/project-goals-and-roadmap-reset.md` (quyết định human đã chốt + audit Muse 2026-10-13).
 **POC chuẩn:** `.local/product-carousel-swiper-poc-03.html` (đã chốt, không chọn lại).
 **Engine:** Swiper 11 giữ nguyên (`docs/decisions/collection-carousel-engine-keep-swiper.md`).
@@ -11,6 +11,10 @@
 ---
 
 ## 1. Mục tiêu roadmap C (human đã chốt)
+
+Mapping addition **2026-11-07**: human gán **V1 / 1.3.24 — Fullscreen Step Slider**, **PLANNED/chưa start**. Mapping **1.3.10 DEFERRED → M5 (phần Step Slider) → 1.3.24**; kế thừa toàn bộ acceptance/plan018/research, không kích hoạt toàn bộ M5. PATCH là ngoại lệ human xác nhận theo precedent1.3.22–23; slot chưa được gán. Current giữ1.3.20, không bump/build/chuyển milestone. Các câu Step Slider chưa-gán-SemVer bên dưới là snapshot lịch sử được supersede bởi mapping này.
+
+Mapping transition2026-11-07: current **1.3.20 Category Grid/details + Woo Archive M1**, kế thừa nền M1 follow-up/sidebar consumer và theme native archive scope, không kích hoạt toàn bộ stackM3/M6.1.3.19 deferred với full carry/checklist, không PASS; Hero1.3.21 riêng, Blog/M2/ratio controls chưa start. Không rename plugin hoặc đổi query ownership. Metadata development1.3.20, không git remote push/deploy.
 
 Mapping addition2026-11-06: human cho triển khai Woo Archive M1 (plan059§9–10) **chung1.3.20 Product Category Grid + Category details**, giữ version đã dùng và CG/DS acceptance; theme native archive visuals, không archive builder/query ownership migration. Đây là source scope addition ngoài current1.3.19 theo precedent Category source; không chuyển mốc/bump metadata. Blog archive và Archive M2 chưa start. Giữ AM1/AL/AR evidence riêng.
 
