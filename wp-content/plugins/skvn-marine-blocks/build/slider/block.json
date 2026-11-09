@@ -6,7 +6,7 @@
   "title": "SKVN Slider",
   "category": "skvn-marine",
   "icon": "images-alt2",
-  "description": "Swiper-powered slider skeleton with stacked editor preview.",
+  "description": "Slider with native slide editing, a slide list and static navigation previews.",
   "textdomain": "skvn-marine-blocks",
   "attributes": {
     "autoplay": {
