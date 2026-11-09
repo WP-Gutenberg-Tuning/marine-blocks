@@ -10,7 +10,8 @@ import { Button, PanelBody, RangeControl } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { memo, useMemo } from '@wordpress/element';
+import { memo, useContext, useMemo } from '@wordpress/element';
+import { SliderEditorFocusContext } from '../slider/editor/context';
 
 const TEMPLATE = [
 	[ 'core/heading', { level: 3, placeholder: 'Slide heading' } ],
@@ -103,6 +104,7 @@ export const Edit = memo( function SlideEdit( {
 	context,
 	setAttributes,
 }: SlideEditProps ) {
+	const editorFocus = useContext( SliderEditorFocusContext );
 	const preset = String( context[ 'skvn-marine/sliderPreset' ] || '' );
 	const attachment = useSelect(
 		( select ) => {
@@ -130,6 +132,7 @@ export const Edit = memo( function SlideEdit( {
 			return (
 				editor
 					.getBlockParents( clientId )
+					.slice().reverse()
 					.find(
 						( parentId ) =>
 							editor.getBlockName( parentId ) ===
@@ -139,6 +142,14 @@ export const Edit = memo( function SlideEdit( {
 		},
 		[ clientId ]
 	);
+	const directParentClientId = useSelect(
+		( select ) => editorFocus ? ( select( blockEditorStore ) as {
+			getBlockRootClientId: ( id: string ) => string | null;
+		} ).getBlockRootClientId( clientId ) : null,
+		[ clientId, editorFocus?.rootClientId ]
+	);
+	const isInactiveInEditor = editorFocus && directParentClientId === editorFocus.rootClientId &&
+		editorFocus.activeSlideClientId !== clientId;
 	const resolvedImageUrl =
 		attachment?.source_url || attributes.backgroundImageUrl;
 	const hasImage = Boolean(
@@ -155,6 +166,9 @@ export const Edit = memo( function SlideEdit( {
 		className: `skvn-slide skvn-slide--editor${
 			showsBackgroundImage ? ' skvn-slide--has-background' : ''
 		}`,
+		// Keep the native editor subtree mounted. Only its owned presentation is
+		// hidden; selection ancestry reveals the target synchronously on render.
+		...( isInactiveInEditor ? { style: { display: 'none' } } : {} ),
 	} );
 	const selectImage = useMemo(
 		() => ( image: SelectedImage ) => {

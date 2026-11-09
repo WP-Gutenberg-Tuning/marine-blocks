@@ -82,6 +82,7 @@ function skvn_marine_blocks_register_blocks() {
 			$editor_ver,
 			true
 		);
+
 	}
 
 	$editor_style = __DIR__ . '/build/style-index.ts.css';
@@ -137,6 +138,18 @@ function skvn_marine_blocks_register_blocks() {
 				? array( 'skvn-marine-slider-core' )
 				: array(),
 			filemtime( $slider_style )
+		);
+	}
+
+	$slider_editor_style = __DIR__ . '/assets/css/slider-editor.css';
+	if ( file_exists( $slider_editor_style ) ) {
+		wp_register_style(
+			'skvn-marine-slider-editor',
+			plugins_url( 'assets/css/slider-editor.css', __FILE__ ),
+			wp_style_is( 'skvn-marine-slider-view', 'registered' )
+				? array( 'skvn-marine-slider-view' )
+				: array(),
+			filemtime( $slider_editor_style )
 		);
 	}
 
@@ -250,6 +263,13 @@ function skvn_marine_blocks_register_blocks() {
 				wp_style_is( 'skvn-marine-slider-view', 'registered' )
 			) {
 				$args['editor_style_handles'][] = 'skvn-marine-slider-view';
+			}
+
+			if (
+				in_array( $block, array( 'slider', 'slide' ), true ) &&
+				wp_style_is( 'skvn-marine-slider-editor', 'registered' )
+			) {
+				$args['editor_style_handles'][] = 'skvn-marine-slider-editor';
 			}
 
 			if ( 'slider' === $block && wp_script_is( 'skvn-marine-slider-view', 'registered' ) ) {
