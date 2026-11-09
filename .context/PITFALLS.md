@@ -8,6 +8,28 @@
 
 ## Agent Pitfalls (lỗi quy trình của AI agent)
 
+### AP-13 — Kiểm DOM sau compile rồi bỏ sót CSS cache của first response
+
+- **Case2026-11-09:** header Home đẹp sau tải nhưng co/thiếu lúc đầu trên desktop. Agent trước đó chỉ xem computed DOM sau WindPress compiler:27212ký tự CSS có menu. Raw HTML thực trả cache21218ký tự, thiếu companion và utilities header; VFS `/mhf-header.css` đã mới.
+- **Rule:** với lỗi first-load, so raw response/CSS cache với settled DOM; file đã Save hoặc style ID có chữ cached không chứng minh response cache đã chứa source mới. Browser compiler có thể bổ sung/ghi đè style cùng ID.
+- **Repair direction:** Generate CSS Cache từ nguồn mới, purge HTML/CDN và kiểm cold paint; không đoán chung là browser cache, không thêm preloader/delay để che. `cache_dir:[]` của public metadata không tự là evidence cache thiếu.
+- **Evidence:** runbook `docs/testing/mega-menu-gutenberg-tailwind-prototype.md` MM-LOAD01–03, raw/JSON ở `.local/header-first-load-2026-11-09*`; cache rebuild/first-paint runtime chưa được nghiệm thu.
+
+### AP-12 — Giao prototype có JS nhưng không nối runtime đang dùng
+
+- **Case2026-11-08:** agent giao Gutenberg markup/CSS/controller rời, rồi sửa CSS và nói cập nhật stylesheet. Human làm đúng nhưng Home390px vẫn cao246px, không hamburger vì controller chưa được nạp. CSS từng bọc `@layer components` cũng bị theme unlayered ghi đè; preview không có theme rules nên che lỗi.
+- **Sai:** coi file tồn tại hoặc bản preview chạy là một tính năng đã dùng được trong WordPress; lặp lại yêu cầu human tự ghép assets sau khi đã chốt mobile drawer.
+- **Đúng:** nối markup → stylesheet → runtime enqueue → breakpoint/interaction. Chỉ rõ source/deploy/runtime evidence riêng; kiểm script tags + toggle/dialog/ready state. Dùng shared runtime hiện có, không bị reveal/reduced-motion early return chặn menu. CSS companion phải chịu được theme cascade, preview dùng cùng source CSS.
+- **Evidence/repair:** `docs/testing/mega-menu-gutenberg-tailwind-prototype.md`; shared animations.js + enqueue.php đã có source và9VM model testsPASS, PHP lint/deploy/native browser pending. Không nói onsite đã sửa chỉ vì source đã nối.
+
+### AP-11 — Nâng toolbar đúng hàng nhưng dùng sai hệ cột
+
+**Xảy ra:** 2026-11-07, hotfix archive heading plan059§11; human gửi screenshot result count bị đẩy vào giữa.
+**Lỗi của agent:** Chỉ chuyển count/sort ngang H1 rồi dùng hai flex items co giãn độc lập; không ràng buộc heading row với sidebar/product tracks phía dưới. Requirement đúng hàng đã có nhưng implementation thiếu trục ngang của design. Đây là lỗi layout của agent, không phải cache hoặc human thiếu thông tin.
+**Evidence:** Audit trang thật `https://minhhaifishery.com/product-category/grouper/`, logged-out, viewport1280×720: heading/sidebar x72.5; product/card x344.5; count x536.5, lệch +192px. Sorting/grid cùng right1192.5. Computed header `flex:1 1 224px`, toolbar `flex:1 1 448px`; body sidebar240px + gap32px. Source `wp-content/themes/skvn-marine/style.css`, selectors `.skvn-archive-heading-row` và `.skvn-archive-layout`. Plan059§12 giữ evidence/repair; §13 giữ UX mobile riêng.
+**Tránh:** Với các hàng cần thẳng trục, dùng chung track sizing, gap, width owner và container breakpoint. Acceptance phải đo cả left/right delta giữa hàng heading/toolbar và body grid, không chỉ cùng hàng hoặc không overflow. Kiểm desktop, breakpoint±1px, narrow/title dài; baseline và horizontal alignment là hai điều kiện riêng. Không dùng offset/margin âm để bù một kết quả flex sai. Không coi source/model PASS là visual PASS.
+**Fixed (source2026-11-07, chưa runtime PASS):** Human cho thực hiện059§12–13. Một outer grid chung sidebar240/gap32/container1120 cho header/nav/toolbar/results; bỏ flex-basis độc lập. PHP shell giữ native callbacks và một nav đúng mobile reading order; disclosure CSS-owned mode/focus/no-JS có5VM modelPASS. Chờ human lint/onsite geometry≤1CSSpx và native Woo/fallback; no-overflow cũ không làm alignment PASS.
+
 ### AP-08 — Guard chỉ tồn tại ở Copy/root, Paste và descendants đi vòng
 
 **Xảy ra:** 2026-11-05, review Content Actions commit `0a53a2d`.
