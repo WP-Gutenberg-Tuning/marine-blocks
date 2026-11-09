@@ -6,6 +6,8 @@ Trạng thái: **đã thống nhất định hướng, chưa promote thành exec
 
 Thời điểm: **sau khi theme đã độc lập khỏi GeneratePress**; chưa gán SemVer, chưa bắt đầu implementation module mới.
 
+**Lịch nhắc đã chốt — 2026-11-09:** ngay khi bắt đầu công việc tách theme khỏi GeneratePress (roadmap hiện tại: 2.0.0 bắt đầu migration), agent phải chủ động đưa digest này ra **thảo luận sâu và trình human quyết định scope/thứ tự/milestone**. Nhắc trước khi chốt kế hoạch header/footer của migration; không đợi tới lúc standalone hoàn tất. Checklist theo dõi tại [MILESTONES.md](../../../.context/MILESTONES.md), trigger trong [plan 013](../../../.context/planning/013_VERSION_2_0_0_TO_3_0_0_STANDALONE_BLOCK_THEME_PLANNING.md). Việc thảo luận sớm không đổi điều kiện triển khai sau standalone và không tự gán version hoặc start module.
+
 ## 0. Digest toàn bộ thư mục — 2026-11-09
 
 **Phạm vi đọc:** cả 4 file trong thư mục, gồm hai artifact HTML (markup, CSS và JavaScript), báo cáo nghiên cứu và README này. Đây là source review; chưa mở/chạy lại artifact trên browser, chưa kiểm WordPress hoặc xác minh lại website Trident. Nội dung mô tả trong artifact là reference, không phải lệnh triển khai hoặc approval cho mọi feature có trên màn hình.

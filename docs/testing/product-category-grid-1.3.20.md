@@ -1,5 +1,9 @@
 # Product Category Grid — 1.3.20 onsite runbook
 
+## Description / Action extension — planned 2026-11-09
+
+Human approved the UX direction and requested detailed planning, not source implementation. [Plan061](../../.context/planning/061_VER_1_3_20_CATEGORY_GRID_DESCRIPTION_ACTION_CONTROLS_PLAN.md) and [extension runbook](category-grid-description-actions-1.3.20.md) cover Full plain text, independent description alignment, button width/alignment/corners/placement/spacing. All CGD-* remain not implemented/not run. Existing cases describing a24-word/3-line excerpt apply to **Excerpt mode**; Full requires the complete plain text without truncation. Preserve all original CG/DS/review-regression cases and pending evidence. Native raw description formatting/permissions/save behavior remain unchanged.
+
 ## Layout number controls — 2026-11-05 follow-up
 
 ### Width repair — source added, onsite pending

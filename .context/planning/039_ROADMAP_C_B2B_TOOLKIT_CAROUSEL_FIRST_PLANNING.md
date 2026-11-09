@@ -1,5 +1,7 @@
 # 039 — Roadmap C: B2B Toolkit, Carousel First (stack — M1 → 1.3.17 IN PROGRESS)
 
+**Slider scope amendment2026-11-09:** M5 → **1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**. Human thêm editor redesign theo044§10/053 P3/EF-SLIDER/Slider part EF-06; SED-* Chưa làm, mockup/palette chưa chốt, chưa coding/start. Contrast source/hotfix và HERO-* riêng. Các giới hạn “chỉ đụng Hero contrast” bên dưới là repair gốc, nay bổ sung editor có chủ đích; không mở parallax/motion repair. Step Slider giữ1.3.24; current1.3.20 không đổi.
+
 **Status:** Human đã promote/bắt đầu M1 → V1 / 1.3.17 ngày 2026-10-13: Product/Post Carousel Stability & QA. IN PROGRESS; chưa có test PASS hoặc release approval. 5 chỉnh sửa audit PM vẫn hiệu lực.
 **Milestone chính thức hiện tại:** V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1 (IN PROGRESS, human start2026-11-07).1.3.19 DEFERRED_WITH_CARRY_OVER; carry register trong MILESTONES.md, snapshot/history giữ checklist, không completed/PASS. Các dòng status/mapping dated cũ bên dưới là lịch sử.
 **Nguồn:** `docs/decisions/project-goals-and-roadmap-reset.md` (quyết định human đã chốt + audit Muse 2026-10-13).

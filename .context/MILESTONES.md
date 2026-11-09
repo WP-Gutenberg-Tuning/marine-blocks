@@ -17,6 +17,8 @@ Human instruction: “cho agent push milestone lên1.3.20”. SemVer1.3.20 đã 
 
 ### Scope và acceptance current1.3.20
 
+Category extension2026-11-09: human duyệt hướng và giao **planning chi tiết**, chưa coding delta. [Plan061](planning/061_VER_1_3_20_CATEGORY_GRID_DESCRIPTION_ACTION_CONTROLS_PLAN.md) bổ sung Full plain-text description/Excerpt, căn description, Action width Auto/Full/Custom%, alignment, Pill/custom px, Follow content/Bottom và khoảng cách exact/minimum. Defaults cũ/term persistence giữ; px inputs là ngoại lệ hẹp Category Action, không toàn plugin. CGD-UI01–04, CGD-ED01–03, CGD-TECH01–04 **Chưa làm**; [runbook](../docs/testing/category-grid-description-actions-1.3.20.md). Giữ current1.3.20, không bump/chuyển mốc hoặc start toàn bộ visual Sidebar054; CG/DS/carry cũ không mất acceptance.
+
 Archive hotfix059§12–13: human start2026-11-07, chung current1.3.20; grid alignment HF-AX và mobile category disclosure MN-* có source,5JS state/focus modelPASS; PHP lint/onsite geometry/native Woo Chờ kiểm chứng. Giữ HF-HDR FAIL lịch sử/AP-11; không đổi product ratio/query/plugin hoặc bump/deploy.
 
 | Work package | Source / acceptance | Trạng thái / evidence cần tiếp |
@@ -61,6 +63,16 @@ Execution update 2026-11-04 (UX hotfix 046): human đã yêu cầu bắt đầu,
 **Update mới hơn:** 057 đã được human duyệt coding+commit trong current1.3.19 không bump, xem scope addition ở đầu file và057§17. Các câu pending057 bên dưới là checkpoint trước approval;058 vẫn Deferred sau2.0, không thay trigger review/xếp lịch.
 
 Human tách Content actions thành hai plan: [057](planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md) dùng menu ⋮ sẵn có của từng block, ưu tiên trước (SemVer/start TBD); [058](planning/058_FUTURE_CANDIDATE_EDITOR_CONTEXT_MENU_AFTER_2_0.md) right-click **Deferred sau khi qua2.0**. Khi đạt trigger này, agent phải tổng hợp các tính năng đề xuất đang chờ rồi trình human chốt scope/SemVer/thứ tự thực hiện. Không coi vừa bắt đầu2.0 là đã qua2.0; không tự gán2.0.1/2.1.0 hoặc start. Giữ CCP-TECH03 ở058, không mất acceptance. Update2026-11-05: human yêu cầu và cho commit research/plan/handoff docs;057§10–16 có proposal P0–P5, API/version gate, acceptance và memo scope/start còn mở. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`; runbook `docs/testing/block-content-actions.md`. Không đổi current/bump hoặc thêm057 vào1.3.19 khi chưa được human duyệt riêng.
+
+### Nhắc thảo luận khi bắt đầu tách GeneratePress — Header/Footer và Mega Menu (2026-11-09)
+
+**Trigger:** khi human bắt đầu/chuyển sang công việc tách theme khỏi GeneratePress (roadmap hiện tại: 2.0.0 bắt đầu migration), agent phải chủ động thông báo và đưa [digest megamenu](../docs/ideations/megamenu/README.md) ra thảo luận sâu trước khi chốt kế hoạch header/footer của đợt migration. Không đợi tới khi standalone hoàn tất mới nhắc.
+
+- [ ] Trình lại digest cả thư mục: module Header/Footer, quản lý templates, navigation/drawer và research sóng; phân biệt reference với scope đã duyệt.
+- [ ] Thảo luận host theme, plugin component/assets vs theme placement, storage/menu source, CTA mobile, phạm vi templates/conditions/wave và migration/fallback từ hệ hiện tại; mang theo câu hỏi §6 và acceptance HF-*.
+- [ ] Trình human quyết định phạm vi, thứ tự và **SemVer/milestone cụ thể** sau khi đối chiếu roadmap. Chỉ ghi đã quyết khi có xác nhận; nếu chưa chốt, giữ mục chờ và ghi câu hỏi còn mở.
+
+Đây là lịch nhắc để thảo luận/chốt milestone, **không phải lệnh triển khai ở 2.0.0**. Quyết định dựng module sau khi theme độc lập khỏi GeneratePress vẫn giữ hiệu lực; việc nhắc sớm không tự gán module vào 2.0.0 hoặc 3.0.0, không chuyển current 1.3.20. Theo dõi cùng [plan 013](planning/013_VERSION_2_0_0_TO_3_0_0_STANDALONE_BLOCK_THEME_PLANNING.md).
 
 ### Follow-up đã lưu cho 2.0.0 — GP layout dependency (2026-11-04)
 
@@ -986,12 +998,26 @@ Scope: chọn Product Category thủ công, grid responsive, archive/custom URL,
 
 Version rationale: feature thường tăng MINOR; **1.3.20 là ngoại lệ do human xác nhận**. Thứ tự mới 2026-11-04 là Sidebar 1.3.19 → Category 1.3.20 → Hero contrast 1.3.21. Post Category riêng, chưa gán số. Chưa start/current/bump metadata.
 
-### 1.3.21 — Hero Slider Contrast Repair (stack: M5 — HOTFIX, KHÔNG phải current)
+### 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign (stack: M5, KHÔNG phải current)
+
+**Concept01 source2026-11-09:** human xác nhận P1 “Đã test, đúng UX”; tiếp tục P2/layout/P3 controls-states trong source theo063§13. Frame lavender/scroll rail/native stage/static Arrow–Add–Pagination footer có source; bỏ P1 URL gate/bootstrap/harness, normal editor sau human build.19selection/Add mocked tests + syntax10files PASS; presentation suite human10/10 PASS (64.42s, SSR/WP mocks). Human flow acceptance không tự PASS full N01–03/3–10Slide/locks/fidelity/perf/HERO. U01–09 + AF01–10 actual evidence pending; không close current1.3.20/bump/build/lint/deploy/commit/push. Các checkpoint chờ gate/source chưa có bên dưới là lịch sử superseded.
+
+**Source start2026-11-09 — human “Tiến hành”:** bắt đầu063 P1 ngoài current1.3.20. Default-off QA harness (`skvn-slider-editor-proof=1`) có source native context/selection/mounted inactive presentation,14 mocked-store tests PASS và syntax5files PASS; N01–03/onsite API+iframe/assets chưa proof. **P2/P3 không rollout trước gate**, chưa final Concept01/PASS. Ledger063§12 + runbook§2.1; không bump/current transition/build/lint/commit/push/deploy. Các entry planning-only/no source/start bên dưới là lịch sử superseded về lệnh source start.
+
+**Detailed execution plan2026-11-09:** [063](planning/063_VER_1_3_21_SLIDER_EDITOR_UI_EXECUTION_PLAN.md) + [native editor runbook](../docs/testing/slider-editor-ui-1.3.21.md) chia P0–P5, source/AF mapping và controls/states inventory. P0 pin actual WP/Gutenberg/tagged APIs; P1 chứng minh một mounted native InnerBlocks tree, chọn/edit/IME/Undo/List View trước rollout frame/rail/footer. Visibility/context là kỹ thuật dự kiến chưa proof; không tự bỏ artifact nếu fail. Editor CSS handle riêng, legacy/schema/frontend giữ. Human chỉ yêu cầu planning; chưa coding/start1.3.21 hoặc đổi current1.3.20.
+
+**Reference lock2026-11-09:** human xem Concept01 và nói “Good”, yêu cầu implementation bám artifact. [Plan062](planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) là contract bắt buộc: đọc canonical HTML/hash, AF01–10→source mapping, paired artifact/actual editor images và deviation register; không tự bỏ/đổi frame, bố cục hoặc nhãn. Reference accepted không là source/runtime PASS hoặc lệnh start; demo review controls/state không thành product implementation. Các câu chưa có mockup/layout dưới đây là checkpoint trước khi có reference, không gate hỏi lại bố cục Concept01; phần Inspector/variations/native feasibility còn phải audit.
 
 Status: **IN PROGRESS (source) — chờ human build + kiểm chứng runtime**
+
+**Scope amendment2026-11-09:** human yêu cầu thêm redesign phần Slider Editor UI vào1.3.21. **Contrast: đã có source, runtime Chờ kiểm chứng; Editor redesign: PLANNED/Chưa làm, chưa start.** Version1.3.21 giữ theo quyết định human, đây là mở scope đã duyệt cùng version, không đổi Version Naming Rule. Hình thức hotfix ngoài current áp phần contrast đã có; không dùng nó để tự start redesign hoặc chuyển current khỏi1.3.20.
+
+Editor scope: canvas/preview/chrome, tổ chức Inspector/settings của Slider/Slide, nhận diện parent/slide và luồng Add/select/reorder/edit; audit Hero, Product Showcase, Card Carousel và Slider mặc định để xác định UI phù hợp từng variation. Kế thừa P3/EF-SLIDER và phần Slider của EF-06 từ053, cùng khung/spacing/asset contract. Layout cụ thể, palette và việc di chuyển control cần proposal/mockup trước coding; chưa phê duyệt một kiểu preview mới. Bảo toàn native InnerBlocks/List View/RichText, Undo/save/reopen và controls hiện hành; không custom slide store hoặc runtime Swiper/autoplay trên canvas. Step Slider vẫn1.3.24; không gộp sang đây.
 Confirmed: **2026-10-19** — Hero contrast được chọn 1.3.19 dạng hotfix ngoài current; **2026-11-04 human dời scope này sang 1.3.21**, giữ source/status/acceptance và hình thức hotfix ngoài current.
 Current milestone: **V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1** từ human transition2026-11-07. Hero1.3.21 vẫn hotfix ngoài current; không tự archive hoặc bump riêng cho Hero.
 SemVer rationale: PATCH — sửa cascade/default của Slider đã có, không thêm feature/schema/dependency. Mapping cũ 1.3.19 được thay bằng **1.3.21** theo human 2026-11-04 để dành 1.3.19 cho Sidebar.
+
+Rationale trên là của repair gốc; amendment2026-11-09 bổ sung editor redesign theo human vào cùng1.3.21, không suy PATCH là quyền thêm schema/feature frontend. Plan044§10 giữ scope/acceptance mới; contrast/flicker và editor nghiệm thu riêng.
 
 > **Không bump metadata cho 1.3.21.** Bump `node tools/bump-project-version.mjs` chỉ áp dụng khi milestone được bắt đầu làm current. Milestone này là hotfix ngoài current nên WordPress version headers giữ nguyên cho tới khi human quyết định khác.
 
@@ -1019,6 +1045,15 @@ Acceptance (điểm tương ứng HERO-* trong 044 §7):
 - [ ] HERO-TECH-01/02: diff review, không invalid-block, regression Product Showcase/Card Carousel/core button ngoài Hero sạch.
 - [ ] HERO-TECH-03: kết luận chớp — tái hiện / không tái hiện trong môi trường đã ghi / chưa kiểm được.
 - [ ] Human approve kết quả visual.
+
+Acceptance bổ sung Editor redesign — **Chưa làm**, không thay HERO-*:
+
+- [ ] SED-ED01 — Audit controls/content/states theo từng variation, proposal/mockup canvas + Sidebar/Inspector; human chốt layout/palette trước coding.
+- [ ] SED-ED02 — Parent/slide rõ, tận dụng chiều rộng canvas, responsive editor/sidebar hẹp; giữ các thông tin và controls cần thiết, không có control chết hoặc ẩn mất setting đang dùng.
+- [ ] SED-ED03 — Add/select/reorder/delete/duplicate, native List View/InnerBlocks/RichText, keyboard/focus/IME, Undo/Redo/save/reopen và giới hạn slide hiện hành hoạt động.
+- [ ] SED-ED04 — Khung ngoài/label/màu và spacing theo053 sau khi duyệt palette; states empty/one/many/limit/missing media/long content đầy đủ, preview static ghi rõ giới hạn.
+- [ ] SED-TECH01 — Editor CSS thực sự được enqueue, không style leak; schema/save/data owner giữ, không engine/store song song; no-invalid-block và frontend regression trên các variations.
+- [ ] SED-UI01 — Frontend behavior/layout/motion của redesign giữ baseline, contrast source dùng chung không regression; evidence đúng build, tách lỗi cũ/chớp.
 
 Không tự đánh dấu milestone hoàn thành, không runtime PASS và không release approved khi thiếu evidence.
 

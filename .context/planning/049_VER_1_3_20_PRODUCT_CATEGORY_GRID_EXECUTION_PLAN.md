@@ -1,5 +1,7 @@
 # V1 / 1.3.20 — Product Category Grid + Category details
 
+**Delta đã duyệt về hướng — 2026-11-09:** [plan061](061_VER_1_3_20_CATEGORY_GRID_DESCRIPTION_ACTION_CONTROLS_PLAN.md) cụ thể hóa Full plain-text description/Excerpt, desc alignment và Action width/alignment/radius px/placement/gap. Human giao planning chi tiết, chưa coding delta; nằm trong current1.3.20, không version mới. Những chỗ dưới nói card luôn hiển thị excerpt là baseline **Excerpt**, không áp Full. Native description/storage/save contract và toàn bộ CG/DS acceptance giữ; thêm CGD-* và runbook riêng. Không suy approval này thành full054 Sidebar hoặc runtime PASS.
+
 Human transition2026-11-07: **current V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1**, bắt đầu theo lệnh human.1.3.19 DEFERRED_WITH_CARRY_OVER, full acceptance/evidence tại history và current carry register; không completed/PASS. Các current1.3.19/chưa-chuyển-mốc phía dưới là checkpoint lịch sử. Metadata sync development1.3.20, không release/deploy/git remote push. Card ảnh1:1, ratio controls next scope và Blog/ArchiveM2 chưa start.
 
 Ngày: 2026-11-04. **PLANNED, chưa start/coding.** Current là 1.3.19, agent Sol đang triển khai Sidebar theo 048. Human yêu cầu lập plan song song; không phải lệnh chuyển current. Version 1.3.20 đã chốt, không hỏi lại.

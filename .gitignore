@@ -198,3 +198,9 @@ docs/artifacts/*
 !docs/artifacts/init-prompt-v1-1.3.1-slider-controls.md
 !docs/artifacts/init-prompt-v1-1.3.4-core-control.md
 !docs/artifacts/init-prompt-v1-1.3.8-core-button-hover-fix.md
+
+# Canonical Slider Editor Concept01: keep only these review sources versionable.
+!docs/artifacts/editor-ui/
+docs/artifacts/editor-ui/*
+!docs/artifacts/editor-ui/slider-editor-redesign-prototype.html
+!docs/artifacts/editor-ui/slider-editor-redesign-prototype.md

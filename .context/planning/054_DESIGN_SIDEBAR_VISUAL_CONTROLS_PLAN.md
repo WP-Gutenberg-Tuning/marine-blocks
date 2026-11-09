@@ -1,5 +1,7 @@
 # Design Sidebar — visual controls implementation plan
 
+**Scope clarification2026-11-09:** human duyệt riêng hướng mở rộng Category description/Action controls; detailed spec tại [061](061_VER_1_3_20_CATEGORY_GRID_DESCRIPTION_ACTION_CONTROLS_PLAN.md), current1.3.20. Inventory “existing-only” bên dưới là snapshot trước delta061; các controls mới của061 là ngoại lệ có chủ đích, chưa coding. Không coi đây là approval Q1–Q3/toàn bộ visual tile redesign054 hoặc thêm controls sang Product/Post. Giữ owner/reset của061 khi triển khai consumer Category.
+
 2026-11-05. **Planning / chờ chốt Q1–Q3, chưa triển khai visual controls.** Current V1 / 1.3.19; đây là đề xuất cải thiện presentation của Design Sidebar hiện có, không đổi milestone/metadata hoặc nghiệm thu1.3.20. User yêu cầu agent commit tồn đọng và tài liệu planning, không phải coding Sidebar trong lượt này.
 
 ## 1. Mục tiêu và quyết định đã có

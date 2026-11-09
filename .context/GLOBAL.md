@@ -60,6 +60,20 @@ Current2026-11-07: **V1 /1.3.20 — Product Category Grid + Category details + W
 
 Active planning (root — load when task liên quan):
 
+Slider Concept01 source2026-11-09: P1 human “Đã test, đúng UX” cho flow đã báo; P2/P3 frame/rail/native stage/footer/Inspector states có source. P1 flag/harness/bootstrap retire, UI mặc định sau human build;19selection/Add tests và syntax10files PASS. Presentation suite human10/10 PASS (64.42s, SSR/WP mocks); native technical/paired screenshots/geometry/perf pending.063§13/runbook§0 supersede P1 checkpoint bên dưới; current1.3.20 giữ, không bump/build/lint/commit/deploy.
+
+Slider source start2026-11-09: human “Tiến hành” theo063/062; P1 default-off QA harness URL `skvn-slider-editor-proof=1`, per-root native context/one mounted InnerBlocks tree,14 mocked-store tests PASS. N01–03/onsite WP-Gutenberg/iframe/assets pending; **P2/P3 chờ gate**, chưa final Concept01. Source/evidence063§12, runbook§2.1. Không transition/bump/commit/build/lint/deploy; current1.3.20 giữ. Planning-only entries bên dưới superseded về source start.
+
+- `.context/planning/063_VER_1_3_21_SLIDER_EDITOR_UI_EXECUTION_PLAN.md` — detailed implementation plan theo044/062/Concept01: P0 versioned API gate, P1 mounted native3slide/selection/IME/Undo proof, P2 layout/rail/footer/assets, P3 Inspector/states/responsive, P4 focused tests, P5 human fidelity/native/frontend. Dedicated editor CSS handle và source map; chưa coding/start, current1.3.20 giữ. Runbook `docs/testing/slider-editor-ui-1.3.21.md`.
+
+- `.context/planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md` — human2026-11-09 nhận Slider Concept01 làm reference và yêu cầu bám mẫu; canonical HTML/hash, AF01–10 mapping, deviation register và paired artifact/actual screenshot gate. Đọc cùng044§10 trước implementation/review; demo controls/state không ship. Chưa source/start1.3.21, current1.3.20 giữ.
+
+Slider amendment2026-11-09: **1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**. Human bổ sung editor redesign (canvas/chrome + tổ chức controls Slider/Slide), nối044§10 và053 P3/EF-SLIDER/Slider part EF-06. Redesign PLANNED, mockup/palette chưa chốt, chưa code/start; contrast source/runtime pending riêng. Step Slider1.3.24 giữ. Không đổi current1.3.20 hoặc bump metadata.
+
+- `.context/planning/061_VER_1_3_20_CATEGORY_GRID_DESCRIPTION_ACTION_CONTROLS_PLAN.md` — human2026-11-09 duyệt hướng và yêu cầu planning chi tiết: Full plain text/Excerpt, căn description độc lập, Action Auto/Full/Custom%, align, Pill/custom px, Flow/Bottom và gap exact/minimum. Current1.3.20 Category extension; chưa coding/build/onsite, CGD-* Chưa làm. Runbook `docs/testing/category-grid-description-actions-1.3.20.md`; không mở toàn bộ054 hoặc đổi query/term owners.
+
+Header/Footer discussion reminder2026-11-09: khi human bắt đầu tách theme khỏi GeneratePress (roadmap2.0.0), agent phải chủ động nhắc và trình `docs/ideations/megamenu/README.md` để thảo luận sâu, chốt scope/thứ tự/SemVer với human. Register tại MILESTONES.md và plan013. Đây là trigger thảo luận sớm; implementation module vẫn sau standalone, chưa gán version/start, không tự đưa vào2.0.0/3.0.0.
+
 Header menu responsive2026-11-08: Home mobile CSS đã nạp nhưng không có drawer JS (390px/header246px/toggle0/dialog0). Controller đã nối existing theme assets/js/animations.js, inc/enqueue.php wp-i18n/translations;9VM state testsPASS, native browser/PHP lint/deploy pending. WindPress CSS vẫn own styling; không plugin feature, header GP repair hoặc đổi current. Read `docs/examples/mega-menu-gutenberg-tailwind/README.md` + `docs/testing/mega-menu-gutenberg-tailwind-prototype.md` khi sửa menu. Example controller là mirror từ shared runtime, không script bắt human tự gắn trên SKVN nữa.
 
 Spacer width execution2026-11-07: human cho sửa plan055 RS-W01–03; root editor alignwide, bỏ forced max-width:none/margin-inline0 để theo host Wide constraint như Collection/Grid.5existing tests/parse PASS, geometry/build/lint/onsite pending. Height/schema/save/frontend không đổi; previous “planning only” checkpoint bên dưới là lịch sử.

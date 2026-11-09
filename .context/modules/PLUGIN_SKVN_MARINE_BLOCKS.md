@@ -2,6 +2,12 @@
 
 ## [manual] Role
 
+Slider Concept01 source2026-11-09: P1 human UX accepted; `SliderEditorCanvas` thay harness/gate tạm, root frame + rail thumbnail/number/title + native stage + static footer. No query/bootstrap required after build; one native tree/UI-only context giữ. Dedicated editor CSS + shared spacing helper, native Add revalidate locks/permissions/root/limit, Inspector Playback/maps chung captions.19mocked selection/Add tests + syntax10files PASS; presentation suite human10/10 PASS (64.42s, SSR/WP mocks). Actual fidelity/geometry/10Slide/perf/technical pending; source map063§13/runbook§0. Current1.3.20/metadata giữ, không agent build/lint/deploy/commit.
+
+Slider activation repair2026-11-09: human Console onsite jsHasP1=false/script versionef08fdab29aba198d592 và URL mất flag; native Slider có mặt. Local WP7.1 edit-post BrowserURL canonicalizes query. P1 đổi sang PHP request-only bootstrap `skvnMarineSliderEditorProof` trước JS, không đọc location.search trong render.16 helper tests/syntax5files PASS, actual build/deploy/bootstrap/native pending. Cần đồng bộ PHP + build/JS+asset.php + static CSS; runbook§2.3/063§12 và diagnostic mới. Không dùng old query-literal marker để test repaired bundle; không rollout P2/P3/PASS.
+
+Slider source start2026-11-09: human “Tiến hành” theo063/062 ngoài current1.3.20. P1 QA harness URL `skvn-slider-editor-proof=1` default-off; native UI-only context/selection/one InnerBlocks, own Slide useBlockProps inactive presentation; CSS handle `skvn-marine-slider-editor` chỉ editor.14 mocked tests/syntax5files PASS; actual N01–03/onsite version/iframe/assets pending, **P2/P3 chờ gate**.063§12/runbook§2.1 giữ source map và giới hạn; không final Concept01, bump/transition/commit/build/lint/deploy.
+
 Current transition2026-11-07: human bắt đầu **1.3.20 — Product Category Grid + Category details + Woo Archive M1**.1.3.19 DEFERRED_WITH_CARRY_OVER; acceptance chưa nghiệm thu giữ current carry register/history, không completed/PASS. Metadata development1.3.20, không release/deploy.049/059/060 là scope; ảnh1:1, ratio controls next scope, Blog/M2 chưa start. Checkpoint current1.3.19 bên dưới là lịch sử. Nhắc chạy deferred tests trước follow-up runtime khác.
 
 Shared product-card API060 approved/source2026-11-07 trong1.3.20: `skvn_marine_blocks_render_product_card` query-free public presenter, existing Collection wrapper giữ flat/grouped/media options; card-only asset `assets/css/product-card.css` import bởi Collection + optional enqueue helper cho theme archive. Archive profile1:1/full specs safe-default, verified meta opt-in/no PDF. Theme adapter không require plugin internals.7CSS modelPASS, PHP/onsite/build pending. Ratio controls next scope deferred, current không chuyển; API consumer theme cần wrapper khi migration1.4.0.
@@ -116,6 +122,12 @@ src/
 - `skvn-marine/post-collection` — planned V1 / 1.3.3 dynamic post grid/carousel foundation
 
 ## [manual] Product And Post Collections
+
+Slider detailed execution2026-11-09: plan063 nối044/062/canonical hash; parent-local editor context và derived rail metadata, một native InnerBlocks tree/mounted visibility phải proof P1 đúng runtime WP/Gutenberg, không snapshot store/iframe demo. Source inventory, dedicated editor-only CSS handle, selection/focus/locks/limits/Inspector/states + P0–P5 và runbook `docs/testing/slider-editor-ui-1.3.21.md`. Chưa coding/start1.3.21; current1.3.20 giữ.
+
+Slider artifact fidelity2026-11-09: Concept01 được human xem/đánh giá Good, yêu cầu bám khi coding; đọc plan062 + canonical HTML/CSS/JS/hash và044§10. Map AF01–10→source, giữ two-column/scroll rail/static Arrow–Add–Pagination captions/frame, compare artifact/actual editor images; changes cần evidence/delta review. Không dùng demo array/contenteditable/iframe thay native blocks. Reference accepted không runtime PASS/start1.3.21; current1.3.20 giữ.
+
+Category description/Action planning2026-11-09: human duyệt hướng và giao detailed plan061 cho current1.3.20; Full plain text/Excerpt, desc alignment, Action width%, align, radius px, Flow/Bottom + gap exact/minimum. Chưa coding delta; CGD-* Chưa làm. Attrs local/Page Save/Undo, native term/raw permissions không đổi; `descriptionText` presentation field dự kiến cho canvas/frontend. Defaults/legacy gap0.4rem giữ; px exception chỉ Category Action, không đổi preset policy hoặc start054. Runbook `docs/testing/category-grid-description-actions-1.3.20.md`.
 
 Design visual-controls planning 2026-11-05: plan054 lưu SVG layout tiles, CSS fit/surface specimens, swatches/type preview theo controls có consumer. Q1(Category existing-only vs modes mới), Q2(Media layout owner/reset), Q3(group navigation) đang đề xuất, chưa human approve/coding. Không coi Category cardPadding là Product mediaPadding, không expose fit trên Product nếu chưa consumer, giữ Legacy/unknown values; Theme Design/session và frame053 không đổi scope.
 
