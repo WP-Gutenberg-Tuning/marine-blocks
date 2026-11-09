@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "skvn-marine/feature-showcase",
-  "version": "1.3.19",
+  "version": "1.3.20",
   "title": "SKVN Feature Showcase",
   "category": "skvn-marine",
   "icon": "excerpt-view",
