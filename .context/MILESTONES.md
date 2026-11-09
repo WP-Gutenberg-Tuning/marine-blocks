@@ -544,7 +544,7 @@ Planning:
 
 Decision:
 
-- `docs/decisions/fullscreen-step-slider-1.3.10.md`
+- `docs/decisions/sliders/step-slider/fullscreen-step-slider-1.3.10.md`
 
 Dependencies:
 
@@ -1077,7 +1077,7 @@ Acceptance kế thừa — tất cả **Chưa làm**, chưa có runtime evidence
 - [ ] Execution plan ghi riêng Block UI / Editor UX / Technical, Content & States và Acceptance & Evidence; giữ toàn bộ acceptance 1.3.10 và research/open decisions plan018 §14.
 - [ ] Build, PHP syntax, deploy artifact audit và onsite QA có evidence trên build xác định; tạo runbook `docs/testing/` trước onsite, human duyệt trước completion.
 
-Nguồn: `planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md`, `docs/decisions/fullscreen-step-slider-1.3.10.md`, roadmap039. Giữ filename cũ để bảo toàn liên kết. Hero contrast 1.3.21, Blog Archive, Archive M2 và ratio controls không được gộp vào 1.3.24 bởi quyết định này.
+Nguồn: `planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md`, `docs/decisions/sliders/step-slider/fullscreen-step-slider-1.3.10.md`, roadmap039. Giữ filename cũ để bảo toàn liên kết. Hero contrast 1.3.21, Blog Archive, Archive M2 và ratio controls không được gộp vào 1.3.24 bởi quyết định này.
 
 ### 1.4.3 — Interactive Illustrated Map
 

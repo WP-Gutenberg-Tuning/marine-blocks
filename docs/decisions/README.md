@@ -53,7 +53,8 @@ docs/decisions/.assets/  hình minh hoạ
 | [`slider-editor-arrow-preview-1.3.6.md`](slider-editor-arrow-preview-1.3.6.md) | V1 / 1.3.6 | CASE-006 editor arrow preview |
 | [`slider-parallax-both-1.3.8.md`](slider-parallax-both-1.3.8.md) | V1 / 1.3.8 | Rev 1.1 parallax contract |
 | [`swiper-architecture.md`](swiper-architecture.md) | none | Runtime usage map (2 consumer) + loopFix invariant |
-| [`fullscreen-step-slider-1.3.10.md`](fullscreen-step-slider-1.3.10.md) | V1 / 1.3.10 | **Milestone hiện tại (PENDING)** |
+| [`fullscreen-step-slider-1.3.10.md`](sliders/step-slider/fullscreen-step-slider-1.3.10.md) | V1 / 1.3.24 (origin 1.3.10) | PLANNED, chưa start; product contract 2026-11-09 |
+| [`2-side-product-slider.md`](sliders/2-side-product-slider/2-side-product-slider.md) | Chưa gán | Product direction đã chốt, chưa start |
 
 ### Collections & WooCommerce
 
@@ -140,7 +141,7 @@ Các mục dưới đây **cố ý chưa sửa** vì sửa cần quyết định
 | Blog Sidebar Content Settings | Hậu tố `1.3.12` trùng milestone Team Credits | Đã bỏ hậu tố → `archives/blog-sidebar-content-settings.md` |
 | Typography Report | Header report gốc ghi milestone `1.5.0 — Typography Settings`, nhưng `1.5.0` hiện là Woo Catalog Plugin | Chưa renumber; scope contract mới hơn là `typography-scope-and-font-loading.md` |
 | Collection Hover Interactions | Hậu tố `1.3.8` trùng Slider Parallax | Đã đổi → `collection-hover-interactions-1.3.7.md` (human xác nhận 2026-10-13) |
-| Fullscreen Step Slider | File gốc tên `1.5.0`, milestone thật là 1.3.10 | Đã đổi → `fullscreen-step-slider-1.3.10.md` |
+| Fullscreen Step Slider | File gốc tên `1.5.0`, origin 1.3.10; human gán 1.3.24 | Đã đổi tên lịch sử và đặt tại `sliders/step-slider/fullscreen-step-slider-1.3.10.md` |
 
 ---
 
