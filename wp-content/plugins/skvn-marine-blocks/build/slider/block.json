@@ -1,0 +1,140 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "skvn-marine/slider",
+  "version": "1.3.20",
+  "title": "SKVN Slider",
+  "category": "skvn-marine",
+  "icon": "images-alt2",
+  "description": "Slider with native slide editing, a slide list and static navigation previews.",
+  "textdomain": "skvn-marine-blocks",
+  "attributes": {
+    "autoplay": {
+      "type": "boolean",
+      "default": true
+    },
+    "autoplayDelay": {
+      "type": "number",
+      "default": 7000
+    },
+    "loop": {
+      "type": "boolean",
+      "default": true
+    },
+    "showArrows": {
+      "type": "boolean",
+      "default": true
+    },
+    "arrowStyle": {
+      "type": "string",
+      "default": "circle"
+    },
+    "arrowPosition": {
+      "type": "string",
+      "default": "side-center"
+    },
+    "showPagination": {
+      "type": "boolean",
+      "default": true
+    },
+    "paginationStyle": {
+      "type": "string",
+      "default": "dots"
+    },
+    "paginationPosition": {
+      "type": "string",
+      "default": "bottom-center"
+    },
+    "effect": {
+      "type": "string",
+      "default": "slide"
+    },
+    "transitionStyle": {
+      "type": "string",
+      "default": ""
+    },
+    "transitionDuration": {
+      "type": "number",
+      "default": 800
+    },
+    "heightPreset": {
+      "type": "string",
+      "default": "default"
+    },
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "slidesPerView": {
+      "type": "number",
+      "default": 1
+    },
+    "preset": {
+      "type": "string",
+      "default": ""
+    },
+    "responsiveSlides": {
+      "type": "string",
+      "default": "uniform"
+    },
+    "enableParallax": {
+      "type": "boolean",
+      "default": false
+    },
+    "parallaxIntensity": {
+      "type": "string",
+      "enum": [
+        "subtle",
+        "medium",
+        "strong"
+      ],
+      "default": "medium"
+    },
+    "parallaxAdvanced": {
+      "type": "boolean",
+      "default": false
+    },
+    "parallaxDepth": {
+      "type": "string",
+      "enum": [
+        "both",
+        "translate",
+        "scale"
+      ],
+      "default": "both"
+    },
+    "parallaxDirection": {
+      "type": "string",
+      "enum": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "parallaxTranslate": {
+      "type": "number",
+      "default": 30
+    },
+    "parallaxScale": {
+      "type": "number",
+      "default": 1.12
+    },
+    "parallaxInset": {
+      "type": "number",
+      "default": 35
+    }
+  },
+  "allowedBlocks": [
+    "skvn-marine/slide"
+  ],
+  "providesContext": {
+    "skvn-marine/sliderPreset": "preset"
+  },
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ]
+  }
+}

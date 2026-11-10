@@ -1,0 +1,257 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "skvn-marine/product-collection",
+  "version": "1.3.20",
+  "title": "SKVN Product Collection",
+  "category": "skvn-marine",
+  "icon": "products",
+  "description": "Dynamic SKVN product grid or carousel collection.",
+  "textdomain": "skvn-marine-blocks",
+  "attributes": {
+    "layout": {
+      "type": "string",
+      "default": "grid"
+    },
+    "contentWidth": {
+      "type": "string"
+    },
+    "specValuesLimit": {
+      "type": "number"
+    },
+    "eyebrow": {
+      "type": "string",
+      "default": ""
+    },
+    "heading": {
+      "type": "string",
+      "default": "Featured products"
+    },
+    "showHeading": {
+      "type": "boolean",
+      "default": true
+    },
+    "intro": {
+      "type": "string",
+      "default": ""
+    },
+    "accessibleLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "categories": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    },
+    "relation": {
+      "type": "string",
+      "default": "OR"
+    },
+    "orderMode": {
+      "type": "string",
+      "default": "newest"
+    },
+    "itemsToShow": {
+      "type": "number",
+      "default": 3
+    },
+    "responsivePreset": {
+      "type": "string",
+      "default": "3-2-1"
+    },
+    "showImage": {
+      "type": "boolean",
+      "default": true
+    },
+    "imageRatio": {
+      "type": "string",
+      "default": "1:1"
+    },
+    "cardStyle": {
+      "type": "string",
+      "default": "default"
+    },
+    "equalHeight": {
+      "type": "boolean",
+      "default": true
+    },
+    "badgeBehavior": {
+      "type": "string",
+      "default": "display"
+    },
+    "showPrice": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSku": {
+      "type": "boolean",
+      "default": false
+    },
+    "showStock": {
+      "type": "boolean",
+      "default": false
+    },
+    "showProductCategories": {
+      "type": "boolean",
+      "default": true
+    },
+    "showProductTags": {
+      "type": "boolean",
+      "default": false
+    },
+    "productActionMode": {
+      "type": "string",
+      "default": "quote"
+    },
+    "customActionUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "appendQuoteContext": {
+      "type": "boolean",
+      "default": true
+    },
+    "showArrows": {
+      "type": "boolean",
+      "default": true
+    },
+    "showPagination": {
+      "type": "boolean",
+      "default": true
+    },
+    "autoplay": {
+      "type": "boolean",
+      "default": false
+    },
+    "autoplayDelay": {
+      "type": "number",
+      "default": 5000
+    },
+    "archiveUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "archiveLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "catalogCtaUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "showCatalogCta": {
+      "type": "boolean",
+      "default": false
+    },
+    "catalogCtaLabel": {
+      "type": "string",
+      "default": "Download catalog"
+    },
+    "showSpecChips": {
+      "type": "boolean",
+      "default": true
+    },
+    "chipStyle": {
+      "type": "string",
+      "default": "tag"
+    },
+    "chipColorScheme": {
+      "type": "string",
+      "default": ""
+    },
+    "titleFontFamily": {
+      "type": "string",
+      "default": ""
+    },
+    "titleFontSize": {
+      "type": "string",
+      "default": ""
+    },
+    "titleColor": {
+      "type": "string",
+      "default": ""
+    },
+    "detailsFontFamily": {
+      "type": "string",
+      "default": ""
+    },
+    "detailsFontSize": {
+      "type": "string",
+      "default": ""
+    },
+    "detailsColor": {
+      "type": "string",
+      "default": ""
+    },
+    "actionFontFamily": {
+      "type": "string",
+      "default": ""
+    },
+    "actionFontSize": {
+      "type": "string",
+      "default": ""
+    },
+    "actionBackgroundColor": {
+      "type": "string",
+      "default": ""
+    },
+    "actionTextColor": {
+      "type": "string",
+      "default": ""
+    },
+    "actionHoverBackgroundColor": {
+      "type": "string",
+      "default": ""
+    },
+    "actionHoverTextColor": {
+      "type": "string",
+      "default": ""
+    },
+    "mediaLayout": {
+      "type": "string"
+    },
+    "mediaWidthPercent": {
+      "type": "number"
+    },
+    "mediaOffset": {
+      "type": "number"
+    },
+    "mediaShadowToggle": {
+      "type": "boolean"
+    },
+    "mediaShadowOffsetX": {
+      "type": "number"
+    },
+    "mediaShadowOffsetY": {
+      "type": "number"
+    },
+    "mediaShadowUnit": {
+      "type": "string"
+    },
+    "mediaShadowBlur": {
+      "type": "number"
+    },
+    "mediaShadowOpacity": {
+      "type": "number"
+    },
+    "mediaPadding": {
+      "type": "number"
+    },
+    "mediaPaddingUnit": {
+      "type": "string"
+    }
+  },
+  "supports": {
+    "html": false
+  }
+}
