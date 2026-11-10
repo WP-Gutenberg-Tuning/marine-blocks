@@ -393,6 +393,20 @@ function skvn_marine_blocks_category_grid_description_excerpt( $description, $wo
 }
 
 /**
+ * Full plain-text description used by the card in "Full text" display mode.
+ *
+ * The stored description is untouched: tags are stripped only for display and
+ * runs of whitespace collapse so the text reads as one paragraph. Formatting
+ * (paragraphs/lists/inline HTML) is not preserved by design (plan 061 §5.1).
+ *
+ * @param string $description Raw category description.
+ * @return string
+ */
+function skvn_marine_blocks_category_grid_description_text( $description ) {
+	return trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( (string) $description ) ) );
+}
+
+/**
  * Resolve ordered category IDs into data read from the taxonomy/catalog.
  *
  * Nothing here is stored in the block: names, links, counts, thumbnails and
@@ -435,6 +449,7 @@ function skvn_marine_blocks_category_grid_resolve( $term_ids, $context = 'view' 
 			'path'               => skvn_marine_blocks_category_grid_term_path( $term_id ),
 			'count'              => isset( $counts[ $term_id ] ) ? (int) $counts[ $term_id ] : 0,
 			'descriptionExcerpt' => skvn_marine_blocks_category_grid_description_excerpt( $term->description ),
+			'descriptionText'    => skvn_marine_blocks_category_grid_description_text( $term->description ),
 			'description'        => 'edit' === $context && current_user_can( 'edit_term', $term_id ) ? $term->description : '',
 			'thumbnail'          => skvn_marine_blocks_category_grid_thumbnail( $term_id ),
 			'link'               => is_wp_error( $link ) ? '' : (string) $link,

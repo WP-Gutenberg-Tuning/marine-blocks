@@ -271,13 +271,18 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 
 	$resolved = skvn_marine_blocks_category_grid_resolve( $term_ids, 'view' );
 
-	$show_image       = skvn_marine_blocks_category_grid_bool( $attributes, 'showImage', true );
-	$show_name        = skvn_marine_blocks_category_grid_bool( $attributes, 'showName', true );
-	$show_description = skvn_marine_blocks_category_grid_bool( $attributes, 'showDescription', false );
-	$show_path        = skvn_marine_blocks_category_grid_bool( $attributes, 'showPath', false );
-	$show_count       = skvn_marine_blocks_category_grid_bool( $attributes, 'showCount', false );
-	$show_cta         = skvn_marine_blocks_category_grid_bool( $attributes, 'showCta', false );
-	$cta_label        = isset( $attributes['ctaLabel'] ) ? sanitize_text_field( (string) $attributes['ctaLabel'] ) : '';
+	$show_image          = skvn_marine_blocks_category_grid_bool( $attributes, 'showImage', true );
+	$show_name           = skvn_marine_blocks_category_grid_bool( $attributes, 'showName', true );
+	$show_description    = skvn_marine_blocks_category_grid_bool( $attributes, 'showDescription', false );
+	$description_display = skvn_marine_blocks_category_grid_choice(
+		isset( $attributes['descriptionDisplay'] ) ? $attributes['descriptionDisplay'] : '',
+		array( 'excerpt', 'full' ),
+		'excerpt'
+	);
+	$show_path           = skvn_marine_blocks_category_grid_bool( $attributes, 'showPath', false );
+	$show_count          = skvn_marine_blocks_category_grid_bool( $attributes, 'showCount', false );
+	$show_cta            = skvn_marine_blocks_category_grid_bool( $attributes, 'showCta', false );
+	$cta_label           = isset( $attributes['ctaLabel'] ) ? sanitize_text_field( (string) $attributes['ctaLabel'] ) : '';
 
 	if ( '' === $cta_label ) {
 		$cta_label = __( 'Explore category', 'skvn-marine-blocks' );
@@ -435,10 +440,19 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 			$card .= '<p class="skvn-category-grid__path ' . esc_attr( trim( $details_class ) ) . '">' . esc_html( $path_text ) . '</p>';
 		}
 
-		if ( $show_description && ! empty( $term['descriptionExcerpt'] ) ) {
-			$card .= '<p class="skvn-category-grid__description ' . esc_attr( trim( $details_class ) ) . '">'
-				. esc_html( $term['descriptionExcerpt'] )
-				. '</p>';
+		if ( $show_description ) {
+			// "Full text" only renders the dedicated plain-text field: a stale
+			// API response without it is never coalesced into the excerpt.
+			$description_text = 'full' === $description_display
+				? ( isset( $term['descriptionText'] ) ? (string) $term['descriptionText'] : '' )
+				: ( isset( $term['descriptionExcerpt'] ) ? (string) $term['descriptionExcerpt'] : '' );
+
+			// Empty descriptions render no paragraph (plan 061 §3.1).
+			if ( '' !== $description_text ) {
+				$card .= '<p class="skvn-category-grid__description' . ( 'full' === $description_display ? ' skvn-category-grid__description--full' : '' ) . ' ' . esc_attr( trim( $details_class ) ) . '">'
+					. esc_html( $description_text )
+					. '</p>';
+			}
 		}
 
 		if ( $show_cta ) {

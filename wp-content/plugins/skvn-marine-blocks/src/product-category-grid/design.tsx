@@ -137,7 +137,7 @@ export function CategoryDesignControls( {
 				<>
 					<ToggleControl
 						checked={ attributes.showDescription === true }
-						label={ __( 'Show description excerpt', 'skvn-marine-blocks' ) }
+						label={ __( 'Show description', 'skvn-marine-blocks' ) }
 						onChange={ ( showDescription ) => setAttributes( { showDescription } ) }
 					/>
 					<ToggleControl

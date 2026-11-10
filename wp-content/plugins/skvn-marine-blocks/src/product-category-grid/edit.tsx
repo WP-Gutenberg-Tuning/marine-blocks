@@ -237,9 +237,35 @@ export function Edit( { attributes, setAttributes, clientId }: EditProps ) {
 					/>
 					<ToggleControl
 						checked={ attributes.showDescription === true }
-						label={ __( 'Show description excerpt', 'skvn-marine-blocks' ) }
+						label={ __( 'Show description', 'skvn-marine-blocks' ) }
 						onChange={ ( showDescription ) => setAttributes( { showDescription } ) }
 					/>
+					{ attributes.showDescription === true && (
+						<SelectControl
+							help={ __(
+								'Full text shows the entire description without formatting. Longer descriptions make the row taller.',
+								'skvn-marine-blocks'
+							) }
+							label={ __( 'Description display', 'skvn-marine-blocks' ) }
+							onChange={ ( descriptionDisplay ) =>
+								setAttributes( {
+									descriptionDisplay:
+										descriptionDisplay === 'full' ? 'full' : 'excerpt',
+								} )
+							}
+							options={ [
+								{
+									label: __( 'Excerpt', 'skvn-marine-blocks' ),
+									value: 'excerpt',
+								},
+								{
+									label: __( 'Full text', 'skvn-marine-blocks' ),
+									value: 'full',
+								},
+							] }
+							value={ attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt' }
+						/>
+					) }
 					<ToggleControl
 						checked={ attributes.showCount === true }
 						label={ __( 'Show product count', 'skvn-marine-blocks' ) }

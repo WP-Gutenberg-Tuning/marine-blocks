@@ -285,6 +285,18 @@
 	overflow: hidden;
 }
 
+/*
+ * "Full text" display mode: natural height, no excerpt clamp and no hidden
+ * overflow (plan 061 — Full only grows the row naturally; CSS layout safety:
+ * no viewport math, no overflow masking of geometry).
+ */
+.skvn-category-grid__description--full {
+	display: block;
+	overflow: visible;
+	-webkit-line-clamp: none;
+	line-clamp: none;
+}
+
 .skvn-category-grid__cta {
 	align-self: flex-start;
 	background-color: var(--wp--preset--color--skvn-blue-700, #0369a1);

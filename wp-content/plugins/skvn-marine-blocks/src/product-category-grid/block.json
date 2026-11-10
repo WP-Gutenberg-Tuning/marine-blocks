@@ -49,6 +49,10 @@
       "type": "boolean",
       "default": false
     },
+    "descriptionDisplay": {
+      "type": "string",
+      "default": "excerpt"
+    },
     "showPath": {
       "type": "boolean",
       "default": false

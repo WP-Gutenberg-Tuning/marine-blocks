@@ -53,6 +53,25 @@ function countLabel( count: number ): string {
 	);
 }
 
+/** Normalized display mode: anything unknown falls back to the excerpt. */
+function descriptionDisplay( attributes: CategoryGridAttributes ): 'excerpt' | 'full' {
+	return attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt';
+}
+
+/** Card description text for the current mode; invalid enums fall back to excerpt. */
+function descriptionCardText(
+	display: 'excerpt' | 'full',
+	record: CategoryRecord
+): string {
+	if ( display === 'full' ) {
+		// A stale API response without the field is never coalesced into the
+		// excerpt (plan 061 §5.1): full text renders only what the server sent.
+		return record.descriptionText ?? '';
+	}
+
+	return record.descriptionExcerpt;
+}
+
 function PreviewCard( {
 	attributes,
 	record,
@@ -63,6 +82,8 @@ function PreviewCard( {
 	const classes = roleClasses( attributes );
 	const hidden = record.count < 1;
 	const pathText = record.path.length > 1 ? record.path.slice( 0, -1 ).join( ' › ' ) : '';
+	const display = descriptionDisplay( attributes );
+	const descriptionText = descriptionCardText( display, record );
 
 	return (
 		<li
@@ -105,9 +126,13 @@ function PreviewCard( {
 							{ pathText }
 						</p>
 					) }
-					{ attributes.showDescription && record.descriptionExcerpt && (
-						<p className={ `skvn-category-grid__description ${ classes.details }` }>
-							{ record.descriptionExcerpt }
+					{ attributes.showDescription && descriptionText && (
+						<p
+							className={
+								`skvn-category-grid__description${ display === 'full' ? ' skvn-category-grid__description--full' : '' } ${ classes.details }`
+							}
+						>
+							{ descriptionText }
 						</p>
 					) }
 					{ attributes.showCta && (

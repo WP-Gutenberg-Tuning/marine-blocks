@@ -46,10 +46,20 @@ User screenshot Grouper là evidence nhu cầu UX, không chứng minh mọi car
 - **Description alignment**: Left / Center / Right / Justify; chỉ áp đoạn description, không ảnh/name/count/path/CTA. Mặc định Left (physical left/right theo nhãn; không tự mở RTL policy mới).
 - Nếu showDescription=false: control disabled, giải thích `Enable the description to adjust its alignment.`; giữ giá trị để bật lại, không tự reset.
 - Justify căn hai lề, dòng cuối theo hành vi text mặc định; không thêm letter-spacing hoặc force justify dòng cuối. Đây là lựa chọn có chủ ý; card hẹp có thể giãn khoảng trắng, không tự đổi sang Left trên mobile.
+- Control chọn bằng icon như Word (human quyết 2026-11-10): `ToggleGroupControl` native với 4 option dùng icon có sẵn từ `@wordpress/icons` — `alignLeft` / `alignCenter` / `alignRight` / `alignJustify`; mỗi option có `title` để hover hiện "Left / Center / Right / Justify" đúng yêu cầu tooltip. Không dependency mới, không custom SVG tile engine (§6 giữ nguyên). Icon group keyboard-accessible theo components native; khi `showDescription=false` control disabled như bullet trên nhưng không mất giá trị.
 
-### 3.3. Design → Action
+### 3.3. Design → Call to action (Scheme A, human quyết 2026-11-10)
 
-Giữ toggle Show action label và colors hiện có. UI gọi “Button” cho kích thước/hình dạng, help tiếp tục nói card là một link, label không phải control tương tác độc lập. Khi showCta=false, ẩn các controls phụ và giữ attrs đã chọn.
+Terminology Scheme A (human chốt 2026-11-10): nhóm UI đặt tên theo vai trò **Call to action**; controls bên trong gọi theo hình dạng **Button** — giữ đúng split vai trò/hình dạng từng hẹn, help tiếp tục nói card là một link, label không phải control tương tác độc lập. Toggle "Show action label" đổi thành **"Show call to action"**. Chỉ đổi labels i18n: attribute keys, giá trị group `'action'`, type `DesignGroup` và class CSS `skvn-category-grid__cta` giữ nguyên (saved blocks cũ parse không đổi).
+
+| UI hiện tại | UI mới (Scheme A) | Vị trí |
+|---|---|---|
+| Group "Action" (dropdown "Design component", shared Category + Collection) | "Call to action" | `src/design-sidebar/navigation.tsx` (designGroups) |
+| "Show action label" | "Show call to action" | Category `design.tsx` |
+| "Action background" / "Action text color" / "Action hover background" / "Action hover text" | "Button background" / "Button text color" / "Button hover background" / "Button hover text" | Category `design.tsx` |
+| "Action font" / "Action size" / "Action background" / "Action text" | "Button font" / "Button size" / "Button background" / "Button text" | Collection `src/collection/controls.tsx` (labels only) |
+
+"Edit button style" của DesignShortcut giữ nguyên. PanelBody "Actions" và "Post action / Product action / Custom action URL" trong Collection là khái niệm catalog link mode khác — KHÔNG rename. Đổi Collection labels là delta ngoài block Category, lý do: shared dropdown dùng chung + human yêu cầu rename "trên toàn bộ"; labels only, không chạm attrs/logic. Khi showCta=false, ẩn các controls phụ và giữ attrs đã chọn.
 
 | Control | Lựa chọn / hiệu lực | Conditional state |
 |---|---|---|
@@ -122,11 +132,11 @@ Display
   Description display    [Excerpt | Full text]
 
 Design / Details
-  Description alignment  [Left | Center | Right | Justify]
+  Description alignment  [icon: Left | Center | Right | Justify — hover title per icon]
   Details color / size   [existing controls]
 
-Design / Action
-  Show action label      [On]
+Design / Call to action
+  Show call to action    [On]
   Button width           [Auto | Full | Custom]
   Width                  [50] %          (Custom only)
   Button alignment       [Left | Center | Right]
@@ -135,7 +145,7 @@ Design / Action
   Button placement       [Follow content | Align to bottom]
   Spacing above button   [Default | Custom]
   Spacing                [8] px          (Custom only)
-  [existing colors]
+  Button colors          [existing controls]
   [Reset this component]
 ```
 
@@ -147,7 +157,7 @@ Tất cả strings tiếng Anh/i18n domain hiện hành. Dùng controls native �
 |---|---|---|
 | P0 — Baseline | Plan049/runbook Category; source audit | Ghi build/fixture và pending cũ; xác minh defaults/loaded CSS/permission; không đánh PASS từ source |
 | P1 — Full data + mode | `modules/category-grid/resolver.php`, `rest.php`, `render.php`; `src/product-category-grid/types.ts`, `block.json`, `preview.tsx`, `edit.tsx`, `details.tsx` | `descriptionText`, Full/Excerpt, labels/help, parity và read-only role; không ghi native data khi đổi mode |
-| P2 — Action + alignment xuyên suốt | `block.json`, `types.ts`, `constants.ts` hoặc helper Category-local; `design.tsx`, `preview.tsx`, `style.css`, `modules/category-grid/render.php` | Attr→controls→preview→frontend, full text alignment, width/radius/placement/gap; không broad shared abstraction |
+| P2 — Action + alignment xuyên suốt | `block.json`, `types.ts`, `constants.ts` hoặc helper Category-local; `design.tsx`, `preview.tsx`, `style.css`, `modules/category-grid/render.php`; + delta labels-only theo §3.3: `src/collection/controls.tsx`, `src/design-sidebar/navigation.tsx` (designGroups label + DesignShortcut copy) | Attr→controls→preview→frontend, full text alignment, width/radius/placement/gap; Scheme A rename labels; không broad shared abstraction |
 | P3 — Reset/validation/regression | `src/design-sidebar/navigation.tsx`; tests Category hiện có hoặc fixture phù hợp; docs testing | Reset allowlist, invalid/zero cases, compatibility/Undo/fallback và data boundary |
 | P4 — Human build/onsite | Runbooks + execution ledger trong plan này | Build/lint do human; screenshots/rect/permission/save-reopen; từng acceptance có evidence hoặc giữ pending |
 
@@ -163,9 +173,10 @@ Tất cả delta dưới đây: **Chưa làm**, không lấy PASS của baseline
 | CGD-UI02 | Block UI | Desc4alignment độc lập head/count/CTA; long words không tràn | Chưa làm | Scoped alignment/wrap | Left/Center/Right/Justify trên card hẹp | Computed styles/rect/shots pending |
 | CGD-UI03 | Block UI | Auto/Full/Custom% đúng body, nhãn wrap; Pill/custom0px riêng card | Chưa làm | Action width/radius | Padding0/md/lg, width1/50/100, long label | Body/button boxes/radius pending |
 | CGD-UI04 | Block UI | Flow gap chính xác; Bottom gap tối thiểu/đáy cùng hàng; không phantom gap | Chưa làm | Content/slot/gap owner | Cards nhiều/ít/không text, CTA off, gap0/16/128 | Vertical rect deltas + paired shots pending |
-| CGD-ED01 | Editor UX | Controls rõ/conditional, show off giữ state; không input tràn sidebar | Chưa làm | Display/Details/Action/help | Sidebar/fallback narrow, keyboard, toggle modes | Video/attrs pending |
+| CGD-ED01 | Editor UX | Controls rõ/conditional, show off giữ state; không input tràn sidebar; labels theo Scheme A (Call to action/Button…), icon alignment có hover title | Chưa làm | Display/Details/Call-to-action/help + rename | Sidebar/fallback narrow, keyboard, toggle modes, hover icons | Video/attrs pending |
 | CGD-ED02 | Editor UX | Page Save/Undo/duplicate/reopen giữ config; reset đúng group | Chưa làm | Attrs/reset | Hai blocks cùng term khác config; reset từng group | Serialized attr diff/video pending |
 | CGD-ED03 | Editor UX | Persisted preview/source-data note chính xác; role không edit_term vẫn thấy Full | Chưa làm | Full presentation field + note | Draft/save/error/conflict và read-only term role | Network/preview/permission evidence pending |
+| CGD-ED04 | Editor UX | Rename Scheme A nhất quán trên shared dropdown + Category + Collection; keys/class/giá trị group/data không đổi; "Edit button style" giữ; catalog "Actions/Product action" không bị rename | Chưa làm | Labels-only rename theo bảng §3.3 | Dropdown cả 2 block, serialized attr keys trước/sau renamed build | Screenshots + attr diff pending |
 | CGD-TECH01 | Technical | Raw term không đổi bởi mode/style/reset; one link/card, không HTML injection | Chưa làm | PHP/React text output, no new writes | HTML/link fixture, before/after raw, network write audit | Raw comparison + DOM/link count pending |
 | CGD-TECH02 | Technical | Validation TS/PHP tương đương,0 có hiệu lực, defaults cũ không cần resave | Chưa làm | Finite/range/enum/default guards | Missing/invalid/floats/string/NaN và zero tests | Named test output + legacy shots pending |
 | CGD-TECH03 | Technical | Assets đúng editor/frontend; không extra term query/REST storm, không consumer khác đổi | Chưa làm | Scoped CSS/data lifecycle | Network, frontend khi WindPress off trên fixture an toàn; Product/Post/archive baseline | Network/console/before-after pending |
@@ -182,3 +193,5 @@ Build/lint human chạy theo AGENTS; commands trong runbook. Agent không tự b
 ### Execution ledger
 
 - 2026-11-09: human duyệt hướng; source audit và detailed planning hoàn tất. **Chưa coding, chưa build/lint/onsite; mọi CGD-* chưa PASS.** Numeric ranges/seeds là defaults triển khai dự kiến; không phải evidence đã đo.
+- 2026-11-10: P1 — Full data + mode: source slice hoàn tất theo file map P1 (resolver/rest/render, types/block.json/preview/edit/details) + 2 delta ngoài map cần thiết cho slice hoàn chỉnh: `style.css` (modifier `skvn-category-grid__description--full` bỏ clamp 3 dòng cho Full — CGD-UI01 cần CSS) và `design.tsx` (đổi nhãn toggle "Show description" cho DesignFallback parity, không thêm dropdown mode trong Design theo §3.1). **Chưa build/lint/deploy/onsite; CGD-UI01, CGD-ED03, CGD-TECH01 có source, chưa PASS.** Runbook P1-1 đã sửa wording: `descriptionText` là presentation field (không lưu vào block attributes), attribute block.json là `descriptionDisplay`.
+- 2026-11-10 (planning update, chưa code): human phản ánh UX sidebar ("phải chọn Design component để edit, ngồi mò cả buổi") và quyết **không restructure** — thêm settings còn thiếu vào nhóm Details/Action hiện hành; các đề xuất flat-accordions/hybrid bị loại khỏi scope đợt này (tension ghi RESOLVED_ACTIVE 2026-11-10 trong TENSIONS_ACTIVE.md). Chốt: **giữ Button corners + Btn placement** trong P2 dù tin nhắn chỉ liệt kê 3 mục; terminology **Scheme A** (§3.3 bảng rename, §6 sketch group "Call to action"); §3.2 thêm spec icon alignment control; rename áp global labels-only gồm Collection `controls.tsx` + shared `navigation.tsx` (P2 file map +2 file labels-only). CGD-ED04 thêm vào register. Control-UX standard ("design system cho controls") ghi theo dõi như **Plan 062 candidate** — chưa duyệt version, không coding trong 1.3.20.
