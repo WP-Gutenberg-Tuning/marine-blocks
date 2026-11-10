@@ -183,6 +183,22 @@ node -e "JSON.parse(require('fs').readFileSync('wp-content/plugins/skvn-marine-b
 
 **Rule chung:** Trước khi position element ra ngoài container (negative inset, `transform: translate` ra ngoài bounds), kiểm tra `overflow` của container và mọi ancestor. Swiper wrapper luôn cần `overflow: hidden` → arrows phải nằm ngoài wrapper div, hoặc dùng padding + negative margin trick trên parent.
 
+### DP-05 — Class CSS editor gán vào wrapper ngoài cùng thay vì element mục tiêu
+
+**File liên quan:** `src/slider/edit.tsx`, `src/slide/edit.tsx`
+
+**Xảy ra:** Class `skvn-slide--hero-max-height` (và tương tự các class layout/size) được thêm vào `blockProps.className` của wrapper ngoài cùng (`.skvn-slider--editor-focus`) trong `slider/edit.tsx`, thay vì gán vào element slide (`.skvn-slide--editor`) trong `slide/edit.tsx`.
+
+**Hậu quả:** Rule CSS `max-height` + `overflow: hidden` áp lên toàn bộ container slider (bao gồm rail, stage, footer, navigation preview…), không chỉ slide. Làm hỏng layout editor và đẩy các block khác trong block list xuống dưới.
+
+**Pattern gốc:** `blockProps` của block cha chứa toàn bộ editor chrome. Class dùng cho element con phải được gán vào `blockProps` của chính element đó, không phải wrapper block cha.
+
+**Checklist khi thêm class layout/size cho block trong editor:**
+1. Xác định chính xác element nào nhận rule CSS (wrapper hay element con).
+2. Nếu class dùng cho slide/element con, gán vào `blockProps` của element đó, không phải wrapper block cha.
+3. Kiểm tra trong editor DevTools xem class xuất hiện trên element đúng, không lan sang các element cha.
+4. Rule `max-height`/`overflow` chỉ áp trên element slide, không áp lên container block.
+
 ---
 
 ## Patterns cần chú ý (không phải lỗi, nhưng dễ bỏ sót)
