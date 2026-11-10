@@ -136,7 +136,7 @@ export function SliderEditorCanvas( { clientId, attributes }: { clientId: string
 				<EditorArrowPreview attributes={ attributes } index={ index } count={ count } />
 				<div className="skvn-slider-editor__add-group"><Button className="skvn-slider-editor__add" variant="secondary" icon="plus-alt2"
 					disabled={ Boolean( state.insertionReason ) } onClick={ ( event ) => { event.stopPropagation(); add(); } }
-					aria-describedby={ `${ pickerId }-add-hint` }>{ __( 'Add slide', 'skvn-marine-blocks' ) }</Button>
+					aria-describedby={ `${ pickerId }-add-hint` }>{ __( '+ Add slide', 'skvn-marine-blocks' ) }</Button>
 					<span id={ `${ pickerId }-add-hint` } className="skvn-slider-editor__add-hint">{ addHint }</span></div>
 				<EditorPaginationPreview attributes={ attributes } index={ index } count={ count } />
 			</div>
