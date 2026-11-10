@@ -45,6 +45,12 @@
 	position: relative;
 }
 
+.skvn-slide--hero-max-height {
+	max-height: 480px;
+	min-height: 0;
+	overflow: hidden;
+}
+
 .skvn-slide__media {
 	inset: 0;
 	overflow: hidden;

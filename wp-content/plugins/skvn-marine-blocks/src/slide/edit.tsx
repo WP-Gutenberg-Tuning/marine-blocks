@@ -163,9 +163,7 @@ export const Edit = memo( function SlideEdit( {
 		selectBlock: ( blockClientId: string ) => void;
 	};
 	const blockProps = useBlockProps( {
-		className: `skvn-slide skvn-slide--editor${
-			showsBackgroundImage ? ' skvn-slide--has-background' : ''
-		}`,
+		className: `skvn-slide skvn-slide--editor${ preset === 'hero' ? ' skvn-slide--hero-max-height' : '' }${ showsBackgroundImage ? ' skvn-slide--has-background' : '' }`,
 		// Keep the native editor subtree mounted. Only its owned presentation is
 		// hidden; selection ancestry reveals the target synchronously on render.
 		...( isInactiveInEditor ? { style: { display: 'none' } } : {} ),
