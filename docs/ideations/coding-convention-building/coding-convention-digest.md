@@ -140,7 +140,48 @@ Khi thêm/thay đổi 1 attribute ảnh hưởng appearance/behavior, phải đi
 
 ---
 
-## 4. Checklist trước khi commit/build
+## 4. Bảng tổng hợp lỗi và cách sửa theo nhóm
+
+Bảng dưới tổng hợp từ `.context/PITFALLS.md` (Agent Pitfalls + Dev / Code Pitfalls) và các invariant trong `AGENTS.md`. Mỗi nhóm có cột: **Lỗi gì | Sai gì | Sửa như thế nào**.
+
+### 4.1 Agent Pitfalls
+
+| Lỗi gì | Sai gì | Sửa như thế nào |
+|--------|--------|-----------------|
+| AP-13 Kiểm DOM sau compile rồi bỏ sót CSS cache | Chỉ xem computed DOM sau WindPress compiler; coi file Saved hoặc style ID có chữ cached là evidence cache đã chứa source mới | So raw response/CSS cache với settled DOM; purge HTML/CDN và kiểm cold paint; không đoán chung là browser cache |
+| AP-12 Giao prototype có JS nhưng không nối runtime | Coi file tồn tại hoặc bản preview chạy là tính năng đã dùng được; yêu cầu human tự ghép assets sau khi đã chốt | Nối markup → stylesheet → runtime enqueue → breakpoint/interaction; kiểm script tags + toggle/dialog/ready state |
+| AP-11 Nâng toolbar đúng hàng nhưng dùng sai hệ cột | Chỉ chuyển count/sort ngang H1 rồi dùng hai flex items co giãn độc lập; không ràng buộc heading row với sidebar/product tracks | Dùng chung track sizing, gap, width owner và container breakpoint; đo left/right delta giữa hàng heading/toolbar và body grid |
+| AP-08 Guard chỉ tồn tại ở Copy/root, Paste và descendants đi vòng | Có helper kiểm bindings/limits nhưng không nối vào mọi ingress/node: native clipboard Paste bỏ qua binding nguồn | Lập bảng invariant × ingress × root/ancestor/descendant × trước/sau await; validate raw ingress; guard quyền dùng đúng semantic selectors |
+| AP-09 Test xanh vì không đi qua đường thực thi có lỗi | 16 pure tests trước đó không bao phủ transport/controller; test limit chỉ đi Copy | Với mỗi guard, phải có test gọi entry point thật, bắt guard fail và assert không mutation |
+| AP-10 Đổi spec bằng cách viết test cho behavior sai; tự viết HTML sanitizer | Test assert span phải reject, nhưng spec yêu cầu unwrap giữ semantic content | Viết expected từ spec/fixture người dùng; phân biệt span trình bày (unwrap) và construct không hỗ trợ (reject toàn thao tác) |
+| AP-06 Bỏ visual cũ trước khi chứng minh replacement được nạp | Bỏ nền/viền body cũ khi replacement mới chỉ tồn tại trong source | Nối replacement tới bundle/handle được nạp trong cùng thay đổi; kiểm output thực tế sau human build |
+| AP-07 Đoán cache/deploy khi chưa có bằng chứng onsite | Có selector trong CSS local mới không chứng minh site đang nhận đúng asset, selector match DOM hay rule thắng cascade | Tách ba trạng thái: source defect đã chứng minh / local artifact đã kiểm / onsite delivery chưa kiểm |
+| AP-01 Edit tool yêu cầu Read trước | Gọi Edit tool mà chưa Read file | Read trước rồi mới Edit |
+| AP-02 Incomplete diff khi reorder JSX | Chỉ di chuyển opening tag, quên di chuyển `<BlockEdit {...props} />` xuống sau | Đọc lại toàn bộ hàm/component và viết mental diff hoàn chỉnh; gộp lại thành 1 lần edit |
+| AP-03 Thêm property mà không kiểm tra existing display rule | Thêm `width: 100%` nhưng vô tình xóa `display: flex; align-items: flex-end` | Copy toàn bộ rule cũ vào `old_string`, chỉ thêm dòng mới, không xóa dòng cũ |
+| AP-04 block.json attribute đặt ngoài khối `"attributes"` | Các key attribute bị đặt sau dấu `}` đóng khối `"attributes"` → JSON không hợp lệ | Đảm bảo mọi attribute mới nằm **trước** dấu đóng, cách nhau bằng dấu phẩy, không trailing comma |
+| AP-05 PowerShell không hỗ trợ `&&` | Chạy `git add ... && git commit -m "..."` | Chạy `git add` và `git commit` thành 2 lệnh riêng biệt |
+
+### 4.2 Dev / Code Pitfalls
+
+| Lỗi gì | Sai gì | Sửa như thế nào |
+|--------|--------|-----------------|
+| DP-01 Block attribute thêm vào `block.json` + `edit.tsx` nhưng quên `save.tsx` | `heightPreset` có trong `block.json` và `edit.tsx`, nhưng `save.tsx` có type riêng không bao gồm nó | Thêm vào `save.tsx` type + className/markup/data-attribute; verify `view.ts` đọc từ `data-*` JSON |
+| DP-02 Block attribute maps to CSS class nhưng PHP render không thêm class | `imageRatio` định nghĩa trong `block.json` và CSS đầy đủ, nhưng PHP render không thêm `skvn-collection--ratio-*` vào `$classes` | Thêm vào `$classes[]` hoặc attribute truyền xuống view; `grep` PHP render để confirm class được emit |
+| DP-03 CSS scope sai: component property đặt ở `body` level | `body.skvn-has-footer-page { background: ... }` paint toàn bộ `<body>` bằng màu footer | `body.skvn-*` chỉ nên set CSS custom properties hoặc layout properties ảnh hưởng toàn trang (overflow, scroll) |
+| DP-04 Carousel arrows đặt ngoài `overflow: hidden` container | Arrows đặt ra ngoài container, nhưng container có `overflow: hidden` → arrows bị clip | Thêm outer wrapper (position: relative, no overflow: hidden); arrows nằm ngoài wrapper div |
+| DP-05 Class CSS editor gán vào wrapper ngoài cùng thay vì element mục tiêu | Class `skvn-slide--hero-max-height` gán vào `blockProps` của wrapper `.skvn-slider--editor-focus`, không phải element slide `.skvn-slide--editor` | Gán class vào `blockProps` của chính element mục tiêu, không phải wrapper block cha |
+
+### 4.3 Patterns cần chú ý (không phải lỗi, nhưng dễ bỏ sót)
+
+| Lỗi gì | Sai gì | Sửa như thế nào |
+|--------|--------|-----------------|
+| PP-01 Re-save block sau khi sửa `save.tsx` | Block đã lưu trong DB có markup cũ sau khi `save.tsx` thay đổi output | Sau build, vào editor của mọi trang có block đó → re-save để regenerate markup |
+| PP-02 `view.ts` đọc config từ `data-skvn-*` JSON | Chỉ thêm vào `SliderAttributes` type thôi chưa đủ | Thuộc tính phải có trong `JSON.stringify({...})` được emit bởi `save.tsx` |
+
+---
+
+## 5. Checklist trước khi commit/build
 
 ```
 [ ] block.json parse JSON thành công (src + build)
