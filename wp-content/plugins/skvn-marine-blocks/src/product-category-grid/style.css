@@ -232,12 +232,28 @@
 	width: 100%;
 }
 
+/*
+ * Spacing ownership (plan 061 §5.2): the body no longer carries a flex gap.
+ * Content-to-content spacing belongs to the `__content` group (0.4rem, same
+ * as the old body gap); content-to-button spacing belongs to the group's
+ * margin-bottom (resolved gap) plus the button's auto margin (free-space
+ * push). One owner per spacing, no double counting, no phantom gap when the
+ * CTA is off (the gap var is only emitted while the CTA is shown).
+ */
 .skvn-category-grid__body {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
-	gap: 0.4rem;
+	gap: 0;
 	padding: 0.9rem 0.15rem 0.15rem;
+}
+
+.skvn-category-grid__content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	margin-bottom: var(--skvn-category-grid-cta-gap, 0);
+	min-width: 0;
 }
 
 .skvn-category-grid--padding-none .skvn-category-grid__body {
@@ -306,8 +322,61 @@
 	font-size: 0.85rem;
 	font-weight: 600;
 	margin-top: auto;
+	max-width: 100%;
+	min-width: 0;
+	overflow-wrap: anywhere;
 	padding: 0.4rem 0.95rem;
+	text-align: center;
 	transition: background-color 160ms ease, color 160ms ease;
+}
+
+/*
+ * Button width (plan 061 §3.3): percentages resolve against the body content
+ * box; Auto hugs the label without exceeding the body. No viewport math, no
+ * min-width:max-content, so long labels wrap instead of overflowing.
+ */
+.skvn-category-grid--cta-width-full .skvn-category-grid__cta {
+	width: 100%;
+}
+
+.skvn-category-grid--cta-width-custom .skvn-category-grid__cta {
+	width: var(--skvn-category-grid-cta-width, 50%);
+}
+
+/* Button alignment: position of the whole button inside the body. */
+.skvn-category-grid--cta-align-center .skvn-category-grid__cta {
+	align-self: center;
+}
+
+.skvn-category-grid--cta-align-right .skvn-category-grid__cta {
+	align-self: flex-end;
+}
+
+/* Button corners: 0 is valid (square); large values clamp by geometry. */
+.skvn-category-grid--cta-radius-custom .skvn-category-grid__cta {
+	border-radius: var(--skvn-category-grid-cta-radius, 12px);
+}
+
+/*
+ * Follow content: the resolved gap between the content group and the button
+ * owns the spacing; no free-space push. Align to bottom (the default) keeps
+ * margin-top: auto, so the gap is the minimum spacing above the button.
+ */
+.skvn-category-grid--cta-flow .skvn-category-grid__cta {
+	margin-top: 0;
+}
+
+/* Description alignment (plan 061 §3.2): scoped to the description only. */
+.skvn-category-grid__description--align-center {
+	text-align: center;
+}
+
+.skvn-category-grid__description--align-right {
+	text-align: right;
+}
+
+.skvn-category-grid__description--align-justify {
+	text-align: justify;
 }
 
 /* Typography roles. */
@@ -659,7 +728,9 @@
 	font-size: 0.72rem;
 	font-weight: 600;
 	letter-spacing: 0.02em;
-	margin-top: 0.35rem;
+	/* Editor-only: replaces the old body gap (0.4rem) + 0.35rem margin now
+	 * that the body gap is 0 (plan 061 §5.2 spacing ownership). */
+	margin-top: 0.75rem;
 	padding: 0.15rem 0.55rem;
 }
 

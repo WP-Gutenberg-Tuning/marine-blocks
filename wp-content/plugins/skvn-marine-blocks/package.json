@@ -8,6 +8,7 @@
     "start": "wp-scripts start src/index.ts src/slider/view.ts src/motion-view.ts src/collection-view.ts --output-path=build --webpack-copy-php"
   },
   "dependencies": {
+    "@wordpress/icons": "^10.0.0",
     "swiper": "^11.1.15"
   },
   "devDependencies": {

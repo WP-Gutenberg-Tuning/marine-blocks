@@ -76,6 +76,69 @@ function skvn_marine_blocks_category_grid_columns( $value, $default ) {
 }
 
 /**
+ * Validate a bounded integer attribute (plan 061 §4).
+ *
+ * Only real, finite, whole numbers inside the range are accepted; numeric
+ * strings are normalized, fractions/NaN/out-of-range fall back. `0` is valid
+ * and never coerced to the fallback, and no absint-style sign flip happens.
+ *
+ * @param mixed $value    Raw attribute value.
+ * @param int   $min      Inclusive lower bound.
+ * @param int   $max      Inclusive upper bound.
+ * @param int   $fallback Default when invalid.
+ * @return int
+ */
+function skvn_marine_blocks_category_grid_bounded_int( $value, $min, $max, $fallback ) {
+	if ( ! is_numeric( $value ) ) {
+		return $fallback;
+	}
+
+	$number = $value + 0;
+
+	if ( is_float( $number ) && floor( $number ) !== $number ) {
+		return $fallback;
+	}
+
+	$number = (int) $number;
+
+	if ( $number < $min || $number > $max ) {
+		return $fallback;
+	}
+
+	return $number;
+}
+
+/**
+ * Same contract as `skvn_marine_blocks_category_grid_bounded_int()` for an
+ * optional attribute: absent or invalid values resolve to `null` (the caller
+ * decides what "absent" means - for `actionGapPx` that is the Default gap).
+ *
+ * @param mixed $value Raw attribute value.
+ * @param int   $min   Inclusive lower bound.
+ * @param int   $max   Inclusive upper bound.
+ * @return int|null
+ */
+function skvn_marine_blocks_category_grid_optional_int( $value, $min, $max ) {
+	if ( null === $value || '' === $value || ! is_numeric( $value ) ) {
+		return null;
+	}
+
+	$number = $value + 0;
+
+	if ( is_float( $number ) && floor( $number ) !== $number ) {
+		return null;
+	}
+
+	$number = (int) $number;
+
+	if ( $number < $min || $number > $max ) {
+		return null;
+	}
+
+	return $number;
+}
+
+/**
  * Build the wrapper class list from block attributes.
  *
  * Only fixed literals and allowlisted slugs leave this function.
@@ -128,7 +191,137 @@ function skvn_marine_blocks_category_grid_wrapper_class( $attributes ) {
 		$classes[] = 'skvn-category-grid--card-bg-' . $background;
 	}
 
+	// Call to action geometry classes (plan 061 §3.3/§5.2). Emitted only while
+	// the CTA is shown; default branches (Auto / Left / Pill / bottom) emit no
+	// class so the baseline markup of old blocks stays byte-identical.
+	if ( skvn_marine_blocks_category_grid_bool( $attributes, 'showCta', false ) ) {
+		$width_mode = skvn_marine_blocks_category_grid_choice(
+			isset( $attributes['actionWidthMode'] ) ? $attributes['actionWidthMode'] : '',
+			array( 'auto', 'full', 'custom' ),
+			'auto'
+		);
+
+		if ( 'full' === $width_mode ) {
+			$classes[] = 'skvn-category-grid--cta-width-full';
+		} elseif ( 'custom' === $width_mode ) {
+			$classes[] = 'skvn-category-grid--cta-width-custom';
+		}
+
+		$action_align = skvn_marine_blocks_category_grid_choice(
+			isset( $attributes['actionAlign'] ) ? $attributes['actionAlign'] : '',
+			array( 'left', 'center', 'right' ),
+			'left'
+		);
+
+		if ( 'center' === $action_align ) {
+			$classes[] = 'skvn-category-grid--cta-align-center';
+		} elseif ( 'right' === $action_align ) {
+			$classes[] = 'skvn-category-grid--cta-align-right';
+		}
+
+		$radius_mode = skvn_marine_blocks_category_grid_choice(
+			isset( $attributes['actionRadiusMode'] ) ? $attributes['actionRadiusMode'] : '',
+			array( 'pill', 'custom' ),
+			'pill'
+		);
+
+		if ( 'custom' === $radius_mode ) {
+			$classes[] = 'skvn-category-grid--cta-radius-custom';
+		}
+
+		$placement = skvn_marine_blocks_category_grid_choice(
+			isset( $attributes['actionPlacement'] ) ? $attributes['actionPlacement'] : '',
+			array( 'flow', 'bottom' ),
+			'bottom'
+		);
+
+		if ( 'flow' === $placement ) {
+			$classes[] = 'skvn-category-grid--cta-flow';
+		}
+	}
+
 	return implode( ' ', $classes );
+}
+
+/**
+ * Build the wrapper inline style for the Call to action geometry
+ * (plan 061 §5.2: numeric custom properties are only ever built from
+ * validated numbers, attached to the wrapper so the frontend consumes the
+ * same values as the editor preview).
+ *
+ * Emitted only while the CTA is shown; `actionGapPx` absent = Default 0.4rem.
+ * Must stay in sync with `buildWrapperStyleVars()` in the editor.
+ *
+ * @param array $attributes Block attributes.
+ * @return string Semicolon-separated custom property declarations ('' if none).
+ */
+function skvn_marine_blocks_category_grid_wrapper_style( $attributes ) {
+	if ( ! skvn_marine_blocks_category_grid_bool( $attributes, 'showCta', false ) ) {
+		return '';
+	}
+
+	$style = array();
+
+	$width_mode = skvn_marine_blocks_category_grid_choice(
+		isset( $attributes['actionWidthMode'] ) ? $attributes['actionWidthMode'] : '',
+		array( 'auto', 'full', 'custom' ),
+		'auto'
+	);
+
+	if ( 'custom' === $width_mode ) {
+		$style[] = '--skvn-category-grid-cta-width: ' . skvn_marine_blocks_category_grid_bounded_int(
+			isset( $attributes['actionWidthPercent'] ) ? $attributes['actionWidthPercent'] : null,
+			1,
+			100,
+			50
+		) . '%';
+	}
+
+	$radius_mode = skvn_marine_blocks_category_grid_choice(
+		isset( $attributes['actionRadiusMode'] ) ? $attributes['actionRadiusMode'] : '',
+		array( 'pill', 'custom' ),
+		'pill'
+	);
+
+	if ( 'custom' === $radius_mode ) {
+		$style[] = '--skvn-category-grid-cta-radius: ' . skvn_marine_blocks_category_grid_bounded_int(
+			isset( $attributes['actionRadiusPx'] ) ? $attributes['actionRadiusPx'] : null,
+			0,
+			100,
+			12
+		) . 'px';
+	}
+
+	$gap = skvn_marine_blocks_category_grid_optional_int(
+		isset( $attributes['actionGapPx'] ) ? $attributes['actionGapPx'] : null,
+		0,
+		128
+	);
+
+	$style[] = '--skvn-category-grid-cta-gap: ' . ( null === $gap ? '0.4rem' : $gap . 'px' );
+
+	return implode( '; ', $style );
+}
+
+/**
+ * Class modifier for the description paragraph alignment (plan 061 §3.2).
+ * Left is the default and emits no class.
+ *
+ * @param array $attributes Block attributes.
+ * @return string
+ */
+function skvn_marine_blocks_category_grid_description_align_class( $attributes ) {
+	$align = skvn_marine_blocks_category_grid_choice(
+		isset( $attributes['descriptionAlign'] ) ? $attributes['descriptionAlign'] : '',
+		array( 'left', 'center', 'right', 'justify' ),
+		'left'
+	);
+
+	if ( in_array( $align, array( 'center', 'right', 'justify' ), true ) ) {
+		return ' skvn-category-grid__description--align-' . $align;
+	}
+
+	return '';
 }
 
 /**
@@ -405,14 +598,19 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 			}
 		}
 
-		$card .= '<div class="skvn-category-grid__body">';
+		/*
+		 * Content group (plan 061 §5.2): owns content-to-content spacing and
+		 * renders only when at least one part does, so a CTA with no text
+		 * above never gets a phantom gap.
+		 */
+		$content_html = '';
 
 		if ( $show_name ) {
-			$card .= '<div class="skvn-category-grid__head">';
-			$card .= '<h3 class="' . esc_attr( $name_class ) . '">' . esc_html( $name ) . '</h3>';
+			$content_html .= '<div class="skvn-category-grid__head">';
+			$content_html .= '<h3 class="' . esc_attr( $name_class ) . '">' . esc_html( $name ) . '</h3>';
 
 			if ( $show_count ) {
-				$card .= '<span class="skvn-category-grid__count ' . esc_attr( trim( $details_class ) ) . '">'
+				$content_html .= '<span class="skvn-category-grid__count ' . esc_attr( trim( $details_class ) ) . '">'
 					. esc_html(
 						sprintf(
 							/* translators: %s: number of products in the category. */
@@ -423,9 +621,9 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 					. '</span>';
 			}
 
-			$card .= '</div>';
+			$content_html .= '</div>';
 		} elseif ( $show_count ) {
-			$card .= '<div class="skvn-category-grid__head"><span class="skvn-category-grid__count ' . esc_attr( trim( $details_class ) ) . '">'
+			$content_html .= '<div class="skvn-category-grid__head"><span class="skvn-category-grid__count ' . esc_attr( trim( $details_class ) ) . '">'
 				. esc_html(
 					sprintf(
 						/* translators: %s: number of products in the category. */
@@ -437,7 +635,7 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 		}
 
 		if ( $show_path && '' !== $path_text ) {
-			$card .= '<p class="skvn-category-grid__path ' . esc_attr( trim( $details_class ) ) . '">' . esc_html( $path_text ) . '</p>';
+			$content_html .= '<p class="skvn-category-grid__path ' . esc_attr( trim( $details_class ) ) . '">' . esc_html( $path_text ) . '</p>';
 		}
 
 		if ( $show_description ) {
@@ -449,10 +647,16 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 
 			// Empty descriptions render no paragraph (plan 061 §3.1).
 			if ( '' !== $description_text ) {
-				$card .= '<p class="skvn-category-grid__description' . ( 'full' === $description_display ? ' skvn-category-grid__description--full' : '' ) . ' ' . esc_attr( trim( $details_class ) ) . '">'
+				$content_html .= '<p class="skvn-category-grid__description' . ( 'full' === $description_display ? ' skvn-category-grid__description--full' : '' ) . skvn_marine_blocks_category_grid_description_align_class( $attributes ) . ' ' . esc_attr( trim( $details_class ) ) . '">'
 					. esc_html( $description_text )
 					. '</p>';
 			}
+		}
+
+		$card .= '<div class="skvn-category-grid__body">';
+
+		if ( '' !== $content_html ) {
+			$card .= '<div class="skvn-category-grid__content">' . $content_html . '</div>';
 		}
 
 		if ( $show_cta ) {
@@ -472,11 +676,17 @@ function skvn_marine_blocks_render_product_category_grid( $attributes ) {
 		return '';
 	}
 
-	$wrapper = get_block_wrapper_attributes(
-		array(
-			'class' => skvn_marine_blocks_category_grid_wrapper_class( $attributes ),
-		)
+	$wrapper_args = array(
+		'class' => skvn_marine_blocks_category_grid_wrapper_class( $attributes ),
 	);
+
+	$wrapper_style = skvn_marine_blocks_category_grid_wrapper_style( $attributes );
+
+	if ( '' !== $wrapper_style ) {
+		$wrapper_args['style'] = $wrapper_style;
+	}
+
+	$wrapper = get_block_wrapper_attributes( $wrapper_args );
 
 	return '<div ' . $wrapper . '><ul class="' . esc_attr( skvn_marine_blocks_category_grid_grid_class( $attributes ) ) . '">' . $cards . '</ul></div>';
 }

@@ -263,7 +263,13 @@ export function Edit( { attributes, setAttributes, clientId }: EditProps ) {
 									value: 'full',
 								},
 							] }
-							value={ attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt' }
+							value={
+				attributes.descriptionDisplay === 'full'
+					? 'full'
+					: attributes.descriptionDisplay === 'excerpt'
+					? 'excerpt'
+					: 'excerpt'
+			}
 						/>
 					) }
 					<ToggleControl

@@ -53,6 +53,10 @@
       "type": "string",
       "default": "excerpt"
     },
+    "descriptionAlign": {
+      "type": "string",
+      "default": "left"
+    },
     "showPath": {
       "type": "boolean",
       "default": false
@@ -120,6 +124,33 @@
     "actionHoverTextColor": {
       "type": "string",
       "default": ""
+    },
+    "actionWidthMode": {
+      "type": "string",
+      "default": "auto"
+    },
+    "actionWidthPercent": {
+      "type": "number",
+      "default": 50
+    },
+    "actionAlign": {
+      "type": "string",
+      "default": "left"
+    },
+    "actionRadiusMode": {
+      "type": "string",
+      "default": "pill"
+    },
+    "actionRadiusPx": {
+      "type": "number",
+      "default": 12
+    },
+    "actionPlacement": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "actionGapPx": {
+      "type": "number"
     }
   },
   "supports": {

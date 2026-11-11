@@ -15,14 +15,18 @@ export const designGroups = [
 	{ value: 'image', label: __( 'Image', 'skvn-marine-blocks' ) },
 	{ value: 'title', label: __( 'Title', 'skvn-marine-blocks' ) },
 	{ value: 'details', label: __( 'Details', 'skvn-marine-blocks' ) },
-	{ value: 'action', label: __( 'Action', 'skvn-marine-blocks' ) },
+	{ value: 'action', label: __( 'Call to action', 'skvn-marine-blocks' ) },
 ];
 
 export function resetDesign( name: string, group: DesignGroup, update: ( attrs: Record< string, unknown > ) => void ) {
 	const category = name === 'skvn-marine/product-category-grid';
+	// Optional attrs (actionWidthPercent, actionRadiusPx, actionGapPx) have no
+	// block.json default: reset yields undefined, which removes the attr and
+	// returns the card to the Default gap (plan 061 §4/§8 — reset về absent).
 	const keys = category ? {
-		title: [ 'nameFontFamily', 'nameFontSize', 'nameColor' ], details: [ 'detailsFontSize', 'detailsColor' ],
-		action: [ 'actionBackgroundColor', 'actionTextColor', 'actionHoverBackgroundColor', 'actionHoverTextColor' ],
+		title: [ 'nameFontFamily', 'nameFontSize', 'nameColor' ],
+		details: [ 'detailsFontSize', 'detailsColor', 'descriptionAlign' ],
+		action: [ 'actionWidthMode', 'actionWidthPercent', 'actionAlign', 'actionRadiusMode', 'actionRadiusPx', 'actionPlacement', 'actionGapPx', 'actionBackgroundColor', 'actionTextColor', 'actionHoverBackgroundColor', 'actionHoverTextColor' ],
 		image: [ 'mediaFit', 'cardBackground', 'cardRadius', 'cardPadding', 'cardShadow' ],
 	} : {
 		title: [ 'titleFontFamily', 'titleFontSize', 'titleColor' ], details: [ 'detailsFontFamily', 'detailsFontSize', 'detailsColor', 'chipStyle', 'chipColorScheme' ],
@@ -72,6 +76,6 @@ export function DesignShortcut( { clientId }: { clientId: string } ) {
 	return <>
 		<Button variant="secondary" onClick={ () => openDesign( clientId ) }>{ __( 'Open design settings', 'skvn-marine-blocks' ) }</Button>
 		<Button variant="tertiary" onClick={ () => openDesign( clientId, 'action' ) }>{ __( 'Edit button style', 'skvn-marine-blocks' ) }</Button>
-		<p>{ __( 'Image, Title, Details and Action styles apply to this block. Save them with the page.', 'skvn-marine-blocks' ) }</p>
+		<p>{ __( 'Image, Title, Details and Call to action styles apply to this block. Save them with the page.', 'skvn-marine-blocks' ) }</p>
 	</>;
 }
