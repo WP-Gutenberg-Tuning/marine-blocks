@@ -34,6 +34,10 @@ Mapping addition2026-11-06: human cho triển khai Woo Archive M1 (plan059§9–
 
 **Map milestone 2026-11-04:** human xác nhận **V1 / 1.4.3 — Interactive Illustrated Map**, PLANNED/Chưa làm, sau 1.4.2 và trước 1.5.0; ngoại lệ đánh số cho feature mới, không đổi SemVer rule. Scope/acceptance MAP-* tại MILESTONES.md và `docs/ideations/svg-maps/README.md`. Map là candidate consumer của nền sidebar/plugin; **chưa gán vào M1–M6**, không kích hoạt M3/M6. Giữ scope các mốc hiện có và debt map/contact cũ 1.1.2. Current vẫn 1.3.18, chưa start/bump/build.
 
+**Future candidate 2026-11-11:** human ghi nhận bảng màu hiện tại (palette tĩnh 10 màu SKVN — `COLOR_PALETTE_OPTIONS`, không custom color, không brand colors, không brand kits) **chưa phù hợp làm việc đa site B2B** — sắp tới cần xây bộ **brand kit**. Ghi nhận tại `064_FUTURE_CANDIDATE_BRAND_KIT_COLOR_SYSTEM.md`; chưa gán vào M1–M6, chưa có SemVer, chưa start. Khi đưa vào triển khai phải qua stack→SemVer protocol (AGENTS.md) và detailed planning riêng.
+
+**Future candidate 2026-11-11 (2):** human đề xuất làm lại **giao diện chọn danh sách Category trong Category Grid** (picker + selected list, hiện là functional MVP design lock 2026-10-28) **sau khi 1.4.x hoàn tất, phục vụ publish plugin luôn** (gate Marine Blocks Public Launch, Post 1.5.x). Ghi nhận tại `065_FUTURE_CANDIDATE_CATEGORY_PICKER_UI_REDESIGN.md`; chưa gán SemVer, chưa start; khi duyệt qua stack→SemVer protocol và cần artifact mockup mới do human phê duyệt trước khi coding.
+
 ## 2. Milestone stack M1–M6 (định danh scope, không phải SemVer)
 
 | Nhãn | Kết quả | Trạng thái |

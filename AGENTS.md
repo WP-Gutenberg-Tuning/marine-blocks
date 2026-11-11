@@ -82,6 +82,7 @@ Mỗi task bắt đầu bằng 4 bước này, không có ngoại lệ:
 3. Đọc .context/TENSIONS_OPEN.md     → check toàn bộ OPEN tensions
 4. Đọc .context/TENSIONS_ACTIVE.md   → check RESOLVED_ACTIVE tensions của milestone hiện tại, dùng tag filter
 5. Đọc .context/modules/<module>.md  → load context của module sắp sửa
+6. Đọc .context/CONVENTION.md → Load các coding convention của dự án
 ```
 
 Nếu `.context/modules/<module>.md` chưa tồn tại → load `GLOBAL.md` + hỏi lại trước khi tạo file mới.

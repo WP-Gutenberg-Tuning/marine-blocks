@@ -8,6 +8,8 @@
 
 ## Agent Pitfalls (lỗi quy trình của AI agent)
 
+
+
 ### AP-13 — Kiểm DOM sau compile rồi bỏ sót CSS cache của first response
 
 - **Case2026-11-09:** header Home đẹp sau tải nhưng co/thiếu lúc đầu trên desktop. Agent trước đó chỉ xem computed DOM sau WindPress compiler:27212ký tự CSS có menu. Raw HTML thực trả cache21218ký tự, thiếu companion và utilities header; VFS `/mhf-header.css` đã mới.
@@ -199,7 +201,200 @@ node -e "JSON.parse(require('fs').readFileSync('wp-content/plugins/skvn-marine-b
 3. Kiểm tra trong editor DevTools xem class xuất hiện trên element đúng, không lan sang các element cha.
 4. Rule `max-height`/`overflow` chỉ áp trên element slide, không áp lên container block.
 
+### DP-06 — React Error #130 (`args[]=undefined`) khi mở Category Grid Details: tên component không tồn tại trong runtime `wp.components` [CORRECTED 2026-11-10]
+
+**File liên quan:** `src/product-category-grid/design.tsx`, `build/index.ts.js`, `wp-includes/js/dist/components.js` (WP runtime)
+
+**Xảy ra:** 2026-11-10 — sau khi P2 thêm `ToggleGroupControl`/`ToggleGroupControlOption` vào Details group, mở Details trong design sidebar → `Minified React error #130; args[]=undefined`. Editor crash khi mở Details; frontend không ảnh hưởng (render path editor-only).
+
+#### Root cause đúng (verify bằng runtime dist)
+
+React #130 = **JSX element type `undefined`** — lỗi đến từ định danh component trong JSX, không bao giờ từ giá trị prop.
+
+1. `design.tsx` import tên plain (`ToggleGroupControl`, `ToggleGroupControlOption`) — npm typings v34 đã ổn định tên này nên build pass.
+2. `dependency-extraction-webpack-plugin` externalize `@wordpress/components` → `wp.components` (bundle chỉ chứa property access, không kèm code component).
+3. Core dist WP 7.1 chỉ export `__experimentalToggleGroupControl`, `__experimentalToggleGroupControlOption`, `__experimentalToggleGroupControlOptionIcon` — **không có tên plain**.
+4. Runtime `wp.components.ToggleGroupControlOption` = `undefined` → `<ToggleGroupControl />` render ở `design.tsx:243` khi mở Details → #130.
+
+Bằng chứng: grep export map trong `wp-includes/js/dist/components.js` (WP 7.1 local, cùng major production 7.1.4); `build/index.ts.js` có đúng 1 property access `ToggleGroupControlOption`; crash chỉ xảy ra ở render path duy nhất dùng identifier đó (Details group).
+
+#### Fix — human xác nhận Option B (2026-11-10)
+
+Thay bằng `BaseControl` + `ButtonGroup` + `Button` (`isPressed`, `icon`, `label` + `showTooltip`, `variant="secondary"`, `disabled` theo `showDescription`) — API stable nhiều năm, precedent sẵn trong `slider/edit.tsx:316-331`. Behavior giữ nguyên: help khi description off, prior value kept, tooltip 4 icon. Delta so §3.2 plan061 (spec `ToggleGroupControl`) đã human duyệt — ledger plan061 2026-11-10. Không bundle `@wordpress/components`.
+
+Option A (dùng tên `__experimental*`) bị loại vì để lại technical debt: tên experimental có thể bị xóa khi core lật sang tên plain → crash #130 tái phát sau một core update, không automated test nào bắt được.
+
+**Trạng thái: human xác nhận onsite 2026-11-11 — build/deploy xong, "các setting đã ổn", crash #130 không còn ở Details.** Code P1+P2+fix+P3 (reset keys, 2026-11-11) vẫn uncommitted (câu "đã fix và commit vào codebase" ở cuối bản ghi cũ là sai — chưa commit tới thời điểm này).
+
+#### Checklist tránh lặp lại
+
+1. Import từ `@wordpress/components`: verify tên export tồn tại trong `wp-includes/js/dist/components.js` của core runtime đang target — build-time typings ≠ runtime dist.
+2. Ưu tiên API stable; `__experimental*` chỉ dùng khi chấp nhận rủi ro core update và có kế hoạch fallback.
+3. React #130 → debug bắt đầu bằng "định danh nào trong JSX nhánh này undefined", không phải "prop nào undefined".
+4. Không bundle `@wordpress/components` (nặng, trái convention).
+
+#### Lần hai — `NumberControl` (cùng pattern, 2026-11-11)
+
+Production report: Action group crash #130 khi chọn Custom width / Custom corners (rời Pill) / Custom spacing — đúng lúc `BoundedNumberControl` (conditional) render lần đầu. Verified bằng runtime dist với **lookbehind grep**: core WP 7.1 chỉ có `__experimentalNumberControl`, không có `NumberControl` plain (`NumberControl : 0`); `RangeControl`/`TextControl`/`SelectControl`/`ToggleControl`/`BaseControl`/`ButtonGroup` đều có plain export — giữ nguyên. Cross-check nhất quán: `ColumnNumberControl` trong `edit.tsx` (code cũ ở HEAD, chạy onsite ổn) wrap `TextControl type="number"`, không phải `NumberControl`.
+
+Fix (cùng chuẩn stable-API Option B): 4 chỗ JSX — `design.tsx` `BoundedNumberControl` + `collection/controls.tsx` (shadow offset X/Y, frame padding) — chuyển sang `<TextControl type="number" min max step>`. `resolveMedia*` nhận `value: unknown` nên onChange string chạy nguyên logic; `BoundedNumberControl` giữ draft-gating (onChange chỉ set khi finite/integer/in-range, onBlur reset về giá trị hợp lệ).
+
+Bài học thêm: grep export map phải dùng **lookbehind** — pattern không anchored làm `NumberControl` "khớp 1 lần" vì là chuỗi con của `__experimentalNumberControl`, dễ kết luận ngược rằng plain export tồn tại.
+
+**Onsite:** human build/deploy và xác nhận "các setting đã ổn" (2026-11-11) — Custom inputs mở không #130. Gate riêng cho Collection shadow/padding nếu chưa test thì kiểm trong đợt T-test chính thức (runbook).
+
+#### Bản ghi đầu tiên (SUPERSEDED — sai premise, sai cơ chế, "fix" là no-op)
+
+#### Mô tả lỗi
+
+Khi mở block **SKVN Product Category Grid** trong WordPress Editor và tương tác với các控制 (toggle "Show description", chọn "Description display" Excerpt/Full text), console hiển thị:
+
+```
+Minified React error #130;
+args[]=undefined;
+```
+
+Lỗi này khiến block preview không thể hiển thị (không render được), nhưng block vẫn hoạt động ở frontend sau khi publish.
+
+#### Nguyên nhân
+
+Lỗi do **`attributes.descriptionDisplay` có thể là `undefined`** khi block load đầu tiên, và code không có fallback phù hợp cho hai trường hợp sau:
+
+> Nguyên nhân chính - Thiếu pattern handling undefined values trong Gutenberg block
+
+##### 1. `SelectControl` value prop (edit.tsx)
+
+**Trước (gây lỗi):**
+```tsx
+<SelectControl
+  label={__( 'Description display', 'skvn-marine-blocks' )}
+  onChange={...}
+  options={[
+    { label: __('Excerpt', ...), value: 'excerpt' },
+    { label: __('Full text', ...), value: 'full' },
+  ]}
+  value={ attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt' }  // <-- Khi undefined -> 'excerpt' nhưng có thể gây React error
+/>
+```
+
+Khi `attributes.descriptionDisplay` là `undefined`, biểu thức `undefined === 'full'` trả về `false`, nên value rơi về `'excerpt'`. Tuy nhiên, trong một số trường hợp React khi value thay đổi từ `undefined` sang `'excerpt'` có thể trigger re-render với props undefined, gây lỗi #130.
+
+##### 2. `descriptionDisplay()` helper function (preview.tsx)
+
+**Trước (gây lỗ):**
+```tsx
+function descriptionDisplay( attributes ): 'excerpt' | 'full' {
+  return attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt';
+}
+```
+
+Cũng có cùng vấn đề: khi `attributes.descriptionDisplay` là `undefined`, function trả về `'excerpt'` nhưng có thể không xử lý đúng trong logic downstream.
+
+#### Chi tiết kỹ thuật
+
+##### Flow gây ra lỗi:
+
+1. Block load đầu tiên -> `attributes.descriptionDisplay` chưa được set (undefined)
+2. Sử dụng `SelectControl` với value tính toán trên
+3. React detect change props -> re-render component
+4. `descriptionDisplay()` function gọi với `undefined` value
+5. `PreviewCard` component render với `descriptionText` là `record.descriptionText ?? ''` nhưng `descriptionDisplay` kết quả có thể gây inconsistency
+6. React DevTools/minified code báo lỗi #130 về undefined value
+
+##### Root cause analysis:
+
+- **Missing default value**: `descriptionDisplay` attribute mặc định trong `block.json` là `"excerpt"`, nhưng khi block export/import hoặc load từ saved content, value có thể bị mất hoặc undefined.
+- **No null/undefined check**: Code không có guard explicit cho trường hợp undefined.
+- **React prop inconsistency**: Value prop thay đổi giữa undefined -> 'excerpt' trong render cycle.
+
+#### Giải pháp đã áp dụng
+
+##### Sửa đổi `wp-content/plugins/skvn-marine-blocks/src/product-category-grid/edit.tsx`
+
+```tsx
+// Trước:
+value={ attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt' }
+
+// Sau:
+value={
+  attributes.descriptionDisplay === 'full'
+    ? 'full'
+    : attributes.descriptionDisplay === 'excerpt'
+    ? 'excerpt'
+    : 'excerpt'  // Fallback explicit cho undefined/case khác
+}
+```
+
+##### Sửa đổi `wp-content/plugins/skvn-marine-blocks/src/product-category-grid/preview.tsx`
+
+```tsx
+// Trước:
+function descriptionDisplay( attributes ): 'excerpt' | 'full' {
+  return attributes.descriptionDisplay === 'full' ? 'full' : 'excerpt';
+}
+
+// Sau:
+function descriptionDisplay( attributes ): 'excerpt' | 'full' {
+  const display = attributes.descriptionDisplay;
+  return display === 'full'
+    ? 'full'
+    : display === 'excerpt'
+    ? 'excerpt'
+    : 'excerpt'; // Fallback mặc định cho undefined/case khác
+}
+```
+
+#### Ngăn chặn tương lai
+
+##### 1. Luôn có fallback explicit
+
+```ts
+// Luôn kiểm tra đủ 3 trường hợp:
+value === 'full' ? 'full' : value === 'excerpt' ? 'excerpt' : 'excerpt'
+```
+
+##### 2. Kiểm tra attribute defaults trong block.json
+
+Đảm bảo `descriptionDisplay` có default rõ ràng:
+```json
+"descriptionDisplay": {
+  "type": "string",
+  "default": "excerpt"
+}
+```
+
+##### 3. Sử dụng utility function
+
+Có thể tạo helper function reusable:
+
+```ts
+function safeDescriptionDisplay(attributes): 'excerpt' | 'full' {
+  const display = attributes.descriptionDisplay;
+  if (display === 'full') return 'full';
+  if (display === 'excerpt') return 'excerpt';
+  return 'excerpt'; // default
+}
+```
+
+##### 4. Test case
+
+Thêm test case cho:
+- Block load với saved content có `descriptionDisplay: "full"`
+- Block load với saved content có `descriptionDisplay: "excerpt"`  
+- Block load với saved content `descriptionDisplay` bị remove/missing (undefined)
+
+#### Bình luận
+
+Lỗi này là một ví dụ điển hình về importance của **handling undefined values** trong Gutenberg block development, đặc biệt khi làm việc với attributes có default value nhưng có thể bị mất khi block được export/import hoặc cậpgrade.
+
+Cẩn thận với pattern:
+- `attr === 'value1' ? 'value1' : 'value2'` - Khi attr là undefined, pattern này vẫn chạy nhưng có thể gây side effect
+- Luôn có explicit `else` clause hoặc normalize value trước khi dùng
+
 ---
+*Lưu ý [CORRECTED 2026-11-10]: câu "đã fix và commit vào codebase" ở bản đầu là sai — toàn bộ thay đổi đang uncommitted; "fix" ternary trong `edit.tsx`/`preview.tsx` là no-op (giữ như defensive style, human review khi commit); root cause đúng và fix Option B xem phần đầu DP-06.*
+---
+
 
 ## Patterns cần chú ý (không phải lỗi, nhưng dễ bỏ sót)
 
