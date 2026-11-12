@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "skvn-marine/slider",
-  "version": "1.3.20",
+  "version": "1.3.21",
   "title": "SKVN Slider",
   "category": "skvn-marine",
   "icon": "images-alt2",

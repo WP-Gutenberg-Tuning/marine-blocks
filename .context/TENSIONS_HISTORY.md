@@ -87,3 +87,18 @@ Milestone:  V1 / 1.2.1
 Status:     ARCHIVED
 Resolved:   2026-06-08
 Decision:   Park Feature Showcase source for V1 / 1.2.3. During 1.2.1, keep the source unregistered, keep it out of the inserter, and document the future milestone before activation.
+
+---
+
+## [2026-11-10] | blocks, editor-governance, planning
+Tension:    Shared design sidebar chỉ hiển thị một nhóm qua dropdown "Design component" (Image/Title/Details/Action) — editor phải đoán rồi chọn nhóm mới thấy control; human (chính người làm plugin) mất thời gian "mò cả buổi". Plan061 §6 định thêm P2 controls (Description alignment + Action geometry) vào đúng skeleton đó, nên pain point sẽ nở ra trước khi code.
+Context:    Human test Category Grid sau P1 (Full data + mode, chưa build) và phản ánh UX gây sốc; P2 — Action + alignment bị giữ chờ placement decision từ cuối session 2026-11-10 trước đó.
+Proposal:   A: thay dropdown bằng PanelBody accordions phẳng trong block Inspector; B: accordion groups trong shared plugin sidebar; C: hybrid (per-block design ở Inspector, tab plugin giữ theme tokens). Human quyết hướng khác: không restructure, chỉ thêm settings còn thiếu vào nhóm hiện có.
+Constraint: AGENTS.md SKVN Editor Controls: "Controls should be grouped into Content, Style, Layout, and Advanced sections"; sidebar controls cho marketing users, không raw class input. Plan061 §6 sketch viết theo shared sidebar skeleton hiện hành.
+Severity:   high
+Tags:       blocks, editor-governance, planning
+Milestone:  V1 / 1.3.20
+Evidence:   `src/design-sidebar/navigation.tsx:14-19` (designGroups dropdown), `:37-44` (DesignFallback select + reset), `src/design-sidebar/index.tsx` (shared sidebar), `src/product-category-grid/design.tsx:136-213` (Details/Action groups hiện chỉ có toggles + colors), plan061 §7 (P2 chưa start). Tự kiểm chứng ≤5 phút: mở block Category trong editor, đổi "Design component" và đếm control hiện hữu; đối chiếu plan061 §6.
+Status:     ARCHIVED
+Resolved:   2026-11-10
+Decision:   Human quyết trong session 2026-11-10: **không restructure** — đề xuất A/B/C loại khỏi scope đợt này; giữ dropdown nhóm hiện hành và thêm settings còn thiếu vào Details/Action. P2 triển khai trên skeleton current. Terminology **Scheme A**: group "Call to action", controls "Button …", toggle "Show call to action"; chỉ đổi labels i18n — attribute keys, class CSS, giá trị group `'action'`, DesignGroup type không đổi; rename global gồm Collection `controls.tsx` + shared `navigation.tsx` (labels only). Giữ **Button corners + Button placement** trong P2. Description alignment dùng icon ToggleGroupControl + native icons + hover title. Control-UX standard ("design system cho controls") là follow-up planning riêng — Plan 062 candidate, chưa duyệt version, không coding trong 1.3.20. Chi tiết: plan061 §3.2/§3.3/§6/§9 ledger.

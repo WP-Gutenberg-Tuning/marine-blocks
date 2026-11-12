@@ -7,7 +7,9 @@
 
 ## 0. Milestone hiện tại
 
-Current milestone: **V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1**
+Current milestone: **V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**
+
+Human transition2026-11-12: yêu cầu “commit để tiến hành push milestone sang1.3.21”, bắt đầu current1.3.21. 1.3.20 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY §1.3.20 và carry register current1.3.21 giữ CG/CGD/DS + AM1/AL/AR/AC + DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Hero contrast044 (source có, runtime Chờ kiểm chứng) + Slider Editor UI Redesign theo062/063 (Concept01 source, P0/native/fidelity chưa PASS). Step Slider1.3.24, Blog/M2, ratio controls và Sidebar054 vẫn ngoài scope. Sync working metadata development1.3.21 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current1.3.20 hoặc “không-chuyển-mốc” là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests1.3.20 trước follow-up khác.
 
 Human transition2026-11-07: yêu cầu “cho agent push milestone lên1.3.20”, bắt đầu current1.3.20. 1.3.19 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY và carry register current1.3.20 giữ DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Category049 + Woo Archive059/060, card1:1; ratio controls scope kế tiếp, Blog/M2 chưa start. Sync working metadata development1.3.20 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current cũ hoặc không-chuyển-mốc là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests trước follow-up khác.
 
@@ -687,10 +689,12 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 | 1.3.8 | Slider Parallax |
 | 1.3.9 | Custom Icon Upload |
 | 1.3.10 | Fullscreen Step Slider — DEFERRED; scope chuyển sang 1.3.24 |
-| 1.3.24 | Fullscreen Step Slider — human gán 2026-11-07; PLANNED, chưa start; current giữ 1.3.20 |
+| 1.3.24 | Fullscreen Step Slider — human gán 2026-11-07; PLANNED, chưa start; current giữ 1.3.21 |
 | 1.3.11 | Comprehensive Onsite QA (Slider, Collections & Controls) |
 | 1.3.12 | SKVN Team Credits Easter Egg |
 | 1.3.16 | Comprehensive Testing (1.3.x Feature QA) |
+| 1.3.20 | Product Category Grid + Category details + Woo Archive M1 |
+| 1.3.21 | Hero Slider Contrast Repair + Slider Editor UI Redesign |
 | 1.4.1 | SKVN Theme Init Setup UI |
 | 1.4.2 | Layout Blocks Validation & Quote Evaluation |
 | 1.5.0 | Woo Catalog Plugin |

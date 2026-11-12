@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SKVN Marine Blocks
  * Description: Custom Gutenberg blocks for SKVN Marine.
- * Version: 1.3.20
+ * Version: 1.3.21
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Text Domain: skvn-marine-blocks

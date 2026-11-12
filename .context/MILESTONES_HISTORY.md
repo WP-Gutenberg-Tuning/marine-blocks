@@ -6,6 +6,78 @@
 
 ---
 
+## V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1
+
+Status: **DEFERRED_WITH_CARRY_OVER**
+Started: **2026-11-07**
+Transitioned: **2026-11-12** — human yêu cầu “commit để tiến hành push milestone sang1.3.21”. Đây là chuyển ưu tiên/start1.3.21, không phải nghiệm thu hoặc completed1.3.20; không git remote push/deploy.
+
+Đích nhận acceptance chưa hoàn tất: carry register current1.3.21 trong MILESTONES.md. Giữ nguyên CG-*/CGD-*/DS-*, AM1/AL/AR/AC-*, DS/TD, S19/SR2, CP/EF, RS/CCP và Carousel carry; E02/PASS/model evidence cũ không thay. Blog archive, Archive M2, ratio control060§12 và Visual Sidebar054 vẫn deferred. Snapshot bên dưới giữ nguyên checklist/nội dung/status tại thời điểm chuyển để audit; trạng thái entry này DEFERRED_WITH_CARRY_OVER ưu tiên hơn các dòng Current/IN PROGRESS bên trong.
+
+#### Current Milestone — snapshot verbatim 2026-11-12
+
+Current: **V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1**
+Status: **IN PROGRESS — human start/transition, source có sẵn, runtime Chờ kiểm chứng**
+Started: **2026-11-07**
+Human instruction: “cho agent push milestone lên1.3.20”. SemVer1.3.20 đã được chọn cho Category và bổ sung Woo M1; tiếp tục ngoại lệ numbering đã duyệt, không gán version khác. Đây là milestone advancement, không git remote push/deploy/release approval.
+
+**1.3.19 → DEFERRED_WITH_CARRY_OVER**, snapshot current register + scope/checklist giữ nguyên tại MILESTONES_HISTORY.md §1.3.19. Không đánh completed/PASS vì chuyển mốc. Các checkpoint dated trước2026-11-07 còn ghi current1.3.19/1.3.18 là lịch sử; entry current này và AGENTS.md là source of truth mới. Metadata được sync development1.3.20 bằng bump-only, build/lint/onsite do human; không phát hành tự động.
+
+#### Scope và acceptance current1.3.20
+
+Category extension2026-11-09: human duyệt hướng và giao **planning chi tiết**, chưa coding delta. [Plan061](planning/061_VER_1_3_20_CATEGORY_GRID_DESCRIPTION_ACTION_CONTROLS_PLAN.md) bổ sung Full plain-text description/Excerpt, căn description, Action width Auto/Full/Custom%, alignment, Pill/custom px, Follow content/Bottom và khoảng cách exact/minimum. Defaults cũ/term persistence giữ; px inputs là ngoại lệ hẹp Category Action, không toàn plugin. CGD-UI01–04, CGD-ED01–03, CGD-TECH01–04 **Chưa làm**; [runbook](../docs/testing/category-grid-description-actions-1.3.20.md). Giữ current1.3.20, không bump/chuyển mốc hoặc start toàn bộ visual Sidebar054; CG/DS/carry cũ không mất acceptance.
+
+Archive hotfix059§12–13: human start2026-11-07, chung current1.3.20; grid alignment HF-AX và mobile category disclosure MN-* có source,5JS state/focus modelPASS; PHP lint/onsite geometry/native Woo Chờ kiểm chứng. Giữ HF-HDR FAIL lịch sử/AP-11; không đổi product ratio/query/plugin hoặc bump/deploy.
+
+Island width recipe2026-11-11: human report grid 4→2 cột khi bọc trong Group container. Điều tra kết luận **không code delta** — pipeline width đã có (Collection `contentWidth` control + align class mapper; Category Grid/Slider `supports.align`); nguyên nhân là recipe 2 bước (Group align Wide/Full + block Content width/align) không được biết, container query 760/880px lật layout im lặng. Theme CSS propagation bị loại vì nhân bản layout engine Gutenberg (vi phạm contract một owner). Giao [recipe + T-ISLAND-01–03](../docs/testing/group-island-width-1.3.20.md), human verify onsite; PITFALLS DP-07 ghi nhận. Island pattern/style variation **deferred 1.4.x** theo human — bake 2 bước, ăn palette slug; không tự start, chưa gán SemVer.
+
+Island full-bleed2026-11-12: human làm rõ yêu cầu thật — island phải **giới hạn max-width nội dung nhưng background tràn 2 viền**; align Wide giữ nền trong box 1200px nên không đạt. Kết luận: **Full cho container (nền tràn) + measure cho content bên trong** (constrained 760 hoặc Wide 1200), không cần CSS mới; `alignfull` chỉ tới biên màn hình khi trang bật Full Width Canvas. Ghi nhận gap thiết kế: `.skvn-section` island hiện override từng class con lên 1200px (`style.css:130-157`) nên block khác rơi về 760 → container query tablet; island primitive 1.4.x thay bằng một measure do band sở hữu. Recipe §3 + T-ISLAND-04 (nền tràn) đã cập nhật; design contract Container Nesting và module theme đồng bộ; vẫn không code delta.
+
+Island Elementor rebuttal2026-11-12: human yêu cầu lấy **chuẩn UX Elementor** làm tham chiếu cho hiện tượng "nền chỉ bao đúng width". Đối chiếu tài liệu Elementor (Define container layout/Section Overview): Boxed mặc định giữ box ngoài = available width → nền tràn, measure do Width control; `Full Width` + Width 1200 thì nền dừng ở 1200 — **Elementor cũng không cho nền vượt box**. Vậy ảnh 760/1200 là "Full Width + Width", không phải Boxed; recipe 2 bước chính là Boxed. Khác biệt còn lại: default và số bước (Gutenberg thiếu một control); thêm mismatch measure 760 đọc chữ vs ~1140–1200 layout. Phản biện ghi tại [recipe §4](../docs/testing/group-island-width-1.3.20.md), contract Container Nesting và module theme cập nhật. Decision gate mở §7.1: giữ recipe (A) hay thêm island pattern zero-CSS vào1.3.20 (B); không chọn CSS override. Chưa start, không bump.
+
+Island research handoff2026-11-12: human chuyển phản biện cho agent có khả năng đọc ảnh; prompt tại [handoff](../docs/workflows/prompts/group-island-elementor-rebuttal-agent-handoff.md). Số đo ảnh trong §1 dựa trên giả định scale 1:1 (ảnh1903x927) **chưa chứng minh** — agent research phải xác minh DPR/zoom và tính lại CSS px trước khi dùng 760/1200 làm premise, rồi chốt A/B. Research/docs only, không code/commit/bump.
+
+Island WindPress stopgap2026-11-12: human chốt WindPress là chữa cháy có hạn đến khi có island group. Luật: grid trong Group là một box, con theo cha, cha phủ hết con. Chỉ Group island tạm, một class riêng chưa đặt tên; core Group khác giữ FSE; cấm overflow cắt card; không đưa vào plugin/theme CSS. Gỡ khi island group thành chủ width. §7.1 A/B chưa chọn. 80px chưa có chủ. Decision [group-island-windpress-stopgap-1.3.20](../docs/decisions/group-island-windpress-stopgap-1.3.20.md). Chưa viết utility, chưa start island, không bump.
+
+Island WindPress class prototype2026-11-12: pixel scan lại ảnh (RLE, System.Drawing) cho số card: ảnh (1) grid 572..1411 = 840 (2×414+12) trong Group 760; ảnh (2) grid 352..1631 = 1280 (4×311+3×12) trong Group 1200. Cả hai grid bám **mép trái** Group, vượt **mép phải đúng 80px**; delta 80px hằng số, không theo align/số cột (2 cột +40/cột, 4 cột +20/cột) → **width delta của block grid**, không phải align Wide hay container query. Prototype **một class một rule** `.skvn-island-group` (đề xuất, `.skvn-island` đã thuộc theme) clamp con trực tiếp về content box, không overflow, specificity (0,5,0) thắng `!important` (0,1,0) của core; kèm diagnostic phân biệt 4 chủ khả dĩ của 80px, T-ISLAND-05–09, cảnh báo typography Full và variant C1/C2 cho full-bleed+measure. Doc [group-island-windpress-class-1.3.20](../docs/testing/group-island-windpress-class-1.3.20.md); chưa nạp site/WindPress, chưa chốt tên, không runtime/theme/plugin delta, không bump.
+
+Island 80px owner2026-11-12: đo onsite (post=71, frontend, `clientWidth 1903`/`dpr 1`/`zoom 1` ⇒ scale 1:1): island Wide 351.5..1551.5 = 1200; `.skvn-category-grid` 351.5..1631.5 = **1280**, `max-width: calc(100% + 80px)`, margin 0/0, static ⇒ delta chỉ phải, trái khít. **Chủ = GeneratePress dynamic inline CSS** (`#generate-style-inline-css`): `.entry-content .alignwide, body:not(.no-sidebar) .entry-content .alignfull{margin-left:-40px;width:calc(100% + 80px);max-width:calc(100% + 80px)}` `(0,2,0)`; GP giả định padding 40px, canvas SKVN zero padding, core ép margin auto `!important` ⇒ mất bù trái. Không phải lỗi Category Grid, không phải container query, không phải tàn dư site CSS (`wp-custom-css` false). Bug cấp canvas: mọi `.alignwide` nested trong container đều +80 phải (slider/collection/grid) ⇒ PITFALLS DP-07.1. Probe inject rule §2: 1280→1200, delta 80→0 ⇒ **rule prototype thắng, T-ISLAND-05 PASS kỹ thuật**; nhưng rule **không có mặt** trong CSS serve (vắng cả `windpress-cached-inline-css` và `windpress:vfs` 9.477 byte) ⇒ paste chưa lưu/compile vào project WindPress đang serve, onsite PASS chưa đạt. Hai hướng chưa chọn: T1 theme neutralize GP `.alignwide` trên canvas (chữa cả slider/collection, cần duyệt vì đổi geometry) vs T2 tiếp stopgap class. Không source delta, không bump.
+
+Island foundation2026-11-12: human **tạm không dùng Group** ⇒ stopgap WindPress **dormant**, T2 không theo đuổi; yêu cầu gom kết luận/đánh giá thành nền cho block group island. Tài liệu [066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK](../.context/planning/066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK.md) chốt: island = band + measure + gutter (ba chủ, không gộp); **ba thất bại riêng** của core Group (F1 clamp760/container query, F2 nền=box nên Wide dừng 1200, F3 GP+80 math) với ba cách chữa khác nhau; measure model M1/M2/M3 (M1 loại vì grid 760 lật tablet; khuyến nghị M3-a native + M3-c hai variation); kiến trúc A1 style variation (không sở hữu measure), A2 block variation core/group (khuyến nghị bước 1: 1 click, markup Group, có transform), B custom block InnerBlocks (end state nếu cần control, phải P0 proof `supports.layout`), C pattern (harness only); T1 là **dependency cứng**; hợp đồng width/CSS/editor-64px/migration/validation; acceptance đề xuất GI-B01–08/GI-E01–06/GI-T01–10; gates G-01..G-08 (SemVer, kiến trúc, P0, T1, deferred test 1.3.20, tokens, naming, mockup) đều **chưa đạt**. **Foundation only** — island defer1.4.x, chưa SemVer, chưa start, không source delta, không bump, current1.3.20 giữ.
+
+
+
+
+| Work package | Source / acceptance | Trạng thái / evidence cần tiếp |
+|---|---|---|
+| Product Category Grid + Category details | Plan049; CG-UI-01–04, CG-UX-01–03, CG-TECH-01–05; DS-01–07 áp Category | Đã có source, Chờ kiểm chứng. Giữ native category data/thumbnail/description, query eligibility/count, picker/save/conflict/persistence và plugin độc lập theme. |
+| Woo Archive M1 + shared Product card | Plan059/060; AM1-*, AL-01–06, AR-* áp Woo và AC-* | Source e7f789f; ảnh1:1, desktop category sidebar trái/tablet navigation trên, native Woo query/count/order/pagination, shared presenter/assets + fallback. CSS7modelPASS và baseline16mockPASS giữ phạm vi; combined37PHP/hook-template10 chưa hoàn tất PASS, onsite/build/lint chưa có evidence. |
+| Ngoài current scope | Blog archive, Archive M2 inquiry/second language, ratio control follow-up060§12 | Chưa start/deferred, không tự gán vào1.3.21 hoặc mở ratio setting trong patch1:1. Hero1.3.21 vẫn hotfix riêng. |
+
+Runbooks hiện hành: `docs/testing/product-category-grid-1.3.20.md`, `docs/testing/archive-repair-1.3.x.md`. Source/design approval/model PASS không tự là runtime PASS. Header/footer shared issues không tự gộp repair; CF7/CFDB7 quote contract giữ.
+
+#### Carry register từ1.3.19 →1.3.20 — không mất acceptance
+
+Đây là đích theo dõi phần chưa nghiệm thu; không đổi owner/IDs hoặc tự mở thêm coding scope. Chạy deferred baseline liên quan trước follow-up không liên quan và cập nhật từng evidence, không suy PASS từ transition.
+
+| Nhóm carry | IDs / nguồn gốc | Trạng thái giữ / bước tiếp |
+|---|---|---|
+| Sidebar foundation + Theme Design | DS-01–07, TD-01–04 và named TD concurrency/owner/conflict cases;048/050/runbook sidebar | Đã có source, runtime Chờ kiểm chứng; selection/tab/Undo/save/reopen, permissions/theme gate, draft/conflict/storage/fonts và conditional assets/lifecycle. |
+| Sidebar hardening | S19-01–04 và toàn bộ SR2-* trong050/051 | Giữ source + VM/mock evidence từng plan; không runtime PASS. Handoff `docs/testing/plugin-design-sidebar-1.3.19-review-handoff.md`; test được carry, không xóa scope vì version mới. |
+| Editor preview/canvas | CP01–05, EF01–06;052/053 và runbooks canvas/frame | CP/EF onsite Chờ kiểm chứng; EF01–05 có source/8VM spacing modelPASS, EF06 Slider/Step vẫn audit/planning chưa implementation. |
+| Responsive Spacer | RS-UI-01–03, RS-UX-01–05, RS-TECH-01–04;055/runbook spacer1.3.19 | Source có,13Node model/spacing checksPASS phạm vi cũ; build/lint/geometry/onsite Chờ kiểm chứng. Margin/emoji preview source giữ, không suy editor lag đã xử lý. |
+| Content Actions | Toàn bộ CCP-* và CCP-R1–R4/R01–R06;057/runbook |18modelPASS/11controller mockedPASS giữ; real WP clipboard/parse/Undo/permissions/Save/menu/runtime/build Chờ kiểm chứng. Right-click058 vẫn Deferred sau2.0. |
+| Carousel carry từ1.3.18 qua1.3.19 | UX-01–13 (UX-02a và IDs con), UI-18-TITLE/STYLE; TECH-01–13 (TECH-08a/12 và IDs con), E01–E15;045/040/runbooks | E02/PASS có sẵn giữ nguyên; phần khác giữ status/evidence gốc, không làm lại PASS nếu không có regression. Source/model không thay Technical runtime. |
+| Legacy carry C/D/media/arrows | State owner/overflow C, skeleton D-01–08, Post visual, controls hide/disabled, G-MEDIA và editor preview040§13 | Chờ kiểm chứng; giữ human override không sửa skeleton hoặc thêm skeleton toàn trang. Arrow centering source chờ onsite. |
+| Chưa duyệt |054 visual controls Q1–Q3 | Planning/deferred, không tự start cùng1.3.20. Giữ decision/evidence tại plan, chờ human chọn khi trở lại scope. |
+
+Snapshot/checklist gốc đầy đủ ở history1.3.19 và plans/runbooks; bảng carry không thay hoặc rút gọn yêu cầu. **Loading/navigation046 vẫn thuộc1.3.18**, acceptance LDR-01–09/UXHF-01–10 theo runbook riêng; không nhập vào Category.
+
+#### Deferred test reminder khi bắt đầu1.3.20
+
+Trước follow-up runtime khác, human chạy build/lint theo AGENTS và baseline Category/Archive + carry Sidebar/Spacer/Content Actions/Carousel liên quan. Gửi build/versions/URLs, screenshots editor/frontend desktop/mobile, console/network và query/quote evidence theo runbook. Khi deploy nhắc chụp Editor UI cho selling point; transition này chưa deploy.
+
+
 ## V1 / 1.3.19 — Plugin Design Sidebar Foundation
 
 Status: **DEFERRED_WITH_CARRY_OVER**
