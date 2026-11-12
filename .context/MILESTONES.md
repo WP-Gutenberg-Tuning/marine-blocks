@@ -13,7 +13,9 @@ Status: **IN PROGRESS — human start/transition, source có sẵn một phần,
 Started: **2026-11-12**
 Human instruction: “commit để tiến hành push milestone sang1.3.21”. SemVer1.3.21 đã được human chốt2026-10-19 (đổi mapping2026-11-04) cho Hero contrast và mở rộng2026-11-09 với Slider Editor UI Redesign; không gán version khác. Đây là milestone advancement, không git remote push/deploy/release approval.
 
-**1.3.20 → DEFERRED_WITH_CARRY_OVER**, không completed/PASS. Snapshot current register + scope/checklist giữ nguyên tại MILESTONES_HISTORY.md §1.3.20. Category đã có source và human-tested một phần (T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 chỉ confirm mức UX, không formal PASS); Woo Archive M1 AM1/AL/AR/AC vẫn Chờ kiểm chứng. Entry current này + AGENTS.md là source of truth mới; checkpoint dated trước2026-11-12 còn ghi current1.3.20 là lịch sử, superseded.
+Human clarification2026-11-12: câu “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác…” thuộc **ngữ cảnh1.3.20**, không phải PASS1.3.21. Ghi nhận nằm ở MILESTONES_HISTORY §1.3.20 (acceptance1.3.20 PASS theo human, lỗi phát sinh sửa ở milestone khác). Current1.3.21 giữ **IN PROGRESS**, metadata1.3.21, không archive, không chuyển1.3.22. Commit tự chuyển1.3.22 (`563a66e`) đã revert bằng `cee8ed0`; transition chỉ xảy ra khi human ra lệnh riêng.
+
+**1.3.20 → DEFERRED_WITH_CARRY_OVER**, không completed/PASS. Snapshot current register + scope/checklist giữ nguyên tại MILESTONES_HISTORY.md §1.3.20. Category đã có source và human-tested một phần (T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 chỉ confirm mức UX, không formal PASS); Woo Archive M1 AM1/AL/AR/AC vẫn Chờ kiểm chứng. **Human PASS2026-11-12** chốt acceptance1.3.20 ở mức người dùng (chi tiết history §1.3.20); nhãn chuyển mốc giữ nguyên, evidence kỹ thuật còn thiếu là carry. Entry current này + AGENTS.md là source of truth mới; checkpoint dated trước2026-11-12 còn ghi current1.3.20 là lịch sử, superseded.
 
 ### Scope và acceptance current1.3.21
 
@@ -37,8 +39,8 @@ Checklist đầy đủ HERO-*/SED-* ở mục §1.3.21 bên dưới; process wai
 
 | Nhóm carry | IDs / nguồn gốc | Trạng thái giữ / bước tiếp |
 |---|---|---|
-| Category Grid + Category details | Plan049/061; CG-UI-01–04, CG-UX-01–03, CG-TECH-01–05, CGD-UI01–04/CGD-ED01–03/CGD-TECH01–04 | Source đã có; T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 confirm mức UX, chưa formal PASS. DS-01–07 áp Category vẫn Chờ kiểm chứng. |
-| Woo Archive M1 + shared Product card | Plan059/060; AM1-*, AL-01–06, AR-*, AC-* | Source e7f789f; CSS7modelPASS + baseline16mockPASS giữ phạm vi; combined37PHP/hook-template10, build/lint và onsite geometry chưa PASS. Ảnh1:1 giữ, ratio control không mở. |
+| Category Grid + Category details | Plan049/061; CG-UI-01–04, CG-UX-01–03, CG-TECH-01–05, CGD-UI01–04/CGD-ED01–03/CGD-TECH01–04 | **Human PASS2026-11-12 cho scope1.3.20** (T07/T09/T10/T11 và CGD-TECH03/04 đã PASS trước đó; phần còn lại theo lời human “đã pass toàn bộ”). Evidence kỹ thuật chưa thu thập (DS-01–07 áp Category, geometry/onsite) là carry, không mở lại trạng thái. |
+| Woo Archive M1 + shared Product card | Plan059/060; AM1-*, AL-01–06, AR-*, AC-* | **Human PASS2026-11-12 cho scope1.3.20**; source e7f789f, CSS7modelPASS + baseline16mockPASS giữ phạm vi. combined37PHP/hook-template10, build/lint và onsite geometry chưa có evidence → carry, không mở lại. Ảnh1:1 giữ, ratio control không mở. |
 | Sidebar foundation + Theme Design | DS-01–07, TD-01–04 và named TD concurrency/owner/conflict cases;048/050 | Đã có source, runtime Chờ kiểm chứng: selection/tab/Undo/save/reopen, permissions/theme gate, draft/conflict/storage/fonts và conditional assets/lifecycle. |
 | Sidebar hardening | S19-01–04 và toàn bộ SR2-* trong050/051 | Giữ source + VM/mock evidence từng plan; không runtime PASS. Handoff `docs/testing/plugin-design-sidebar-1.3.19-review-handoff.md`; test được carry, không xóa scope vì version mới. |
 | Editor preview/canvas | CP01–05, EF01–06;052/053 | CP/EF onsite Chờ kiểm chứng; EF01–05 có source/8VM spacing modelPASS; EF06 phần Step vẫn audit/planning, phần Slider nay thuộc scope1.3.21. |
@@ -1022,6 +1024,8 @@ Version rationale: feature thường tăng MINOR; **1.3.20 là ngoại lệ do h
 
 Status: **IN PROGRESS (source) — CURRENT từ 2026-11-12, chờ human build + kiểm chứng runtime**
 
+**Clarification2026-11-12:** câu “Đẩy version, đã pass toàn bộ…” của human thuộc **ngữ cảnh1.3.20** (ghi tại MILESTONES_HISTORY §1.3.20), **không** phải nghiệm thu1.3.21. Vì vậy HERO-*/SED-* giữ nguyên trạng thái Chờ kiểm chứng; current vẫn1.3.21; không archive, không chuyển1.3.22, metadata1.3.21. Commit tự chuyển1.3.22 (`563a66e`) đã revert (`cee8ed0`).
+
 **Process waiver2026-11-12:** human xác nhận Editor UI Slider đã được làm khi current vẫn1.3.20 và chưa bump1.3.21. Giữ source đó; không revert vì lệch thứ tự version. Đây không phải runtime PASS, không đóng SED-*/HERO-*, không bump metadata và không chuyển current. Cùng ngày chủ dự án PASS U02, U03, U05. Còn U01, U04, U06, U07, U08, U09. Contrast và hiện tượng chớp vẫn nghiệm thu riêng. **Superseded một phần 2026-11-12:** human đã chuyển current sang1.3.21; waiver chỉ còn nghĩa “không revert source editor đã làm sớm”, không còn chặn bump/chuyển mốc.
 
 **Scope amendment2026-11-09:** human yêu cầu thêm redesign phần Slider Editor UI vào1.3.21. **Contrast: đã có source, runtime Chờ kiểm chứng. Editor redesign: đã có source Concept01 (P1 UX flow được human xác nhận2026-11-09; P2/P3 source theo063§13), runtime Chờ kiểm chứng — supersede câu “PLANNED/Chưa làm, chưa start”.** Version1.3.21 giữ theo quyết định human, đây là mở scope đã duyệt cùng version, không đổi Version Naming Rule. Hình thức hotfix ngoài current áp phần contrast đã có; không dùng source editor để tự chuyển current khỏi1.3.20.
@@ -1089,7 +1093,7 @@ Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
 - [ ] PDP-TRACE-01 — Trước implementation lập execution plan và đối chiếu từng acceptance liên quan của **1.3.5**: kế thừa phần đã có, chỉ triển khai delta; không xóa acceptance hoặc đánh dấu 1.3.5 completed. Archive scope vẫn ở nơi cũ.
 - [ ] Tạo runbook onsite với URL/fixtures/steps/expected/evidence, human duyệt trước completion. SemVer đã chốt; bắt đầu/chuyển current cần lệnh riêng.
 
-Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
+Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Execution plan có sẵn nhưng **planning-only, chưa code, chưa start**: [067](planning/067_VER_1_3_22_PRODUCT_PAGE_DESIGN_CONTROLS_EXECUTION_PLAN.md) — chỉ thi hành sau lệnh transition riêng của human. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
 
 ### 1.3.23 — Post Page Basic Design Controls
 
