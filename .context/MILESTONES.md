@@ -13,9 +13,9 @@ Status: **IN PROGRESS — human start/transition, source có sẵn một phần,
 Started: **2026-11-12**
 Human instruction: “commit để tiến hành push milestone sang1.3.21”. SemVer1.3.21 đã được human chốt2026-10-19 (đổi mapping2026-11-04) cho Hero contrast và mở rộng2026-11-09 với Slider Editor UI Redesign; không gán version khác. Đây là milestone advancement, không git remote push/deploy/release approval.
 
-Human clarification2026-11-12: câu “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác…” thuộc **ngữ cảnh1.3.20**, không phải PASS1.3.21. Ghi nhận nằm ở MILESTONES_HISTORY §1.3.20 (acceptance1.3.20 PASS theo human, lỗi phát sinh sửa ở milestone khác). Current1.3.21 giữ **IN PROGRESS**, metadata1.3.21, không archive, không chuyển1.3.22. Commit tự chuyển1.3.22 (`563a66e`) đã revert bằng `cee8ed0`; transition chỉ xảy ra khi human ra lệnh riêng.
+Human clarification2026-11-12: câu “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác…” thuộc **ngữ cảnh1.3.20**, không phải PASS1.3.21. Ghi nhận nằm ở MILESTONES_HISTORY §1.3.20 (**1.3.20 → DONE_WITH_CARRY_OVER**). Current1.3.21 giữ **IN PROGRESS**, metadata1.3.21, không archive, không chuyển1.3.22. Commit tự chuyển1.3.22 (`563a66e`) đã revert bằng `cee8ed0`; transition chỉ xảy ra khi human ra lệnh riêng.
 
-**1.3.20 → DEFERRED_WITH_CARRY_OVER**, không completed/PASS. Snapshot current register + scope/checklist giữ nguyên tại MILESTONES_HISTORY.md §1.3.20. Category đã có source và human-tested một phần (T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 chỉ confirm mức UX, không formal PASS); Woo Archive M1 AM1/AL/AR/AC vẫn Chờ kiểm chứng. **Human PASS2026-11-12** chốt acceptance1.3.20 ở mức người dùng (chi tiết history §1.3.20); nhãn chuyển mốc giữ nguyên, evidence kỹ thuật còn thiếu là carry. Entry current này + AGENTS.md là source of truth mới; checkpoint dated trước2026-11-12 còn ghi current1.3.20 là lịch sử, superseded.
+**1.3.20 → DONE_WITH_CARRY_OVER** (human PASS2026-11-12; lúc chuyển mốc ghi `DEFERRED_WITH_CARRY_OVER`). Snapshot current register + scope/checklist giữ nguyên tại MILESTONES_HISTORY.md §1.3.20. Category đã có source và human-tested một phần (T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 chỉ confirm mức UX, không formal PASS); Woo Archive M1 AM1/AL/AR/AC vẫn Chờ kiểm chứng. **Human PASS2026-11-12** chốt acceptance1.3.20 ở mức người dùng (chi tiết history §1.3.20); evidence kỹ thuật còn thiếu là carry. Entry current này + AGENTS.md là source of truth mới; checkpoint dated trước2026-11-12 còn ghi current1.3.20 là lịch sử, superseded.
 
 ### Scope và acceptance current1.3.21
 
@@ -1077,7 +1077,7 @@ Không tự đánh dấu milestone hoàn thành, không runtime PASS và không 
 
 ### 1.3.22 — Product Page Basic Design Controls
 
-Status: **PLANNED — implementation Chưa làm, chưa start**.
+Status: **PLANNED — implementation Chưa làm, chưa start**. Plan067 đã tạo (2026-11-12) được **giữ nguyên, không phát triển tiếp** theo lệnh human cho tới khi có lệnh transition riêng.
 Confirmed: **2026-11-03** — Product trước Post; sau hoán đổi 2026-11-04, nền sidebar là **1.3.19**, thứ tự các consumer Product **1.3.22 → 1.3.23** giữ nguyên.
 
 Version rationale: đây là feature mới, thông thường tăng MINOR; **1.3.22 và 1.3.23 là ngoại lệ đánh số do human xác nhận**, như 1.3.20–21. Không đổi Version Naming Rule, không chuyển current 1.3.18, không bump metadata hoặc archive.

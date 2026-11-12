@@ -8,13 +8,13 @@
 
 ## V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1
 
-Status: **DEFERRED_WITH_CARRY_OVER**
+Status: **DONE_WITH_CARRY_OVER** (human PASS2026-11-12)
 Started: **2026-11-07**
-Transitioned: **2026-11-12** — human yêu cầu “commit để tiến hành push milestone sang1.3.21”. Đây là chuyển ưu tiên/start1.3.21, không phải nghiệm thu hoặc completed1.3.20; không git remote push/deploy.
+Transitioned: **2026-11-12** — human yêu cầu “commit để tiến hành push milestone sang1.3.21”. Lúc chuyển mốc ghi `DEFERRED_WITH_CARRY_OVER`; cùng ngày human xác nhận đã pass toàn bộ nên trạng thái hiện hành là `DONE_WITH_CARRY_OVER`. Không git remote push/deploy.
 
-Human PASS2026-11-12: “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác, các thứ cần làm đã đủ và thực hiện đúng với thiết kế” — human xác nhận trong session rằng câu này nói về **1.3.20**. Ghi nhận: acceptance1.3.20 (Category CG-*/CGD-* và DS-01–07 áp Category; Woo Archive AM1/AL/AR/AC) **PASS theo human**, lỗi phát sinh sau đó sửa ở milestone khác. Nhãn `DEFERRED_WITH_CARRY_OVER` giữ làm mốc lịch sử (1.3.20 không quay lại current); evidence kỹ thuật chưa thu thập (combined37PHP/hook-template10, build/lint, onsite geometry) là carry, không mở lại trạng thái và không hạ PASS của human. Snapshot verbatim bên dưới giữ nguyên trạng thái tại thời điểm chuyển mốc; dòng PASS này là trạng thái nghiệm thu hiện hành của1.3.20.
+Human PASS2026-11-12: “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác, các thứ cần làm đã đủ và thực hiện đúng với thiết kế” — human xác nhận trong session rằng câu này nói về **1.3.20**. Ghi nhận: acceptance1.3.20 (Category CG-*/CGD-* và DS-01–07 áp Category; Woo Archive AM1/AL/AR/AC) **PASS theo human**, lỗi phát sinh sau đó sửa ở milestone khác. 1.3.20 không quay lại current. Evidence kỹ thuật chưa thu thập (combined37PHP/hook-template10, build/lint, onsite geometry) là carry, không mở lại trạng thái và không hạ PASS của human. Snapshot verbatim bên dưới giữ nguyên trạng thái tại thời điểm chuyển mốc; dòng PASS này là trạng thái nghiệm thu hiện hành của1.3.20.
 
-Đích nhận acceptance chưa hoàn tất: carry register current1.3.21 trong MILESTONES.md. Giữ nguyên CG-*/CGD-*/DS-*, AM1/AL/AR/AC-*, DS/TD, S19/SR2, CP/EF, RS/CCP và Carousel carry; E02/PASS/model evidence cũ không thay. Blog archive, Archive M2, ratio control060§12 và Visual Sidebar054 vẫn deferred. Snapshot bên dưới giữ nguyên checklist/nội dung/status tại thời điểm chuyển để audit; trạng thái entry này DEFERRED_WITH_CARRY_OVER ưu tiên hơn các dòng Current/IN PROGRESS bên trong.
+Đích nhận acceptance chưa hoàn tất: carry register current1.3.21 trong MILESTONES.md. Giữ nguyên CG-*/CGD-*/DS-*, AM1/AL/AR/AC-*, DS/TD, S19/SR2, CP/EF, RS/CCP và Carousel carry; E02/PASS/model evidence cũ không thay. Blog archive, Archive M2, ratio control060§12 và Visual Sidebar054 vẫn deferred. Snapshot bên dưới giữ nguyên checklist/nội dung/status tại thời điểm chuyển để audit; trạng thái hiện hành của entry này là `DONE_WITH_CARRY_OVER` (human PASS2026-11-12) và ưu tiên hơn các dòng Current/IN PROGRESS bên trong.
 
 #### Current Milestone — snapshot verbatim 2026-11-12
 
