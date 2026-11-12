@@ -102,20 +102,3 @@ Evidence:   `src/design-sidebar/navigation.tsx:14-19` (designGroups dropdown), `
 Status:     ARCHIVED
 Resolved:   2026-11-10
 Decision:   Human quyết trong session 2026-11-10: **không restructure** — đề xuất A/B/C loại khỏi scope đợt này; giữ dropdown nhóm hiện hành và thêm settings còn thiếu vào Details/Action. P2 triển khai trên skeleton current. Terminology **Scheme A**: group "Call to action", controls "Button …", toggle "Show call to action"; chỉ đổi labels i18n — attribute keys, class CSS, giá trị group `'action'`, DesignGroup type không đổi; rename global gồm Collection `controls.tsx` + shared `navigation.tsx` (labels only). Giữ **Button corners + Button placement** trong P2. Description alignment dùng icon ToggleGroupControl + native icons + hover title. Control-UX standard ("design system cho controls") là follow-up planning riêng — Plan 062 candidate, chưa duyệt version, không coding trong 1.3.20. Chi tiết: plan061 §3.2/§3.3/§6/§9 ledger.
-
----
-
-## [2026-10-19] | slider, milestone, planning
-Tension:    Human yêu cầu sửa Hero Slider (contrast) nhưng chưa chỉ định SemVer và chưa quyết cách xử lý current milestone; repair thuộc stack M5 (Slider) trong khi 1.3.17 đang current và thuộc scope Product/Post Carousel.
-Context:    Agent audit + hoàn thiện plan 044, chuẩn bị implementation cho Hero Slider contrast.
-Proposal:   Gán PATCH trống **V1 / 1.3.19 — Hero Slider Contrast Repair** và để human chọn: (a) chuyển ưu tiên, 1.3.17 → deferred và 1.3.19 → current; (b) chạy 1.3.19 như hotfix ngoài current milestone; (c) gộp vào scope slider M5 hiện có (1.3.11/1.3.16 đang PENDING và trùng scope — T-DEMO-2).
-Constraint: AGENTS.md §"Milestone stack → SemVer": "Chưa có SemVer được xác nhận: tiếp tục audit/planning; không implement mục mới, đổi current milestone, bump metadata hoặc archive milestone/tension." MILESTONES.md: 1.3.18 đã dành cho Collection Editor UX & Technical; 1.3.13/1.3.14 đã code dù mapping chưa xác nhận; 1.3.15 mới chỉ là đề xuất trong T-DEMO-1.
-Severity:   low
-Tags:       slider, milestone, planning
-Milestone:  V1 / 1.3.21 (Hero contrast, hotfix ngoài current V1 / 1.3.18)
-Scheduling update 2026-11-04: human hoán đổi Hero 1.3.19 → 1.3.21 và Sidebar 1.3.21 → 1.3.19. Proposal/Decision dưới đây giữ version lịch sử tại ngày resolve; implementation hiện hành dùng 1.3.21, giữ acceptance/source và không bump/current/archive.
-Status update 2026-11-12: human chuyển current sang **V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**; hình thức “hotfix ngoài current” chấm dứt, phần contrast vào acceptance của mốc hiện hành cùng editor redesign. Decision gốc (white-pill + navy `#073b5a`) không đổi và entry này giữ lại vì thuộc milestone đang current.
-Evidence:   `src/slider/style.css:699-713` không khai báo color; theme `style.css:98-115` đặt `color` trực tiếp lên `.wp-block-heading` ở (0,2,1) nên thắng mọi rule Hero; bug report 2026-10-16 R1–R3. Plan 044 §1.1/§4.2/§4.3 và §"Version triển khai" đã ghi đầy đủ ledger và specificity. Tự kiểm chứng ≤5 phút: mở `src/slider/style.css` dòng 699, `wp-content/themes/skvn-marine/style.css` dòng 98-115, `.context/planning/044_*.md`.
-Status:     ARCHIVED
-Resolved:   2026-10-19
-Decision:   Phương án (b). Human xác nhận 2026-10-19: SemVer **V1 / 1.3.19 — Hero Slider Contrast Repair**, chạy dạng **hotfix ngoài current milestone**. Khi quyết định này được ghi, current là V1 / 1.3.17; từ 2026-10-19 current đã chuyển sang V1 / 1.3.18 — 1.3.19 vẫn là hotfix ngoài current, không archive, không bump metadata cho 1.3.19. CTA Hero theo phương án white-pill + navy `#073b5a`. Ghi mapping M5 → 1.3.19 vào roadmap 039 và section milestone không-current trong MILESTONES.md. 1.3.19 chỉ đụng Hero contrast; T-DEMO-1 (1.3.15 parallax) vẫn OPEN và không bị 1.3.19 xử lý. Human resolve 2026-10-19.

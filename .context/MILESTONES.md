@@ -8,59 +8,59 @@
 
 ## Current Milestone
 
-Current: **V1 / 1.3.22 — Product Page Basic Design Controls**
-Status: **PLANNED — human start/transition2026-11-12; implementation Chưa làm, chưa có source**
+Current: **V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**
+Status: **IN PROGRESS — human start/transition, source có sẵn một phần, runtime Chờ kiểm chứng**
 Started: **2026-11-12**
-Human instruction: “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác, các thứ cần làm đã đủ và thực hiện đúng với thiết kế”. Đây là human approve hoàn thành1.3.21 + start1.3.22 theo thứ tự roadmap đã chốt (Product1.3.22 → Post1.3.23 → Step Slider1.3.24). SemVer1.3.22 đã được human xác nhận2026-11-03; không gán version khác, không phải release/deploy approval.
+Human instruction: “commit để tiến hành push milestone sang1.3.21”. SemVer1.3.21 đã được human chốt2026-10-19 (đổi mapping2026-11-04) cho Hero contrast và mở rộng2026-11-09 với Slider Editor UI Redesign; không gán version khác. Đây là milestone advancement, không git remote push/deploy/release approval.
 
-**1.3.21 → DONE_WITH_CARRY_OVER** theo tuyên bố human2026-11-12: acceptance HERO-*/SED-*/U-* được coi là PASS ở mức human approval; phần evidence native/P0/fidelity/geometry/perf chưa thu thập và lỗi phát sinh sau này sẽ sửa ở milestone khác, không mở lại1.3.21. Snapshot register + scope/checklist tại MILESTONES_HISTORY §1.3.21; §1.3.21 trong file này giữ checklist gốc để audit. Carry1.3.20 (CG/CGD/DS, AM1/AL/AR/AC, DS/TD/S19/SR2/CP/EF/RS/CCP, Carousel) vẫn tracked ở register current.
+**1.3.20 → DEFERRED_WITH_CARRY_OVER**, không completed/PASS. Snapshot current register + scope/checklist giữ nguyên tại MILESTONES_HISTORY.md §1.3.20. Category đã có source và human-tested một phần (T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 chỉ confirm mức UX, không formal PASS); Woo Archive M1 AM1/AL/AR/AC vẫn Chờ kiểm chứng. Entry current này + AGENTS.md là source of truth mới; checkpoint dated trước2026-11-12 còn ghi current1.3.20 là lịch sử, superseded.
 
-### Scope và acceptance current1.3.22
+### Scope và acceptance current1.3.21
 
-Chỉnh thiết kế cơ bản Single Product khi vẫn là child theme GeneratePress: preset gallery/thông tin và tỷ lệ hai cột, độ rộng, bật/tắt thành phần phù hợp, typography/màu/khoảng cách và style thông số/CTA theo token; **thiết kế mặc định chung + override giới hạn từng sản phẩm** với Use default/Reset. Nội dung/gallery/attributes lấy native WooCommerce; tận dụng shell/controls1.3.19 nhưng đây là consumer riêng, không mở rộng ngược scope sidebar.
+**Hero Slider Contrast Repair** — PATCH sửa cascade mặc định của Slider hiện có, không thêm block/attribute/dependency. Theme `style.css:98-115` đặt `color` lên `.wp-block-heading` ở (0,2,1) và thắng mọi rule Hero; carrier `color` trên `.skvn-slide__content` + `color: inherit` ở (0,3,0) đã có source. CTA mặc định white-pill + navy `#073b5a`, hover/focus `#eaf7ff`, guard `:not(.has-background)` ở (0,4,0) để thắng GP inline `a.wp-block-button__link` (0,2,1) mà không đụng background/gradient chọn tay. **Đã có source, runtime Chờ kiểm chứng**; acceptance HERO-UI-01–03/HERO-UX-01/HERO-TECH-01–03 theo044§7. Hiện tượng chớp có outcome riêng, chưa có root cause; contrast PASS không đồng nghĩa chớp đã sửa.
 
-Boundary: theme giữ template PHP/hooks và visual output; plugin giữ editor UI/logic phù hợp, không tạo store/font loader cạnh tranh. Không làm full template drag/drop, template condition engine, archive builder hoặc data model woo-catalog1.5.0. Giữ quote flow CF7/CFDB7, không viết form handler mới. 2.0 mới migrate dần khỏi GeneratePress nên không giả định theme đã độc lập; không đụng `themes/generatepress/**`.
+**Slider Editor UI Redesign** — đổi editor presentation/tổ chức control của Slider/Slide, không đổi frontend render/schema/save/motion. Nối053 P3/EF-SLIDER và phần Slider của EF-06; **Step Slider vẫn1.3.24**, không gộp. Source Concept01: P1 UX flow human “Đã test, đúng UX” (2026-11-09); P2/P3 frame lavender, scroll rail, native stage, static Arrow–Add–Pagination footer và Inspector states có source;19 selection/Add mocked tests + syntax10files PASS, presentation suite human10/10 PASS (64.42s, SSR/WP mocks). Human PASS thêm U02/U03/U05 ngày2026-11-12; còn U01/U04/U06/U07/U08/U09. **Chưa PASS**: native N01–03, WP/Gutenberg/iframe/assets evidence, 3–10Slide/limits, paired artifact/actual fidelity, geometry/perf. P0 pin WP/Gutenberg runtime + tagged API vẫn là gate trước khi coi là final. Harness `skvn-slider-editor-proof=1` là QA gate P1 đã retire, không phải UX sản phẩm; không chạy Swiper/autoplay trong editor; một mounted InnerBlocks tree, context/active state chỉ ở UI.
 
-Acceptance đầy đủ ở mục §1.3.22 bên dưới: **PDP-TRACE-01** (gate đầu tiên — execution plan + đối chiếu1.3.5, chỉ làm delta, không đánh dấu1.3.5 completed), **PDP-UI-01**, **PDP-UX-01**, **PDP-TECH-01**, cộng runbook onsite với URL/fixtures/steps/expected/evidence được human duyệt trước completion. Hiện **chưa có source và chưa có runtime evidence**; scope approval không phải PASS.
+Contract bắt buộc: đọc [062](planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) + canonical HTML/CSS/JS artifact, kiểm hash, map AF01–10→source và so ảnh artifact/actual cùng available width trước coding/review; mọi delta bố cục/khung/nền/labels phải có evidence để human quyết. [063](planning/063_VER_1_3_21_SLIDER_EDITOR_UI_EXECUTION_PLAN.md) chia P0–P5 và giữ ledger; runbook [slider-editor-ui-1.3.21](../docs/testing/slider-editor-ui-1.3.21.md) giữ exact cases.
+
+Checklist đầy đủ HERO-*/SED-* ở mục §1.3.21 bên dưới; process waiver2026-11-12 vẫn hiệu lực ở nghĩa “không revert source editor đã làm khi current còn1.3.20”, không còn nghĩa chặn chuyển mốc.
 
 | Work package | Source / acceptance | Trạng thái / evidence cần tiếp |
 |---|---|---|
-| Execution plan + trace1.3.5 | PDP-TRACE-01; plan1.3.5/005, research `theme-template-editor-fse-transition-research-2026-11-03.md`, roadmap039 | **Chưa làm**. Cần inventory hook/template Single Product hiện có, phần1.3.5 đã có, delta cần làm, mapping token và runbook trước khi code. |
-| Product design controls | PDP-UI-01, PDP-UX-01; shell048/050 | **Chưa làm**. Default + per-product override, Use default/Reset, save/reopen và save-failure không ghi nhầm phạm vi, keyboard/sidebar hẹp; responsive desktop/mobile, title dài, có/không ảnh, thiếu/đủ thuộc tính; CTA đọc được và quote URL giữ product context. |
-| Technical/boundary | PDP-TECH-01 | **Chưa làm**. Native Woo data, quyền/sanitize/escape, fallback khi dependency thiếu, không sửa GP parent, không tải runtime thừa; kiểm source/network/console và regression quote/gallery trên build ghi rõ. |
-| Ngoài current scope | Post1.3.23, Step Slider1.3.24, Blog archive, Woo Archive M2, ratio control060§12, Sidebar054 Q1–Q3, island1.4.x | Chưa start/deferred, không tự gán vào1.3.22. |
+| Hero Slider Contrast Repair | Plan044; HERO-UI-01–03, HERO-UX-01, HERO-TECH-01–03 | Đã có source, runtime Chờ kiểm chứng. Cần build human, ảnh before/after default+custom trên frontend/editor, winning declarations và smoke Product Showcase/Card Carousel/core button ngoài Hero. |
+| Slider Editor UI Redesign | Plan062/063 + Concept01 artifact; U01–U09, AF01–10, N01–03, SED-ED01–04/SED-TECH01/SED-UI01 | Đã có source, runtime Chờ kiểm chứng. P0 pin WP/Gutenberg/tagged API; native N01–03/iframe/assets, 3–10Slide/limits, paired screenshots, geometry/perf và no-invalid-block còn thiếu. |
+| Ngoài current scope | Blog archive, Woo Archive M2 inquiry/second language, ratio control060§12, Visual Sidebar054 Q1–Q3, Step Slider1.3.24 | Chưa start/deferred; không tự gán vào1.3.21 hoặc mở ratio setting trong patch1:1. Step Slider giữ018/1.3.24 và acceptance riêng. |
 
-### Carry register từ1.3.20/1.3.21 →1.3.22 — không mất acceptance
+### Carry register từ1.3.20 →1.3.21 — không mất acceptance
 
-Đích theo dõi phần chưa nghiệm thu; không đổi owner/IDs hoặc tự mở coding scope. Snapshot 1.3.20/1.3.21 ở history giữ checklist gốc; bảng này là con trỏ vận hành, không thay hoặc rút gọn yêu cầu.
+Đích theo dõi phần chưa nghiệm thu; không đổi owner/IDs hoặc tự mở coding scope. Snapshot 1.3.20 ở history giữ checklist gốc; bảng này là con trỏ vận hành, không thay hoặc rút gọn yêu cầu.
 
 | Nhóm carry | IDs / nguồn gốc | Trạng thái giữ / bước tiếp |
 |---|---|---|
-| Hero contrast + Slider editor (1.3.21) | HERO-UI-01–03/HERO-UX-01/HERO-TECH-01–03; U01–U09, AF01–10, N01–03, SED-*;044/062/063 | **DONE_WITH_CARRY_OVER theo human2026-11-12** — không mở lại. Carry: P0 pin WP/Gutenberg/tagged API, native N01–03/iframe/assets, 3–10Slide/limits, paired artifact/actual, geometry/perf chưa thu thập; lỗi phát sinh sửa ở milestone khác. |
 | Category Grid + Category details | Plan049/061; CG-UI-01–04, CG-UX-01–03, CG-TECH-01–05, CGD-UI01–04/CGD-ED01–03/CGD-TECH01–04 | Source đã có; T07/T09/T10/T11 PASS theo human, CGD-TECH03/04 PASS; T01–T06/T08/T12 confirm mức UX, chưa formal PASS. DS-01–07 áp Category vẫn Chờ kiểm chứng. |
 | Woo Archive M1 + shared Product card | Plan059/060; AM1-*, AL-01–06, AR-*, AC-* | Source e7f789f; CSS7modelPASS + baseline16mockPASS giữ phạm vi; combined37PHP/hook-template10, build/lint và onsite geometry chưa PASS. Ảnh1:1 giữ, ratio control không mở. |
-| Sidebar foundation + Theme Design | DS-01–07, TD-01–04 và named TD concurrency/owner/conflict cases;048/050 | Đã có source, runtime Chờ kiểm chứng: selection/tab/Undo/save/reopen, permissions/theme gate, draft/conflict/storage/fonts và conditional assets/lifecycle. Đây là nền của PDP controls — kiểm cùng1.3.22. |
+| Sidebar foundation + Theme Design | DS-01–07, TD-01–04 và named TD concurrency/owner/conflict cases;048/050 | Đã có source, runtime Chờ kiểm chứng: selection/tab/Undo/save/reopen, permissions/theme gate, draft/conflict/storage/fonts và conditional assets/lifecycle. |
 | Sidebar hardening | S19-01–04 và toàn bộ SR2-* trong050/051 | Giữ source + VM/mock evidence từng plan; không runtime PASS. Handoff `docs/testing/plugin-design-sidebar-1.3.19-review-handoff.md`; test được carry, không xóa scope vì version mới. |
-| Editor preview/canvas | CP01–05, EF01–06;052/053 | CP/EF onsite Chờ kiểm chứng; EF01–05 có source/8VM spacing modelPASS; EF06 phần Slider đã đóng cùng1.3.21, phần Step vẫn audit/planning cho1.3.24. |
+| Editor preview/canvas | CP01–05, EF01–06;052/053 | CP/EF onsite Chờ kiểm chứng; EF01–05 có source/8VM spacing modelPASS; EF06 phần Step vẫn audit/planning, phần Slider nay thuộc scope1.3.21. |
 | Responsive Spacer | RS-UI-01–03, RS-UX-01–05, RS-TECH-01–04;055 | Source có,13Node model/spacing checksPASS phạm vi cũ; build/lint/geometry/onsite Chờ kiểm chứng; follow-up mint frame vượt khung Wide vẫn planning. |
 | Content Actions | Toàn bộ CCP-* và CCP-R1–R4/R01–R06;057 |18modelPASS/11controller mockedPASS giữ; real WP clipboard/parse/Undo/permissions/Save/menu/runtime/build Chờ kiểm chứng. Right-click058 vẫn Deferred sau2.0. |
 | Carousel carry từ1.3.18 | UX-01–13 (UX-02a và IDs con), UI-18-TITLE/STYLE; TECH-01–13 (TECH-08a/12 và IDs con), E01–E15;045/040 | E02/PASS có sẵn giữ nguyên; phần khác giữ status/evidence gốc, không làm lại PASS nếu không có regression. |
 | Legacy carry C/D/media/arrows | State owner/overflow C, skeleton D-01–08, Post visual, controls hide/disabled, G-MEDIA, editor preview040§13 | Chờ kiểm chứng; giữ human override không sửa skeleton hoặc thêm skeleton toàn trang. Arrow centering source chờ onsite. |
-| Chưa duyệt |054 visual controls Q1–Q3 | Planning/deferred, không tự start cùng1.3.22. Giữ decision/evidence tại plan, chờ human chọn khi trở lại scope. |
+| Chưa duyệt |054 visual controls Q1–Q3 | Planning/deferred, không tự start cùng1.3.21. Giữ decision/evidence tại plan, chờ human chọn khi trở lại scope. |
 
-**Loading/navigation046 vẫn thuộc1.3.18**, acceptance LDR-01–09/UXHF-01–10 theo runbook riêng; không nhập vào1.3.22.
+**Loading/navigation046 vẫn thuộc1.3.18**, acceptance LDR-01–09/UXHF-01–10 theo runbook riêng; không nhập vào1.3.21.
 
-### Deferred test reminder khi bắt đầu1.3.22
+### Deferred test reminder khi bắt đầu1.3.21
 
-1.3.21 đã được human approve nên không cần chạy lại để “đóng” mốc cũ; phần evidence còn thiếu (P0/native/fidelity) chỉ làm khi có yêu cầu riêng hoặc khi lỗi phát sinh. Trước khi code PDP, chạy deferred baseline còn treo của1.3.20 — Category CGD/CG/DS, Woo Archive AM1/AL/AR — và carry DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel theo runbook, vì PDP dùng chính shell/sidebar và dữ liệu native đó. Build/lint do human chạy theo AGENTS; gửi versions/URLs, ảnh editor/frontend desktop/mobile và console/network.
+Trước follow-up runtime khác, human chạy deferred baseline còn treo: Category CGD/CG/DS, Woo Archive AM1/AL/AR, cộng carry DS/TD/S19/SR2/CP/EF/RS/CCP và Carousel. Cho1.3.21, build/lint theo AGENTS bằng human rồi kiểm HERO-* + N01–03/SED trên đúng build đó; gửi versions/URLs, ảnh editor/frontend desktop/mobile, paired artifact/actual và console/network. Source/model PASS không thay runtime PASS.
 
-### Island foundation — ngoài scope1.3.22, defer1.4.x
+### Island foundation — ngoài scope1.3.21, defer1.4.x
 
-[066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK](planning/066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK.md) giữ kết luận Group/island: island = band + measure + gutter (ba chủ); ba thất bại F1 clamp760/container query, F2 nền=box, F3 GP+80 math; measure M1/M2/M3 (khuyến nghị M3-a native + M3-c hai variation); kiến trúc A1/A2/B/C với T1 là **dependency cứng**. Stopgap WindPress **dormant**; chưa SemVer, chưa start, không source delta; gates G-01..G-08 chưa đạt. Root cause 80px ở PITFALLS DP-07.1 và [group-island-windpress-class-1.3.20](../docs/testing/group-island-windpress-class-1.3.20.md); recipe ở [group-island-width-1.3.20](../docs/testing/group-island-width-1.3.20.md).
+[066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK](planning/066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK.md) giữ toàn bộ kết luận Group/island: island = band + measure + gutter (ba chủ, không gộp); ba thất bại riêng của core Group — F1 clamp760/container query, F2 nền=box nên Wide dừng1200, F3 GP+80 math; measure model M1/M2/M3 (khuyến nghị M3-a native + M3-c hai variation); kiến trúc A1/A2/B/C với T1 là **dependency cứng**, A2 block variation là bước1 và B custom block là end state sau P0 proof. Stopgap WindPress **dormant**; chưa SemVer, chưa start, không source delta. Gates G-01..G-08 chưa đạt; G-05 yêu cầu chạy deferred test1.3.20 trước khi mở. Root cause 80px ở PITFALLS DP-07.1 và [group-island-windpress-class-1.3.20](../docs/testing/group-island-windpress-class-1.3.20.md); recipe/measure ở [group-island-width-1.3.20](../docs/testing/group-island-width-1.3.20.md).
 
 ## Standing rules, forward reminders và legacy checkpoints
 
-Các mục dưới đây là quy tắc thường trực, nhắc việc tương lai và checkpoint lịch sử (1.3.18–1.3.21, 2.0.0). Chúng không thuộc scope1.3.22 và không bị thay bởi transition2026-11-12; các dòng ghi current1.3.20/1.3.21/1.3.18 hoặc “chưa chuyển mốc” là lịch sử đã superseded.
+Các mục dưới đây là quy tắc thường trực, nhắc việc tương lai và checkpoint lịch sử (1.3.18–1.3.19, 2.0.0). Chúng không thuộc scope1.3.21 và không bị thay bởi transition2026-11-12; các dòng ghi current1.3.20/1.3.18 hoặc “chưa chuyển mốc” là lịch sử đã superseded.
 
 ### UX hotfix bổ sung trong 1.3.18 — 2026-11-03
 
@@ -1010,7 +1010,7 @@ Scope: chọn Product Category thủ công, grid responsive, archive/custom URL,
 
 Version rationale: feature thường tăng MINOR; **1.3.20 là ngoại lệ do human xác nhận**. Thứ tự mới 2026-11-04 là Sidebar 1.3.19 → Category 1.3.20 → Hero contrast 1.3.21. Post Category riêng, chưa gán số. Chưa start/current/bump metadata.
 
-### 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign (stack: M5, **DONE_WITH_CARRY_OVER 2026-11-12**)
+### 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign (stack: M5, **CURRENT từ 2026-11-12**)
 
 **Concept01 source2026-11-09:** human xác nhận P1 “Đã test, đúng UX”; tiếp tục P2/layout/P3 controls-states trong source theo063§13. Frame lavender/scroll rail/native stage/static Arrow–Add–Pagination footer có source; bỏ P1 URL gate/bootstrap/harness, normal editor sau human build.19selection/Add mocked tests + syntax10files PASS; presentation suite human10/10 PASS (64.42s, SSR/WP mocks). Human flow acceptance không tự PASS full N01–03/3–10Slide/locks/fidelity/perf/HERO. U01–09 + AF01–10 actual evidence pending; không close current1.3.20/bump/build/lint/deploy/commit/push. Các checkpoint chờ gate/source chưa có bên dưới là lịch sử superseded.
 
@@ -1020,7 +1020,7 @@ Version rationale: feature thường tăng MINOR; **1.3.20 là ngoại lệ do h
 
 **Reference lock2026-11-09:** human xem Concept01 và nói “Good”, yêu cầu implementation bám artifact. [Plan062](planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) là contract bắt buộc: đọc canonical HTML/hash, AF01–10→source mapping, paired artifact/actual editor images và deviation register; không tự bỏ/đổi frame, bố cục hoặc nhãn. Reference accepted không là source/runtime PASS hoặc lệnh start; demo review controls/state không thành product implementation. Các câu chưa có mockup/layout dưới đây là checkpoint trước khi có reference, không gate hỏi lại bố cục Concept01; phần Inspector/variations/native feasibility còn phải audit.
 
-Status: **DONE_WITH_CARRY_OVER từ 2026-11-12** — human tuyên bố “đã pass toàn bộ… lỗi nếu có sẽ sửa trong milestone khác”. Acceptance HERO-*/SED-*/U-* coi là PASS ở mức human approval; evidence native/P0/fidelity chưa thu thập được carry sang1.3.22, không mở lại mốc này.
+Status: **IN PROGRESS (source) — CURRENT từ 2026-11-12, chờ human build + kiểm chứng runtime**
 
 **Process waiver2026-11-12:** human xác nhận Editor UI Slider đã được làm khi current vẫn1.3.20 và chưa bump1.3.21. Giữ source đó; không revert vì lệch thứ tự version. Đây không phải runtime PASS, không đóng SED-*/HERO-*, không bump metadata và không chuyển current. Cùng ngày chủ dự án PASS U02, U03, U05. Còn U01, U04, U06, U07, U08, U09. Contrast và hiện tượng chớp vẫn nghiệm thu riêng. **Superseded một phần 2026-11-12:** human đã chuyển current sang1.3.21; waiver chỉ còn nghĩa “không revert source editor đã làm sớm”, không còn chặn bump/chuyển mốc.
 
@@ -1071,9 +1071,9 @@ Acceptance bổ sung Editor redesign — **Chưa làm**, không thay HERO-*:
 
 Không tự đánh dấu milestone hoàn thành, không runtime PASS và không release approved khi thiếu evidence.
 
-### 1.3.22 — Product Page Basic Design Controls (stack: M6 consumer, **CURRENT từ 2026-11-12**)
+### 1.3.22 — Product Page Basic Design Controls
 
-Status: **PLANNED — human start2026-11-12; implementation Chưa làm, chưa có source**.
+Status: **PLANNED — implementation Chưa làm, chưa start**.
 Confirmed: **2026-11-03** — Product trước Post; sau hoán đổi 2026-11-04, nền sidebar là **1.3.19**, thứ tự các consumer Product **1.3.22 → 1.3.23** giữ nguyên.
 
 Version rationale: đây là feature mới, thông thường tăng MINOR; **1.3.22 và 1.3.23 là ngoại lệ đánh số do human xác nhận**, như 1.3.20–21. Không đổi Version Naming Rule, không chuyển current 1.3.18, không bump metadata hoặc archive.
@@ -1087,7 +1087,7 @@ Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
 - [ ] PDP-UX-01 — Editor UX: phân biệt default chung với override sản phẩm; Use default/Reset, save/reopen và save failure không gây ghi nhầm phạm vi; keyboard/sidebar hẹp dùng được; evidence video và giá trị đã lưu.
 - [ ] PDP-TECH-01 — Technical: native Woo data, quyền/sanitize/escape, fallback khi dependency không khả dụng, không sửa GP parent; không tải runtime không cần thiết; kiểm source/network/console và regression quote/gallery trên build ghi rõ.
 - [ ] PDP-TRACE-01 — Trước implementation lập execution plan và đối chiếu từng acceptance liên quan của **1.3.5**: kế thừa phần đã có, chỉ triển khai delta; không xóa acceptance hoặc đánh dấu 1.3.5 completed. Archive scope vẫn ở nơi cũ.
-- [ ] Tạo runbook onsite với URL/fixtures/steps/expected/evidence, human duyệt trước completion. SemVer đã chốt; human đã start current2026-11-12 (xem block Current Milestone), nên bước tiếp là execution plan PDP-TRACE-01 chứ không phải xin chuyển mốc lại.
+- [ ] Tạo runbook onsite với URL/fixtures/steps/expected/evidence, human duyệt trước completion. SemVer đã chốt; bắt đầu/chuyển current cần lệnh riêng.
 
 Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
 

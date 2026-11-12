@@ -7,11 +7,9 @@
 
 ## 0. Milestone hiện tại
 
-Current milestone: **V1 / 1.3.22 — Product Page Basic Design Controls**
+Current milestone: **V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**
 
-Human advance2026-11-12: yêu cầu “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác”. 1.3.21 → **DONE_WITH_CARRY_OVER** theo human approval (KHÔNG phải evidence agent tự suy), không mở lại; snapshot tại MILESTONES_HISTORY §1.3.21. Current1.3.22 theo thứ tự roadmap đã chốt (Product1.3.22 → Post1.3.23 → Step Slider1.3.24), SemVer đã xác nhận2026-11-03. Scope: Single Product design controls (preset gallery/info + tỷ lệ cột, width, component toggles, typography/màu/spacing, spec/CTA theo token), default chung + override từng sản phẩm với Use default/Reset, native Woo data; acceptance PDP-TRACE-01 (gate plan + đối chiếu1.3.5) → PDP-UI-01/UX-01/TECH-01 + runbook. Theme giữ template PHP/hooks/visual, plugin giữ editor UI/logic; không full template builder/condition engine/data model1.5.0, giữ quote CF7/CFDB7. Sync metadata development1.3.22 bump-only; agent không build/lint/deploy/git remote push. Trước khi code phải nhắc deferred tests1.3.20 (Category/Woo) vì PDP dùng chung shell/sidebar.
-
-Human transition2026-11-12 (đã hoàn thành cùng ngày): yêu cầu “commit để tiến hành push milestone sang1.3.21”, bắt đầu current1.3.21. 1.3.20 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY §1.3.20 và carry register current1.3.21 giữ CG/CGD/DS + AM1/AL/AR/AC + DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Hero contrast044 (source có, runtime Chờ kiểm chứng) + Slider Editor UI Redesign theo062/063 (Concept01 source, P0/native/fidelity chưa PASS). Step Slider1.3.24, Blog/M2, ratio controls và Sidebar054 vẫn ngoài scope. Sync working metadata development1.3.21 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current1.3.20 hoặc “không-chuyển-mốc” là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests1.3.20 trước follow-up khác.
+Human transition2026-11-12: yêu cầu “commit để tiến hành push milestone sang1.3.21”, bắt đầu current1.3.21. 1.3.20 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY §1.3.20 và carry register current1.3.21 giữ CG/CGD/DS + AM1/AL/AR/AC + DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Hero contrast044 (source có, runtime Chờ kiểm chứng) + Slider Editor UI Redesign theo062/063 (Concept01 source, P0/native/fidelity chưa PASS). Step Slider1.3.24, Blog/M2, ratio controls và Sidebar054 vẫn ngoài scope. Sync working metadata development1.3.21 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current1.3.20 hoặc “không-chuyển-mốc” là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests1.3.20 trước follow-up khác.
 
 Human transition2026-11-07: yêu cầu “cho agent push milestone lên1.3.20”, bắt đầu current1.3.20. 1.3.19 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY và carry register current1.3.20 giữ DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Category049 + Woo Archive059/060, card1:1; ratio controls scope kế tiếp, Blog/M2 chưa start. Sync working metadata development1.3.20 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current cũ hoặc không-chuyển-mốc là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests trước follow-up khác.
 
@@ -697,7 +695,6 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 | 1.3.16 | Comprehensive Testing (1.3.x Feature QA) |
 | 1.3.20 | Product Category Grid + Category details + Woo Archive M1 |
 | 1.3.21 | Hero Slider Contrast Repair + Slider Editor UI Redesign |
-| 1.3.22 | Product Page Basic Design Controls |
 | 1.4.1 | SKVN Theme Init Setup UI |
 | 1.4.2 | Layout Blocks Validation & Quote Evaluation |
 | 1.5.0 | Woo Catalog Plugin |
