@@ -420,3 +420,26 @@ Xem DP-01. Nếu `view.ts` cần đọc 1 attribute, attribute đó phải có t
 2. `edit.tsx` — thêm `align` vào type TS + gán class alignment vào `useBlockProps({ className })`
 3. `save.tsx` — không thêm (alignment là editor-only, không lưu vào markup frontend)
 4. Kiểm class alignment xuất hiện trong editor DevTools, không gây block validation failed.
+
+### DP-07 — Bọc block plugin trong Group container: width contract cần 2 bước, container query lật layout âm thầm
+
+- **Case2026-11-11:** human thử island = Group (background palette) chứa Product Collection Grid preset 4-2-1; grid rơi từ 4 cột desktop về 2 cột tablet.
+- **Root cause:** theme clamp chỉ áp con trực tiếp — `style.css:994-1004` `.skvn-full-width-canvas .entry-content > *` → `--skvn-content-width` 760px, `> .alignwide` → 1200px. Group thường (không align) thành con trực tiếp → bị clamp 760px; block plugin bên trong (`width:100%`) theo parent. Container query (`@container (max-width: 760px)` collection, `(min-width: 880px)` category-grid) lật sang layout tablet mà không có cảnh báo. Gutenberg constrained layout chỉ truyền width contract cho con CÓ align (`> .alignwide`).
+- **Sai (đã loại bỏ):** viết theme CSS "propagate" width xuống grandchildren — nhân bản layout engine constrained của Gutenberg, vi phạm contract một owner (`docs/standards/css-layout-safety-contract.md` Alignment Ownership).
+- **Đúng recipe (2 bước, thiếu 1 vẫn kẹt 760px):** (1) Group → align Wide/Full trên toolbar; (2) block bên trong → Collection: `Layout → Content width: Wide/Full` (attr `contentWidth`, control `src/collection/controls.tsx:410-424`, mapper `modules/collection-render/cards.php:900-909`) hoặc Category Grid/Slider/Feature Showcase: nút align toolbar (`supports.align`).
+- **Tránh:** container query breakpoint (760/880px) lật layout im lặng khi parent đổi width — test block trong container/nested parent, không chỉ top-level. Pipeline width có thể đã tồn tại: audit control/attr/renderer TRƯỚC khi đề xuất code fix mới.
+- **Product hóa:** island pattern bake 2 bước — human defer 1.4.x (2026-11-11), ăn palette slug không hardcode hex (nối 064 Brand Kit).
+- **Evidence:** `docs/testing/group-island-width-1.3.20.md` (recipe + T-ISLAND-01–03); human xác nhận hiện tượng 4→2 (2026-11-11); recipe runtime chưa verify onsite.
+
+#### DP-07.1 — Grid nhô +80px **chỉ bên phải** trong Group: GeneratePress `.alignwide` math, không phải block [2026-11-12]
+
+- **Case:** sau khi đặt đúng align Wide (Group 1200) grid vẫn 1280, mép trái khít Group, mép phải vượt 80px; card chia +20/cột (4 cột) hoặc +40/cột (2 cột).
+- **Root cause (đo onsite, `getComputedStyle`):** GeneratePress phát dynamic inline CSS
+  `.entry-content .alignwide, body:not(.no-sidebar) .entry-content .alignfull { margin-left:-40px; width:calc(100% + 80px); max-width:calc(100% + 80px); }`
+  (specificity `(0,2,0)`). Rule này giả định GP content padding 40px; canvas SKVN đã zero padding đó (`.skvn-full-width-canvas .entry-content { padding: 0 }`).
+  Margin `-40px` bị core layout đè bằng `margin-left/right: auto !important` (`.is-layout-constrained`), nên chỉ còn `width/max-width: 100% + 80px` → **tràn phải 80px, trái khít 0**.
+- **Vì sao chỉ lộ trong Group:** ở page level, theme clamp `style.css:994-1013` (`.entry-content > .alignwide` 1200) thắng GP vì load sau; block **nested trong Group** không phải con trực tiếp của `.entry-content` → clamp không áp → GP thắng `max-width`, và `100%` resolve theo Group.
+- **Không phải:** lỗi Category Grid/Collection, `calc(100% + 80px)` trong plugin, container query, hay Additional CSS (`wp-custom-css` = false).
+- **Hệ quả:** mọi `.alignwide` nằm trong container có width (Group/Columns/block) trên canvas full-width đều +80px phải — không riêng grid.
+- **Chống tái diễn:** khi một block nested bị rộng hơn parent đúng một hằng số, đọc `max-width`/`width` computed **trước**, rồi quét `document.styleSheets` tìm rule khai báo (snippet §4.3-B trong `docs/testing/group-island-windpress-class-1.3.20.md`); đừng suy từ ảnh hay từ source plugin. GP dynamic CSS không nằm trong file nào → grep repo/runtime luôn ra 0 kết quả, không có nghĩa là "không tồn tại".
+- **Evidence:** `docs/testing/group-island-windpress-class-1.3.20.md` §4.2 (số đo) + §4.3 (probe: inject rule `max-width:100% !important` → 1280 ⇒ 1200, delta 80 ⇒ 0; scan B chỉ đúng `inline-sheet#27` = GP).

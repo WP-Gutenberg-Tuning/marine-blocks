@@ -95,6 +95,7 @@ docs/decisions/.assets/  hình minh hoạ
 | [`brand-profile-theme-tokens.md`](brand-profile-theme-tokens.md) | V1 / 0.7.0 | Token contract cho patterns/editor/frontend |
 | [`page-display-controls.md`](page-display-controls.md) | V1 / 0.5.1 | Landing canvas preset, hide header/footer |
 | [`b2b-seafood-editorial-typography-1.2.3.md`](b2b-seafood-editorial-typography-1.2.3.md) | V1 / 1.2.3 | Visual-language note tái sử dụng được |
+| [`group-island-windpress-stopgap-1.3.20.md`](group-island-windpress-stopgap-1.3.20.md) | V1 / 1.3.20 | WindPress chữa cháy có hạn trên Group island tạm — **dormant** từ 2026-11-12 (human tạm không dùng Group); nền cho block island: [plan 066](../../.context/planning/066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK.md) |
 
 ### Roadmap & product boundary
 

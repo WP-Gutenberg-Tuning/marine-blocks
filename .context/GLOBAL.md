@@ -60,6 +60,8 @@ Current2026-11-07: **V1 /1.3.20 — Product Category Grid + Category details + W
 
 Active planning (root — load when task liên quan):
 
+Island foundation2026-11-12: human tạm không dùng Group ⇒ stopgap WindPress **dormant** (T2 không theo đuổi); yêu cầu gom kết luận thành nền cho block group island. [`066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK.md`](planning/066_FUTURE_CANDIDATE_GROUP_ISLAND_BLOCK.md) chốt: ba thất bại riêng của Group (F1 clamp760, F2 nền=box, F3 GP+80); root cause F3 = GP dynamic `.alignwide` math; mô hình measure M1/M2/M3; kiến trúc A1/A2/B/C + khuyến nghị staged (T1 → A2 variation → B nếu cần control); hợp đồng width/CSS/editor/migration; acceptance GI-B/E/T; gates G-01..G-08. **Foundation only** — island defer1.4.x, chưa SemVer, chưa start, không source delta, current1.3.20 giữ.
+
 Slider Concept01 source2026-11-09: P1 human “Đã test, đúng UX” cho flow đã báo; P2/P3 frame/rail/native stage/footer/Inspector states có source. P1 flag/harness/bootstrap retire, UI mặc định sau human build;19selection/Add tests và syntax10files PASS. Presentation suite human10/10 PASS (64.42s, SSR/WP mocks); native technical/paired screenshots/geometry/perf pending.063§13/runbook§0 supersede P1 checkpoint bên dưới; current1.3.20 giữ, không bump/build/lint/commit/deploy.
 
 Slider source start2026-11-09: human “Tiến hành” theo063/062; P1 default-off QA harness URL `skvn-slider-editor-proof=1`, per-root native context/one mounted InnerBlocks tree,14 mocked-store tests PASS. N01–03/onsite WP-Gutenberg/iframe/assets pending; **P2/P3 chờ gate**, chưa final Concept01. Source/evidence063§12, runbook§2.1. Không transition/bump/commit/build/lint/deploy; current1.3.20 giữ. Planning-only entries bên dưới superseded về source start.

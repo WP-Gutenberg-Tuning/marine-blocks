@@ -118,6 +118,30 @@ Implementation rules:
 - Do not increase global `theme.json` `contentSize` to repair one pattern.
 - Do not depend on generated `wp-container-*` classes.
 - Do not use `!important` to defeat Gutenberg constrained layout.
+- Containers (core Group / island surfaces) need the two-step width recipe:
+  align the container **Full** (background paints the block box, so Wide stops
+  the background at 1200px and leaves white gutters) AND constrain the nested
+  content (default constrained 760px; Content width control for Product/Post
+  Collection, toolbar align for Category Grid, Slider, Feature Showcase for
+  1200px). `alignfull` only reaches the page edge when the page owns a
+  full-width canvas. A plain Group is clamped to content width, and container
+  queries flip nested blocks to tablet layout silently at their breakpoints.
+  Do not propagate width to grandchildren in theme CSS — Gutenberg constrained
+  layout owns inside-container layout. Standard:
+  `docs/standards/css-layout-safety-contract.md` (Container Nesting);
+  recipe/verification: `docs/testing/group-island-width-1.3.20.md`;
+  background: PITFALLS DP-07 (2026-11-11).
+- The two-step recipe equals Elementor's **Boxed** content width (outer box
+  full, content boxed). Elementor `Full Width` + Width 1200 also stops its
+  background at 1200. Theme `contentSize` 760 is a reading measure;
+  Elementor's Site Settings content width is a layout measure (~1140–1200px).
+  Elementor rebuttal: recipe doc §4.
+- Human 2026-11-12: a Category Grid inside a Group is one box. The child takes
+  the parent's width and the parent's background covers the child. Measured
+  hang-out of 80px on the right is a containment failure. Until an island
+  group owns that box, site WindPress may patch only the temporary island
+  Groups. Decision:
+  `docs/decisions/group-island-windpress-stopgap-1.3.20.md`.
 
 Agent debugging checklist:
 
