@@ -340,6 +340,11 @@ function skvn_marine_blocks_render_slider( $attributes, $content, $block ) {
 		'paginationPosition' => $pagination_position,
 		'transitionStyle'   => $transition_style,
 		'transitionDuration' => $transition_duration,
+		'contentMotion'     => skvn_marine_blocks_normalize_slider_choice(
+			$attributes['contentMotion'] ?? 'off',
+			array( 'off', 'stagger', 'fade' ),
+			'off'
+		),
 		'heightPreset'      => $height_preset,
 		'slidesPerView'     => $slides_per_view,
 		'slideCount'        => $slide_count,

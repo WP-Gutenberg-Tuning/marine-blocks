@@ -52,6 +52,7 @@ type SliderConfig = {
 	effect?: string;
 	transitionStyle?: string;
 	transitionDuration?: number;
+	contentMotion?: string;
 	heightPreset?: string;
 	slidesPerView?: number;
 	responsiveSlides?: string;
@@ -79,6 +80,7 @@ type NormalizedSliderConfig = {
 	paginationPosition: BottomPosition;
 	transitionStyle: TransitionStyle;
 	transitionDuration: number;
+	contentMotion: 'off' | 'stagger' | 'fade';
 	heightPreset:
 		| 'default'
 		| 'content'
@@ -223,6 +225,11 @@ function parseSliderConfig(
 		transitionDuration: normalizeGovernedTime(
 			parsed.transitionDuration,
 			SLIDER_TRANSITION_TIME
+		),
+		contentMotion: normalizeChoice(
+			parsed.contentMotion,
+			[ 'off', 'stagger', 'fade' ] as const,
+			'off'
 		),
 		heightPreset: normalizeChoice(
 			parsed.heightPreset,
@@ -473,6 +480,20 @@ function initSlider( slider: SliderElement ): void {
 		);
 		slider.classList.add(
 			`skvn-slider--transition-${ transitionStyle }`
+		);
+		const singleSlideView =
+			config.slidesPerView === 1 && config.responsiveSlides !== '3-2-1';
+		slider.classList.toggle(
+			'skvn-slider--content-stagger',
+			config.contentMotion === 'stagger' &&
+				! reducedMotion &&
+				singleSlideView
+		);
+		slider.classList.toggle(
+			'skvn-slider--content-fade',
+			config.contentMotion === 'fade' &&
+				! reducedMotion &&
+				singleSlideView
 		);
 		slider.style.setProperty(
 			'--skvn-slider-transition-duration',

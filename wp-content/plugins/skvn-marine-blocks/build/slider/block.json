@@ -57,6 +57,15 @@
       "type": "number",
       "default": 800
     },
+    "contentMotion": {
+      "type": "string",
+      "enum": [
+        "off",
+        "stagger",
+        "fade"
+      ],
+      "default": "off"
+    },
     "heightPreset": {
       "type": "string",
       "default": "default"

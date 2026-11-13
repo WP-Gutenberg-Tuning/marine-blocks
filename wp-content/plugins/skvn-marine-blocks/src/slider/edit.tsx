@@ -43,6 +43,7 @@ export type SliderAttributes = {
 	effect: string;
 	transitionStyle: '' | 'directional-wipe' | 'fade' | 'zoom-out';
 	transitionDuration: number;
+	contentMotion: 'off' | 'stagger' | 'fade';
 	heightPreset:
 		| 'default'
 		| 'content'
@@ -241,6 +242,32 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 									})
 								}
 								value={ attributes.transitionDuration }
+							/>
+							<SelectControl
+								help={
+									attributes.contentMotion === 'fade'
+										? __(
+												'Each block in order, 0.2s apart, from the side the slide is moving. Applies to blocks placed directly in the slide. Has no effect in the editor.',
+												'skvn-marine-blocks'
+										  )
+										: __(
+												'Heading, then the paragraph, then the buttons. Applies to blocks placed directly in the slide. Has no effect in the editor.',
+												'skvn-marine-blocks'
+										  )
+								}
+								label={__('Text motion', 'skvn-marine-blocks')}
+								onChange={(contentMotion) =>
+									setAttributes({
+										contentMotion:
+											contentMotion as SliderAttributes['contentMotion'],
+									})
+								}
+								options={[
+									{ label: __('Off', 'skvn-marine-blocks'), value: 'off' },
+									{ label: __('Stagger', 'skvn-marine-blocks'), value: 'stagger' },
+									{ label: __('Fade', 'skvn-marine-blocks'), value: 'fade' },
+								]}
+								value={attributes.contentMotion || 'off'}
 							/>
 						</>
 					)}
