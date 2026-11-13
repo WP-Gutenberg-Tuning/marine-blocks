@@ -6,6 +6,82 @@
 
 ---
 
+## V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign — DONE
+
+Status: **DONE_WITH_CARRY_OVER** (human PASS2026-11-13)
+Started: **2026-11-12**
+Transitioned: **2026-11-13** — human “Đã xong toàn phần 1.3.21” rồi lệnh “Chuyển sang 1.3.22 ngay”. Milestone development build, không release/deploy; metadata working bump sang1.3.22.
+
+Human PASS2026-11-13: acceptance1.3.21 nghiệm thu **toàn phần** — Hero contrast (HERO-UI-01–03, HERO-UX-01), HERO-TECH-03 chớp “đã hết”, Slider Editor UI Redesign, cùng addon fill/focal/parallax/text motion. Plan071 overlay color: human “đã test rồi, xong rồi pass”; **repo không có source `overlayColor`** tại thời điểm đóng — ghi để audit, không coi là code đã hoàn thành. Evidence kỹ thuật chưa thu thập (HERO-TECH-01/02, P0 pin WP/Gutenberg/tagged API, native N01–03/iframe/assets, 3–10Slide/limits, AF01–10 paired fidelity, geometry/perf, build/lint output) là carry sang1.3.22, không mở lại trạng thái và không hạ PASS của human.
+
+Snapshot bên dưới giữ nguyên nội dung/status tại thời điểm đóng; các dòng CURRENT/IN PROGRESS/“chưa archive” bên trong là lịch sử.
+### 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign (stack: M5) — archived snapshot
+
+**Concept01 source2026-11-09:** human xác nhận P1 “Đã test, đúng UX”; tiếp tục P2/layout/P3 controls-states trong source theo063§13. Frame lavender/scroll rail/native stage/static Arrow–Add–Pagination footer có source; bỏ P1 URL gate/bootstrap/harness, normal editor sau human build.19selection/Add mocked tests + syntax10files PASS; presentation suite human10/10 PASS (64.42s, SSR/WP mocks). Human flow acceptance không tự PASS full N01–03/3–10Slide/locks/fidelity/perf/HERO. U01–09 + AF01–10 actual evidence pending; không close current1.3.20/bump/build/lint/deploy/commit/push. Các checkpoint chờ gate/source chưa có bên dưới là lịch sử superseded.
+
+**Source start2026-11-09 — human “Tiến hành”:** bắt đầu063 P1 ngoài current1.3.20. Default-off QA harness (`skvn-slider-editor-proof=1`) có source native context/selection/mounted inactive presentation,14 mocked-store tests PASS và syntax5files PASS; N01–03/onsite API+iframe/assets chưa proof. **P2/P3 không rollout trước gate**, chưa final Concept01/PASS. Ledger063§12 + runbook§2.1; không bump/current transition/build/lint/commit/push/deploy. Các entry planning-only/no source/start bên dưới là lịch sử superseded về lệnh source start.
+
+**Detailed execution plan2026-11-09:** [063](planning/063_VER_1_3_21_SLIDER_EDITOR_UI_EXECUTION_PLAN.md) + [native editor runbook](../docs/testing/slider-editor-ui-1.3.21.md) chia P0–P5, source/AF mapping và controls/states inventory. P0 pin actual WP/Gutenberg/tagged APIs; P1 chứng minh một mounted native InnerBlocks tree, chọn/edit/IME/Undo/List View trước rollout frame/rail/footer. Visibility/context là kỹ thuật dự kiến chưa proof; không tự bỏ artifact nếu fail. Editor CSS handle riêng, legacy/schema/frontend giữ. Human chỉ yêu cầu planning; chưa coding/start1.3.21 hoặc đổi current1.3.20.
+
+**Reference lock2026-11-09:** human xem Concept01 và nói “Good”, yêu cầu implementation bám artifact. [Plan062](planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) là contract bắt buộc: đọc canonical HTML/hash, AF01–10→source mapping, paired artifact/actual editor images và deviation register; không tự bỏ/đổi frame, bố cục hoặc nhãn. Reference accepted không là source/runtime PASS hoặc lệnh start; demo review controls/state không thành product implementation. Các câu chưa có mockup/layout dưới đây là checkpoint trước khi có reference, không gate hỏi lại bố cục Concept01; phần Inspector/variations/native feasibility còn phải audit.
+
+Status: **DONE theo human (2026-11-13)** — “Đã xong toàn phần 1.3.21”. Acceptance1.3.21 được human nghiệm thu toàn phần; **chưa archive, chưa bump metadata, current vẫn1.3.21 cho tới khi human ra lệnh transition riêng**. Carry khi chuyển mốc: HERO-TECH-01/02, P0/native N01–03, paired fidelity/geometry/perf và build/lint evidence. Plan071 (màu overlay) **chưa có source** — cần human chốt defer/carry, không tự coi là đã làm.
+
+**Clarification2026-11-12:** câu “Đẩy version, đã pass toàn bộ…” của human thuộc **ngữ cảnh1.3.20** (ghi tại MILESTONES_HISTORY §1.3.20), **không** phải nghiệm thu1.3.21. Vì vậy HERO-*/SED-* giữ nguyên trạng thái Chờ kiểm chứng; current vẫn1.3.21; không archive, không chuyển1.3.22, metadata1.3.21. Commit tự chuyển1.3.22 (`563a66e`) đã revert (`cee8ed0`).
+
+**Process waiver2026-11-12:** human xác nhận Editor UI Slider đã được làm khi current vẫn1.3.20 và chưa bump1.3.21. Giữ source đó; không revert vì lệch thứ tự version. Đây không phải runtime PASS, không đóng SED-*/HERO-*, không bump metadata và không chuyển current. Cùng ngày chủ dự án PASS U02, U03, U05. Còn U01, U04, U06, U07, U08, U09. Contrast và hiện tượng chớp vẫn nghiệm thu riêng. **Superseded một phần 2026-11-12:** human đã chuyển current sang1.3.21; waiver chỉ còn nghĩa “không revert source editor đã làm sớm”, không còn chặn bump/chuyển mốc.
+
+**Scope amendment2026-11-12:** human chốt planning **Hero Slide background fill + Apply modal** vào1.3.21 — [068](planning/068_VER_1_3_21_HERO_SLIDE_BACKGROUND_FILL_AND_COPY_PLAN.md); acceptance HSB-*; chưa implement.
+
+**Scope amendment2026-11-09:** human yêu cầu thêm redesign phần Slider Editor UI vào1.3.21. **Contrast: đã có source, runtime Chờ kiểm chứng. Editor redesign: đã có source Concept01 (P1 UX flow được human xác nhận2026-11-09; P2/P3 source theo063§13), runtime Chờ kiểm chứng — supersede câu “PLANNED/Chưa làm, chưa start”.** Version1.3.21 giữ theo quyết định human, đây là mở scope đã duyệt cùng version, không đổi Version Naming Rule. Hình thức hotfix ngoài current áp phần contrast đã có; không dùng source editor để tự chuyển current khỏi1.3.20.
+
+Editor scope: canvas/preview/chrome, tổ chức Inspector/settings của Slider/Slide, nhận diện parent/slide và luồng Add/select/reorder/edit; audit Hero, Product Showcase, Card Carousel và Slider mặc định để xác định UI phù hợp từng variation. Kế thừa P3/EF-SLIDER và phần Slider của EF-06 từ053, cùng khung/spacing/asset contract. Layout cụ thể, palette và việc di chuyển control cần proposal/mockup trước coding; chưa phê duyệt một kiểu preview mới. Bảo toàn native InnerBlocks/List View/RichText, Undo/save/reopen và controls hiện hành; không custom slide store hoặc runtime Swiper/autoplay trên canvas. Step Slider vẫn1.3.24; không gộp sang đây.
+Confirmed: **2026-10-19** — Hero contrast được chọn 1.3.19 dạng hotfix ngoài current; **2026-11-04 human dời scope này sang 1.3.21**, giữ source/status/acceptance và hình thức hotfix ngoài current.
+Current milestone: **V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign** từ human transition2026-11-12. Hình thức “hotfix ngoài current” của Hero chấm dứt từ đây; Hero vào acceptance của mốc hiện hành cùng editor redesign, không tách archive riêng.
+SemVer rationale: PATCH — sửa cascade/default của Slider đã có, không thêm feature/schema/dependency. Mapping cũ 1.3.19 được thay bằng **1.3.21** theo human 2026-11-04 để dành 1.3.19 cho Sidebar.
+
+Rationale trên là của repair gốc; amendment2026-11-09 bổ sung editor redesign theo human vào cùng1.3.21, không suy PATCH là quyền thêm schema/feature frontend. Plan044§10 giữ scope/acceptance mới; contrast/flicker và editor nghiệm thu riêng.
+
+> **Bump metadata cho 1.3.21 từ 2026-11-12.** 1.3.21 đã là current nên áp dụng nhánh “milestone được bắt đầu làm current”: sync working metadata bằng `node tools/bump-project-version.mjs 1.3.21` (bump-only) rồi human rebuild plugin assets. Câu “không bump metadata cho 1.3.21” phía trên chỉ còn giá trị lịch sử của giai đoạn hotfix ngoài current.
+
+Scope:
+- Sửa contrast mặc định của preset Hero trong `wp-content/plugins/skvn-marine-blocks/src/slider/style.css`: carrier `color` trên `.skvn-slide__content` + `color: inherit` ở specificity đủ thắng rule heading của theme (0,3,0 vs 0,2,1).
+- CTA Hero: white-pill + navy `#073b5a`, hover/focus `#eaf7ff`, có guard `:not(.has-background)` để không đụng background/gradient chọn tay; custom hover vẫn theo marker `has-skvn-btn-hover-*`.
+- Editor dùng chung selector với frontend (một CSS handle cho hai surface); giữ stacked preview, không chạy Swiper/autoplay.
+
+Ngoài scope:
+- Không đổi renderer/schema/save markup/`variations.ts`; không thêm class `has-background` giả.
+- Không sửa theme. Không đổi effect/duration/autoplay/loop/parallax/text-shadow.
+- Hiện tượng chớp có outcome riêng, chưa xác định root cause; contrast PASS không đồng nghĩa chớp đã sửa.
+
+Planning: `.context/planning/044_HERO_SLIDER_CONTRAST_AND_FLICKER_REPAIR_PLAN.md`
+Testing: `docs/testing/hero-slider-contrast-and-flicker-repair.md`
+Hero slide fill (addon): `.context/planning/068_VER_1_3_21_HERO_SLIDE_BACKGROUND_FILL_AND_COPY_PLAN.md` — `docs/testing/hero-slide-background-fill-1.3.21.md`
+Roadmap mapping: 039 §"M5 → 1.3.21".
+
+Acceptance (điểm tương ứng HERO-* trong 044 §7):
+- [ ] Source: selector matrix đúng — default thắng theme fallback, explicit color thắng default, Group color tới được heading, custom hover thắng hover fallback, preset Product Showcase/Card Carousel không đổi.
+- [ ] Human chạy build + PHP lint, báo output.
+- [x] HERO-UI-01 PASS runtime: default text sáng trên gradient, có và không có ảnh. Human PASS2026-11-13.
+- [x] HERO-UI-02 PASS runtime: palette/inline/Group/reset đúng, save-reopen không mất dữ liệu. Human PASS2026-11-13.
+- [x] HERO-UI-03 PASS runtime: CTA normal/hover/focus, gradient và custom hover được giữ. Human PASS2026-11-13.
+- [x] HERO-UX-01 PASS runtime: editor preview khớp frontend, stacked preview không Swiper. Human PASS2026-11-13.
+- [ ] HERO-TECH-01/02: diff review, không invalid-block, regression Product Showcase/Card Carousel/core button ngoài Hero sạch.
+- [x] HERO-TECH-03: kết luận chớp — human2026-11-13 “đã hết chớp”, không còn tái hiện trên build đang dùng. Contrast PASS và chớp hết là hai kết quả riêng, cùng ghi nhận ngày này.
+- [ ] Human approve kết quả visual.
+
+Acceptance bổ sung Editor redesign — **Chưa làm**, không thay HERO-*:
+
+- [ ] SED-ED01 — Audit controls/content/states theo từng variation, proposal/mockup canvas + Sidebar/Inspector; human chốt layout/palette trước coding.
+- [ ] SED-ED02 — Parent/slide rõ, tận dụng chiều rộng canvas, responsive editor/sidebar hẹp; giữ các thông tin và controls cần thiết, không có control chết hoặc ẩn mất setting đang dùng.
+- [ ] SED-ED03 — Add/select/reorder/delete/duplicate, native List View/InnerBlocks/RichText, keyboard/focus/IME, Undo/Redo/save/reopen và giới hạn slide hiện hành hoạt động.
+- [ ] SED-ED04 — Khung ngoài/label/màu và spacing theo053 sau khi duyệt palette; states empty/one/many/limit/missing media/long content đầy đủ, preview static ghi rõ giới hạn.
+- [ ] SED-TECH01 — Editor CSS thực sự được enqueue, không style leak; schema/save/data owner giữ, không engine/store song song; no-invalid-block và frontend regression trên các variations.
+- [ ] SED-UI01 — Frontend behavior/layout/motion của redesign giữ baseline, contrast source dùng chung không regression; evidence đúng build, tách lỗi cũ/chớp.
+
+Không tự đánh dấu milestone hoàn thành, không runtime PASS và không release approved khi thiếu evidence.
+
+
 ## V1 / 1.3.20 — Product Category Grid + Category details + Woo Archive M1
 
 Status: **DONE_WITH_CARRY_OVER** (human PASS2026-11-12)

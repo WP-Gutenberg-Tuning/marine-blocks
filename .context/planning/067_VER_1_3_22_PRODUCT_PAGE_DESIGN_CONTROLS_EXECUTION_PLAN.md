@@ -1,6 +1,6 @@
 # V1 / 1.3.22 — Product Page Basic Design Controls
 
-2026-11-12. **Planning-only, 1.3.22 chưa start** — current vẫn1.3.21 (IN PROGRESS, runtime Chờ kiểm chứng), chưa chuyển mốc. Đây là execution plan PDP-TRACE-01, chưa code; chỉ được thi hành sau khi human ra lệnh transition riêng.
+2026-11-12. **Current từ 2026-11-13** — human “Đã xong toàn phần 1.3.21” + “Chuyển sang 1.3.22 ngay” đã mở khoá plan này. Đây là execution plan PDP-TRACE-01; implementation **Chưa làm**, chưa có runtime evidence.
 
 Đọc trước khi code: AGENTS → MILESTONES §1.3.22 → plan này → `docs/standards/css-layout-safety-contract.md` → `inc/woocommerce.php` và `style.css` mục Product page. Không mở Post 1.3.23, archive builder, woo-catalog 1.5.0, Sidebar 054.
 
