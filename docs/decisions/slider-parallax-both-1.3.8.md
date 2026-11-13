@@ -1,6 +1,70 @@
 # Decision — Slider Parallax (Both Depth) 1.3.8
 
-> **Revision 1.2 (2026-11-13)** — Plan 070. Resting `--skvn-parallax-inset` stays **0**. A negative inset zoomed the still image (~1.7× at medium) and made the editor focal crop miss the frontend. Edge cover during travel is Swiper scale: `S >= 1 + 2 * (translate / 100)`. Presets: subtle 15% / 1.30, medium 30% / 1.60, strong 50% / 2.00. Advanced Edge guard is removed from the Inspector; saved `parallaxInset` is ignored at runtime. Translate and Both raise scale to that floor. Scale-only does not. Sections below that prescribe a negative inset or scale ceiling 1.50 are historical.
+> **Revision 1.3 (2026-11-13)** — Inspector hiện hành và lý do bỏ/đổi control: mục [Điều khiển Motion](#điều-khiển-motion--vì-sao-đổi-2026-11-13). Sơ đồ Rev 1.1 (Edge guard, trần Scale 1.50, preset 1.06/1.12/1.20) là lịch sử.
+
+> **Revision 1.2 (2026-11-13)** — Plan 070. Resting `--skvn-parallax-inset` stays **0**. A negative inset zoomed the still image (~1.7× at medium) and made the editor focal crop miss the frontend. Edge cover during travel is Swiper scale: `S >= 1 + 2 * (translate / 100)`. Presets: subtle 15% / 1.30, medium 30% / 1.60, strong 50% / 2.00. Advanced Edge guard is removed from the Inspector; saved `parallaxInset` is ignored at runtime. Câu “Translate and Both raise scale” trong revision này bị plan 072 sửa cùng ngày: chỉ **Both** và preset Intensity còn nâng scale. Translate only không gắn scale. Scale-only không nâng. Sections below that prescribe a negative inset or scale ceiling 1.50 are historical.
+
+## Điều khiển Motion — vì sao đổi (2026-11-13)
+
+Panel Motion không bỏ Depth, Direction, Translate, Scale, Intensity hay Advanced. Những mục đó vẫn có. Thay đổi là bỏ một control, đổi số của preset, và thêm một control.
+
+### Đang có trên Inspector
+
+Advanced tắt, parallax bật:
+
+- Enable parallax
+- Intensity: Subtle / Medium / Strong
+- Advanced
+- Edge blur (0–48 px, mặc định 0)
+
+Advanced bật:
+
+- Depth: Both / Translate only / Scale only
+- Direction và Translate khi depth không phải Scale only
+- Scale khi depth không phải Translate only (1.00–2.00)
+- Edge blur khi depth không phải Scale only
+
+### Edge guard (inset) — bỏ khỏi Inspector
+
+Control này là thanh 0–80%, nhãn Edge guard, attr `parallaxInset`. Rev 1.1 dùng nó để phóng khung `.skvn-slide__bg` (`inset` âm) cho ảnh không hở mép khi trượt.
+
+Plan 070 bỏ control vì inset âm phóng ảnh **lúc đứng yên**. Medium `-35%` làm khung nền khoảng 170%. `object-fit: cover` crop khung đó, nên ảnh đang xem đã zoom trước khi chuyển slide, và focal chỉnh trong editor (khung 100%) không khớp frontend. Đó là DP-08.
+
+Attr `parallaxInset` vẫn nằm trong block đã lưu, default 35. Runtime không đọc. Giữ attr để slider cũ không thành block invalid. Trả control này lên Inspector mà không trả inset thì thanh đó không làm gì. Trả cả inset thì ảnh đứng yên zoom lại.
+
+Mép lúc chuyển, với Both và với preset, được che bằng scale của Swiper (`S >= 1 + 2 × translate / 100`), không bằng inset. Scale chạy theo progress: lúc đứng yên là 1, chỉ phóng trong lúc chuyển.
+
+### Trần Scale 1.50 thành 2.00 — control vẫn còn
+
+Strong dịch 50%. Sàn che mép là `1 + 2 × 0.50 = 2.00`. Trần 1.50 cắt mất phần che mép của preset đó. Thanh Scale trong Advanced nâng max lên 2.00. Không bỏ thanh Scale.
+
+### Translate only không còn bị gắn scale
+
+Plan 070 lúc đầu gắn sàn scale cho cả Translate only, nếu không thì hở fill. Human bật Translate only và ảnh vẫn zoom lúc chuyển, vì scale 30% ra 1.60 trong khi thanh Scale bị ẩn nên không tắt được.
+
+Plan 072 bỏ attr `data-swiper-parallax-scale` khi depth là `translate`. Thanh Scale vẫn ẩn ở mode đó, đúng như Rev 1.1 (chỉ hiện khi depth có scale). Việc đổi là runtime, không phải xoá control: Translate only giờ chỉ trượt. Mé có thể lộ màu fill. Both và preset Intensity vẫn nâng scale để che mép.
+
+### Preset Intensity đổi số, không đổi nút
+
+Nút Subtle / Medium / Strong giữ nguyên. Số runtime đổi vì bỏ inset:
+
+| Preset | Trước 070 | Sau 070 |
+|---|---|---|
+| Subtle | dịch 15%, scale 1.06, inset −20% | dịch 15%, scale 1.30, inset 0 |
+| Medium | dịch 30%, scale 1.12, inset −35% | dịch 30%, scale 1.60, inset 0 |
+| Strong | dịch 50%, scale 1.20, inset −50% | dịch 50%, scale 2.00, inset 0 |
+
+Help “ảnh đứng yên không zoom” nói frame chưa kéo. Trong lúc chuyển, preset vẫn zoom vì depth preset là Both.
+
+### Edge blur — thêm, không thay một control cũ
+
+Plan 073. Translate only không zoom nên hở fill. Lớp mờ là bản cùng ảnh, đứng yên, `filter: blur`, nằm sau ảnh nét. Ảnh nét không đổi kích thước lúc đứng yên.
+
+Attr `parallaxBlur`, 0–48 px, mặc định **0**. 0 không tạo lớp mờ, slider cũ không đổi. Ẩn khi Scale only vì ảnh không trượt, không có mép để che. Editor không chạy Swiper nên không xem trước được lớp này.
+
+### Không đụng
+
+Transition duration (600–1000 ms) vẫn là control riêng, dùng chung cho chuyển slide và thời lượng parallax. Direction, loop, autoplay, mũi tên, pagination không thuộc đợt này.
 
 **Version:** 1.1  
 
