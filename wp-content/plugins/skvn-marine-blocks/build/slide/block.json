@@ -27,9 +27,28 @@
       "type": "string",
       "default": ""
     },
+    "backgroundImageFocalPoint": {
+      "type": "object",
+      "default": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "overlayOpacity": {
       "type": "number",
       "default": 35
+    },
+    "backgroundFillMode": {
+      "type": "string",
+      "default": "default"
+    },
+    "backgroundFillColor": {
+      "type": "string",
+      "default": ""
+    },
+    "backgroundFillGradient": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {

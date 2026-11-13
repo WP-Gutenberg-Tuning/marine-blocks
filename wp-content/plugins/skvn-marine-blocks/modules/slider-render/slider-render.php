@@ -369,7 +369,7 @@ function skvn_marine_blocks_render_slider( $attributes, $content, $block ) {
 		'parallaxScale'     => max(
 			1.0,
 			min(
-				1.5,
+				2.0,
 				is_numeric( $attributes['parallaxScale'] ?? null ) ? (float) $attributes['parallaxScale'] : 1.12
 			)
 		),
@@ -385,25 +385,9 @@ function skvn_marine_blocks_render_slider( $attributes, $content, $block ) {
 		$config['responsiveSlides'] = $responsive_slides;
 	}
 
-	// Parallax edge-guard inset is config-static: paint on first frame via
-	// inline style so the bg box does not jump from 0% → -N% after JS init (F1).
-	// Client reduced-motion is handled in CSS; JS only wires Swiper data attrs.
+	// Resting crop stays at inset 0 (plan 070). A negative inset enlarges the
+	// cover box and zooms the still image. Travel is covered by Swiper scale.
 	$parallax_enabled = ! empty( $config['enableParallax'] ) && 1 === (int) $slides_per_view;
-	$parallax_inset_pct = 0;
-
-	if ( $parallax_enabled ) {
-		$preset_inset = array(
-			'subtle' => 20,
-			'medium' => 35,
-			'strong' => 50,
-		);
-		$depth          = $config['parallaxAdvanced'] ? $config['parallaxDepth'] : 'both';
-		$include_translate = 'scale' !== $depth;
-		$inset_mag      = $config['parallaxAdvanced']
-			? (int) $config['parallaxInset']
-			: (int) ( $preset_inset[ $config['parallaxIntensity'] ] ?? 35 );
-		$parallax_inset_pct = $include_translate ? max( 0, min( 80, $inset_mag ) ) : 0;
-	}
 
 	$class_name = 'skvn-slider swiper alignfull';
 
@@ -434,14 +418,6 @@ function skvn_marine_blocks_render_slider( $attributes, $content, $block ) {
 		'data-skvn-slider' => wp_json_encode( $config ),
 		'aria-label'       => esc_attr__( 'SKVN content slider', 'skvn-marine-blocks' ),
 	);
-
-	if ( $parallax_enabled && $parallax_inset_pct > 0 ) {
-		// esc_attr via get_block_wrapper_attributes; value is a clamped integer.
-		$wrapper_args['style'] = sprintf(
-			'--skvn-parallax-inset:-%d%%',
-			$parallax_inset_pct
-		);
-	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( $wrapper_args );
 	$slides             = skvn_marine_blocks_render_slider_inner_blocks( $block );
@@ -490,6 +466,107 @@ function skvn_marine_blocks_render_slider( $attributes, $content, $block ) {
 }
 
 /**
+ * Normalize slide background fill mode (Hero preset only at output time).
+ *
+ * @param mixed $value Raw attribute.
+ * @return string default|custom|transparent
+ */
+function skvn_marine_blocks_normalize_slide_fill_mode( $value ) {
+	if ( 'custom' === $value || 'transparent' === $value ) {
+		return $value;
+	}
+
+	return 'default';
+}
+
+/**
+ * Sanitize custom slide fill color or gradient from the block editor.
+ *
+ * @param string $value Raw attribute value.
+ * @return string Sanitized value, or empty string if unrecognised.
+ */
+function skvn_marine_blocks_sanitize_slide_fill_background( $value ) {
+	if ( ! is_string( $value ) || '' === $value ) {
+		return '';
+	}
+
+	$hex = sanitize_hex_color( $value );
+	if ( $hex ) {
+		return $hex;
+	}
+
+	$clean = trim( wp_check_invalid_utf8( wp_strip_all_tags( $value ) ) );
+
+	if ( preg_match( '/^(?:linear|radial|conic)-gradient\(/i', $clean ) ||
+		preg_match( '/^rgba?\(/i', $clean ) ||
+		preg_match( '/^var\(--wp--preset--(?:gradient|color)--[\w-]+\)/i', $clean ) ) {
+		return $clean;
+	}
+
+	return '';
+}
+
+/**
+ * Resolve Hero slide custom fill background from attributes.
+ *
+ * @param array $attributes Block attributes.
+ * @return string CSS background value or empty.
+ */
+function skvn_marine_blocks_resolve_slide_fill_background( $attributes ) {
+	if ( 'custom' !== skvn_marine_blocks_normalize_slide_fill_mode( $attributes['backgroundFillMode'] ?? '' ) ) {
+		return '';
+	}
+
+	$gradient = isset( $attributes['backgroundFillGradient'] ) && is_string( $attributes['backgroundFillGradient'] )
+		? skvn_marine_blocks_sanitize_slide_fill_background( $attributes['backgroundFillGradient'] )
+		: '';
+	if ( '' !== $gradient ) {
+		return $gradient;
+	}
+
+	$color = isset( $attributes['backgroundFillColor'] ) && is_string( $attributes['backgroundFillColor'] )
+		? skvn_marine_blocks_sanitize_slide_fill_background( $attributes['backgroundFillColor'] )
+		: '';
+
+	return $color;
+}
+
+/**
+ * Normalize slide background image focal point (0–1 on each axis).
+ *
+ * @param mixed $value Raw attribute value.
+ * @return array{x: float, y: float}
+ */
+function skvn_marine_blocks_normalize_slide_background_focal_point( $value ) {
+	$default = array(
+		'x' => 0.5,
+		'y' => 0.5,
+	);
+
+	if ( ! is_array( $value ) ) {
+		return $default;
+	}
+
+	$x = isset( $value['x'] ) ? floatval( $value['x'] ) : 0.5;
+	$y = isset( $value['y'] ) ? floatval( $value['y'] ) : 0.5;
+
+	if ( ! is_finite( $x ) ) {
+		$x = 0.5;
+	}
+	if ( ! is_finite( $y ) ) {
+		$y = 0.5;
+	}
+
+	$x = max( 0.0, min( 1.0, $x ) );
+	$y = max( 0.0, min( 1.0, $y ) );
+
+	return array(
+		'x' => round( $x, 4 ),
+		'y' => round( $y, 4 ),
+	);
+}
+
+/**
  * Render a Slide frame with preset-aware media.
  *
  * @param array    $attributes Block attributes.
@@ -525,13 +602,43 @@ function skvn_marine_blocks_render_slide( $attributes, $content, $block ) {
 	);
 	$supports_background = ! in_array( $preset, array( 'product-showcase', 'card-carousel' ), true );
 	$has_image           = $supports_background && '' !== $image_url;
-	$class_name      = 'skvn-slide swiper-slide';
+	$class_name          = 'skvn-slide swiper-slide';
+	$wrapper_style       = '';
 
 	if ( $has_image ) {
 		$class_name .= ' skvn-slide--has-background';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class_name ) );
+	if ( 'hero' === $preset ) {
+		$fill_mode = skvn_marine_blocks_normalize_slide_fill_mode( $attributes['backgroundFillMode'] ?? '' );
+
+		if ( 'transparent' === $fill_mode ) {
+			$class_name .= ' skvn-slide--fill-transparent';
+		} elseif ( 'custom' === $fill_mode ) {
+			$fill_background = skvn_marine_blocks_resolve_slide_fill_background( $attributes );
+			if ( '' !== $fill_background ) {
+				$class_name   .= ' skvn-slide--fill-custom';
+				// get_block_wrapper_attributes() escapes this value once.
+				$wrapper_style = 'background:' . $fill_background . ';';
+			}
+		}
+	}
+
+	if ( $has_image ) {
+		$focal   = skvn_marine_blocks_normalize_slide_background_focal_point(
+			$attributes['backgroundImageFocalPoint'] ?? null
+		);
+		$pos_x   = number_format( $focal['x'] * 100, 2, '.', '' ) . '%';
+		$pos_y   = number_format( $focal['y'] * 100, 2, '.', '' ) . '%';
+		$wrapper_style .= '--skvn-slide-bg-pos-x:' . $pos_x . ';--skvn-slide-bg-pos-y:' . $pos_y . ';';
+	}
+
+	$wrapper_attrs = array( 'class' => $class_name );
+	if ( '' !== $wrapper_style ) {
+		$wrapper_attrs['style'] = $wrapper_style;
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( $wrapper_attrs );
 	$inner_content      = skvn_marine_blocks_render_slider_inner_blocks( $block );
 	$output             = '<div ' . $wrapper_attributes . '>';
 	$output            .= '<div class="skvn-slide__media">';

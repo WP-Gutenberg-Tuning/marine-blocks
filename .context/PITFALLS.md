@@ -443,3 +443,13 @@ Xem DP-01. Nếu `view.ts` cần đọc 1 attribute, attribute đó phải có t
 - **Hệ quả:** mọi `.alignwide` nằm trong container có width (Group/Columns/block) trên canvas full-width đều +80px phải — không riêng grid.
 - **Chống tái diễn:** khi một block nested bị rộng hơn parent đúng một hằng số, đọc `max-width`/`width` computed **trước**, rồi quét `document.styleSheets` tìm rule khai báo (snippet §4.3-B trong `docs/testing/group-island-windpress-class-1.3.20.md`); đừng suy từ ảnh hay từ source plugin. GP dynamic CSS không nằm trong file nào → grep repo/runtime luôn ra 0 kết quả, không có nghĩa là "không tồn tại".
 - **Evidence:** `docs/testing/group-island-windpress-class-1.3.20.md` §4.2 (số đo) + §4.3 (probe: inject rule `max-width:100% !important` → 1280 ⇒ 1200, delta 80 ⇒ 0; scan B chỉ đúng `inline-sheet#27` = GP).
+
+### DP-08 — Bật parallax là ảnh zoom ngay lúc đứng yên; focal editor lệch frontend [2026-11-13]
+
+- **Case:** human test focal plan069. Hero contrast PASS. Bật parallax thì ảnh nền phóng to trước khi slide chuyển. Điểm neo chỉnh trong editor không còn đúng vùng nhìn trên frontend.
+- **Root cause:** edge-guard 1.3.8, không phải `backgroundImageFocalPoint`. Intensity medium: PHP gắn `--skvn-parallax-inset:-35%` ngay frame đầu (`slider-render.php`). `.skvn-slide__bg { inset: var(--skvn-parallax-inset, 0%) }` thành khung 170% (35% mỗi cạnh). `img` `object-fit: cover` phủ khung đó; `.skvn-slide__media` `overflow: hidden` cắt lại. Cửa sổ nhìn còn khoảng 100/170 khung cũ.
+- **Swiper scale không phải zoom lúc đứng yên.** `data-swiper-parallax-scale` medium là `1.12`. Công thức Swiper 11: `scale - (scale - 1) * (1 - abs(progress))`. Slide đang xem có `progress` 0 nên `scale(1)`. `1.12` chỉ có trên slide đang vào hoặc ra. Quyết định: `docs/decisions/slider-parallax-both-1.3.8.md`.
+- **Vì sao focal lệch:** editor không chạy Swiper và không gắn inset, nên FocalPointPicker canh crop khung 100%. Frontend parallax dùng khung 170%. Cùng `%` object-position, cửa sổ khác. Plan069 nói parallax chỉ translate wrapper và focal trên `img` vẫn hợp lệ — đúng với thuộc tính, sai với vùng nhìn khi hộp cover đổi kích thước.
+- **Không phải:** overlay `#073b5a` (lớp riêng, opacity 0–80, default 35), cũng không phải pixel trong file ảnh.
+- **Chống tái diễn:** trước khi sửa focal hoặc bảo parallax “tự zoom”, đo rect `.skvn-slide__bg` so với `.skvn-slide__media` và đọc `--skvn-parallax-inset`. So editor (inset 0) với frontend. Đừng lấy `data-swiper-parallax-scale` làm độ zoom của slide đang xem.
+- **Fixed:** source 2026-11-13 theo plan 070 (inset đứng yên = 0, scale che translate). Chưa human xác nhận ảnh đứng yên. Chưa đóng HSF-TECH-01.

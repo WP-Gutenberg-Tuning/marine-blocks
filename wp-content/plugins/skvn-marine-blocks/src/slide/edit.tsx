@@ -3,15 +3,37 @@ import {
 	InspectorControls,
 	MediaUpload,
 	MediaUploadCheck,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Button, PanelBody, RangeControl } from '@wordpress/components';
+import {
+	Button,
+	FocalPointPicker,
+	Notice,
+	PanelBody,
+	RangeControl,
+	RadioControl,
+} from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { memo, useContext, useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { memo, useContext, useMemo, useState } from '@wordpress/element';
 import { SliderEditorFocusContext } from '../slider/editor/context';
+import { ApplyBackgroundModal } from './apply-background-modal';
+import {
+	BackgroundFillMode,
+	getSlideFillClassSuffix,
+	getSlideFillInlineStyle,
+	normalizeFillMode,
+} from './fill';
+import {
+	DEFAULT_FOCAL_POINT,
+	focalPointToWrapperStyle,
+	formatFocalPositionLabel,
+	normalizeFocalPoint,
+	type FocalPoint,
+} from './focal';
 
 const TEMPLATE = [
 	[ 'core/heading', { level: 3, placeholder: 'Slide heading' } ],
@@ -25,7 +47,11 @@ type SlideAttributes = {
 	backgroundImageId: number;
 	backgroundImageUrl: string;
 	backgroundImageAlt: string;
+	backgroundImageFocalPoint?: FocalPoint;
 	overlayOpacity: number;
+	backgroundFillMode: BackgroundFillMode;
+	backgroundFillColor: string;
+	backgroundFillGradient: string;
 };
 
 type SlideEditProps = {
@@ -162,11 +188,23 @@ export const Edit = memo( function SlideEdit( {
 	const { selectBlock } = useDispatch( blockEditorStore ) as {
 		selectBlock: ( blockClientId: string ) => void;
 	};
+	const fillMode = normalizeFillMode( attributes.backgroundFillMode );
+	const fillClassSuffix = getSlideFillClassSuffix( attributes, preset );
+	const fillInlineStyle = getSlideFillInlineStyle( attributes, preset );
+	const focalPoint = normalizeFocalPoint(
+		attributes.backgroundImageFocalPoint
+	);
+	const focalStyle = showsBackgroundImage
+		? focalPointToWrapperStyle( focalPoint )
+		: undefined;
+	const [ applyModalOpen, setApplyModalOpen ] = useState( false );
 	const blockProps = useBlockProps( {
-		className: `skvn-slide skvn-slide--editor${ preset === 'hero' ? ' skvn-slide--hero-max-height' : '' }${ showsBackgroundImage ? ' skvn-slide--has-background' : '' }`,
-		// Keep the native editor subtree mounted. Only its owned presentation is
-		// hidden; selection ancestry reveals the target synchronously on render.
-		...( isInactiveInEditor ? { style: { display: 'none' } } : {} ),
+		className: `skvn-slide skvn-slide--editor${ preset === 'hero' ? ' skvn-slide--hero-max-height' : '' }${ showsBackgroundImage ? ' skvn-slide--has-background' : '' }${ fillClassSuffix }`,
+		style: {
+			...( fillInlineStyle || {} ),
+			...( focalStyle || {} ),
+			...( isInactiveInEditor ? { display: 'none' } : {} ),
+		},
 	} );
 	const selectImage = useMemo(
 		() => ( image: SelectedImage ) => {
@@ -203,8 +241,97 @@ export const Edit = memo( function SlideEdit( {
 				</PanelBody>
 				{ supportsBackgroundImage ? (
 					<PanelBody
-						title={ __( 'Background image', 'skvn-marine-blocks' ) }
+						initialOpen
+						title={ __( 'Background', 'skvn-marine-blocks' ) }
 					>
+						{ preset === 'hero' && (
+							<>
+								<RadioControl
+									label={ __( 'Fill', 'skvn-marine-blocks' ) }
+									onChange={ ( value ) =>
+										setAttributes( {
+											backgroundFillMode:
+												normalizeFillMode( value ),
+										} )
+									}
+									options={ [
+										{
+											label: __(
+												'Use preset default (Hero navy gradient)',
+												'skvn-marine-blocks'
+											),
+											value: 'default',
+										},
+										{
+											label: __(
+												'Custom color or gradient',
+												'skvn-marine-blocks'
+											),
+											value: 'custom',
+										},
+										{
+											label: __(
+												'Transparent (no fill layer)',
+												'skvn-marine-blocks'
+											),
+											value: 'transparent',
+										},
+									] }
+									selected={ fillMode }
+								/>
+								{ fillMode === 'custom' && (
+									<PanelColorGradientSettings
+										settings={ [
+											{
+												colorValue:
+													attributes.backgroundFillColor ||
+													undefined,
+												gradientValue:
+													attributes.backgroundFillGradient ||
+													undefined,
+												label: __(
+													'Fill',
+													'skvn-marine-blocks'
+												),
+												onColorChange: (
+													value: string | undefined
+												) =>
+													setAttributes( {
+														backgroundFillColor:
+															value || '',
+														backgroundFillGradient:
+															'',
+														backgroundFillMode:
+															'custom',
+													} ),
+												onGradientChange: (
+													value: string | undefined
+												) =>
+													setAttributes( {
+														backgroundFillGradient:
+															value || '',
+														backgroundFillColor: '',
+														backgroundFillMode:
+															'custom',
+													} ),
+											},
+										] }
+										title={ __(
+											'Custom fill',
+											'skvn-marine-blocks'
+										) }
+									/>
+								) }
+								{ fillMode === 'transparent' && (
+									<Notice status="warning" isDismissible={ false }>
+										{ __(
+											'Transparent fill removes the Hero navy layer. Text may be hard to read without a background image or custom text colors.',
+											'skvn-marine-blocks'
+										) }
+									</Notice>
+								) }
+							</>
+						) }
 						<MediaUploadCheck>
 							<MediaUpload
 								allowedTypes={ [ 'image' ] }
@@ -238,6 +365,51 @@ export const Edit = memo( function SlideEdit( {
 							</Button>
 						) }
 						{ hasImage && (
+							<>
+								<p className="skvn-slide-focal__label">
+									{ __(
+										'Background image focal point',
+										'skvn-marine-blocks'
+									) }
+								</p>
+								<FocalPointPicker
+									onChange={ ( value ) =>
+										setAttributes( {
+											backgroundImageFocalPoint:
+												normalizeFocalPoint( value ),
+										} )
+									}
+									url={ resolvedImageUrl }
+									value={ focalPoint }
+								/>
+								<Button
+									onClick={ () =>
+										setAttributes( {
+											backgroundImageFocalPoint: {
+												...DEFAULT_FOCAL_POINT,
+											},
+										} )
+									}
+									variant="secondary"
+								>
+									{ __(
+										'Reset to center',
+										'skvn-marine-blocks'
+									) }
+								</Button>
+								<p className="skvn-slide-focal__position">
+									{ sprintf(
+										/* translators: %s: focal x and y percentages */
+										__(
+											'Position: %s',
+											'skvn-marine-blocks'
+										),
+										formatFocalPositionLabel( focalPoint )
+									) }
+								</p>
+							</>
+						) }
+						{ hasImage && (
 							<RangeControl
 								label={ __(
 									'Overlay opacity',
@@ -253,6 +425,17 @@ export const Edit = memo( function SlideEdit( {
 								step={ 5 }
 								value={ attributes.overlayOpacity }
 							/>
+						) }
+						{ preset === 'hero' && (
+							<Button
+								onClick={ () => setApplyModalOpen( true ) }
+								variant="secondary"
+							>
+								{ __(
+									'Apply to other slides…',
+									'skvn-marine-blocks'
+								) }
+							</Button>
 						) }
 					</PanelBody>
 				) : (
@@ -283,6 +466,13 @@ export const Edit = memo( function SlideEdit( {
 					)
 				) }
 			</InspectorControls>
+			{ applyModalOpen && (
+				<ApplyBackgroundModal
+					currentClientId={ clientId }
+					onClose={ () => setApplyModalOpen( false ) }
+					parentSliderClientId={ parentSliderClientId }
+				/>
+			) }
 			<SlideBackgroundPreview
 				alt={ attributes.backgroundImageAlt }
 				onSelect={ selectImage }

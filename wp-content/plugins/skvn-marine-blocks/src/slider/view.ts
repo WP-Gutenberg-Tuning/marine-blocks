@@ -258,7 +258,7 @@ function parseSliderConfig(
 			'horizontal'
 		),
 		parallaxTranslate: clampInteger( parsed.parallaxTranslate, 30, 0, 80 ),
-		parallaxScale: clampNumber( parsed.parallaxScale, 1.12, 1, 1.5 ),
+		parallaxScale: clampNumber( parsed.parallaxScale, 1.12, 1, 2 ),
 		parallaxInset: clampInteger( parsed.parallaxInset, 35, 0, 80 ),
 	};
 }
@@ -480,10 +480,11 @@ function initSlider( slider: SliderElement ): void {
 
 		// Swiper 11 loop mode does not create DOM clones (rearrangement /
 		// loopFix only). Inject data attrs BEFORE new Swiper() so the Parallax
-		// module reads them on init. Inset CSS var is owned by PHP first paint
-		// (see slider-render.php) — do not set it here (avoids load-time jump).
+		// module reads them on init. Resting inset stays 0 (plan 070): a
+		// negative inset zooms the still image. Scale during the move covers
+		// the translate instead.
+		slider.style.removeProperty( '--skvn-parallax-inset' );
 		if ( reducedMotion ) {
-			slider.style.removeProperty( '--skvn-parallax-inset' );
 			slider.classList.remove( 'skvn-slider--parallax' );
 		} else if ( shouldParallax ) {
 			const presetTranslate = {
@@ -492,9 +493,9 @@ function initSlider( slider: SliderElement ): void {
 				strong: 50,
 			} as const;
 			const presetScale = {
-				subtle: 1.06,
-				medium: 1.12,
-				strong: 1.2,
+				subtle: 1.3,
+				medium: 1.6,
+				strong: 2,
 			} as const;
 			const intensity = config.parallaxIntensity;
 			const advanced = config.parallaxAdvanced;
@@ -505,11 +506,15 @@ function initSlider( slider: SliderElement ): void {
 			const translateMag = advanced
 				? config.parallaxTranslate
 				: presetTranslate[ intensity ];
-			const scaleVal = advanced
+			const chosenScale = advanced
 				? config.parallaxScale
 				: presetScale[ intensity ];
 			const includeTranslate = depth !== 'scale';
-			const includeScale = depth !== 'translate';
+			const coverScale =
+				Math.round( ( 1 + 2 * ( translateMag / 100 ) ) * 100 ) / 100;
+			const scaleVal = includeTranslate
+				? Math.max( chosenScale, coverScale )
+				: chosenScale;
 			const axis = direction === 'vertical' ? 'y' : 'x';
 			const durationMs = String( config.transitionDuration );
 
@@ -529,12 +534,10 @@ function initSlider( slider: SliderElement ): void {
 						);
 					}
 
-					if ( includeScale ) {
-						bg.setAttribute(
-							'data-swiper-parallax-scale',
-							String( scaleVal )
-						);
-					}
+					bg.setAttribute(
+						'data-swiper-parallax-scale',
+						scaleVal.toFixed( 2 )
+					);
 
 					// Keep parallax transition in phase with slide speed
 					// (avoids desync / stutter on loopFix and manual nav).
@@ -543,26 +546,6 @@ function initSlider( slider: SliderElement ): void {
 						durationMs
 					);
 				} );
-
-			// Legacy markup fallback: if PHP did not paint inset, set once
-			// before Swiper so the first transition still has edge-guard.
-			if ( ! slider.style.getPropertyValue( '--skvn-parallax-inset' ) ) {
-				const presetInset = {
-					subtle: 20,
-					medium: 35,
-					strong: 50,
-				} as const;
-				const insetMag = advanced
-					? config.parallaxInset
-					: presetInset[ intensity ];
-				const effectiveInset = includeTranslate ? insetMag : 0;
-				if ( effectiveInset > 0 ) {
-					slider.style.setProperty(
-						'--skvn-parallax-inset',
-						`-${ effectiveInset }%`
-					);
-				}
-			}
 
 			slider.classList.add( 'skvn-slider--parallax' );
 		}

@@ -299,7 +299,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 					<ToggleControl
 						checked={attributes.enableParallax}
 						help={__(
-							'Background image moves at a different speed than the slide, creating a sense of depth. Has no effect in the editor.',
+							'While the slide changes, the background moves at a different speed. The still image stays the same size. Has no effect in the editor.',
 							'skvn-marine-blocks'
 						)}
 						label={__('Enable parallax', 'skvn-marine-blocks')}
@@ -308,7 +308,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 					{ attributes.enableParallax && ! attributes.parallaxAdvanced && (
 						<BaseControl
 							help={__(
-								'Controls how far the background travels and how much it scales during the transition.',
+								'How far the background travels while the slide changes. The still image does not zoom.',
 								'skvn-marine-blocks'
 							)}
 							label={__('Intensity', 'skvn-marine-blocks')}
@@ -384,7 +384,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 									<RangeControl
 										label={__('Translate', 'skvn-marine-blocks')}
 										help={__(
-											'How far the background travels, in percent.',
+											'How far the background travels, in percent. During the change the slider also zooms enough to keep the edge covered.',
 											'skvn-marine-blocks'
 										)}
 										max={80}
@@ -397,32 +397,16 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 										}
 										value={attributes.parallaxTranslate}
 									/>
-									<RangeControl
-										label={__('Edge guard (inset)', 'skvn-marine-blocks')}
-										help={__(
-											'Extra background beyond the frame so the edge is not revealed during travel. Raise if you see a gap.',
-											'skvn-marine-blocks'
-										)}
-										max={80}
-										min={0}
-										onChange={(parallaxInset) =>
-											setAttributes({
-												parallaxInset:
-													parallaxInset ?? 35,
-											})
-										}
-										value={attributes.parallaxInset}
-									/>
 								</>
 							) }
 							{ attributes.parallaxDepth !== 'translate' && (
 								<RangeControl
 									label={__('Scale', 'skvn-marine-blocks')}
 									help={__(
-										'How much the background zooms during the transition.',
+										'Zoom while the slide changes. If this is lower than the translate needs to hide the edge, the slider raises it.',
 										'skvn-marine-blocks'
 									)}
-									max={1.5}
+									max={2}
 									min={1}
 									step={0.01}
 									onChange={(parallaxScale) =>

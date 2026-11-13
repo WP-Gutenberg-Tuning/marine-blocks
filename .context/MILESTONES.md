@@ -19,7 +19,11 @@ Human clarification2026-11-12: câu “Đẩy version, đã pass toàn bộ, nh�
 
 ### Scope và acceptance current1.3.21
 
-**Hero Slider Contrast Repair** — PATCH sửa cascade mặc định của Slider hiện có, không thêm block/attribute/dependency. Theme `style.css:98-115` đặt `color` lên `.wp-block-heading` ở (0,2,1) và thắng mọi rule Hero; carrier `color` trên `.skvn-slide__content` + `color: inherit` ở (0,3,0) đã có source. CTA mặc định white-pill + navy `#073b5a`, hover/focus `#eaf7ff`, guard `:not(.has-background)` ở (0,4,0) để thắng GP inline `a.wp-block-button__link` (0,2,1) mà không đụng background/gradient chọn tay. **Đã có source, runtime Chờ kiểm chứng**; acceptance HERO-UI-01–03/HERO-UX-01/HERO-TECH-01–03 theo044§7. Hiện tượng chớp có outcome riêng, chưa có root cause; contrast PASS không đồng nghĩa chớp đã sửa.
+**Hero Slider Contrast Repair** — PATCH sửa cascade mặc định của Slider hiện có, không thêm block/attribute/dependency. Theme `style.css:98-115` đặt `color` lên `.wp-block-heading` ở (0,2,1) và thắng mọi rule Hero; carrier `color` trên `.skvn-slide__content` + `color: inherit` ở (0,3,0) đã có source. CTA mặc định white-pill + navy `#073b5a`, hover/focus `#eaf7ff`, guard `:not(.has-background)` ở (0,4,0) để thắng GP inline `a.wp-block-button__link` (0,2,1) mà không đụng background/gradient chọn tay. **Human PASS2026-11-13** cho HERO-UI-01–03 và HERO-UX-01. HERO-TECH-03 chớp vẫn chưa kết luận; contrast PASS không đồng nghĩa chớp đã sửa.
+
+**Hero Slide background fill + copy/apply** — **scope amendment2026-11-12** (human Q&A + “OK, ghi lại”): per-slide fill trên Hero (default / custom solid+gradient / transparent), lớp dưới ảnh; modal Apply tách Fill vs Background image; plan [068](planning/068_VER_1_3_21_HERO_SLIDE_BACKGROUND_FILL_AND_COPY_PLAN.md), runbook [hero-slide-background-fill-1.3.21](../docs/testing/hero-slide-background-fill-1.3.21.md), acceptance **HSB-***. Human đã test; source implement — runtime HSB-* Chờ kiểm chứng; tách acceptance khỏi HERO-* (044 cố ý không schema).
+
+**Hero Slide background image focal point** — **scope amendment2026-11-12** (sau test fill): per-slide focal (`FocalPointPicker`) cho mọi preset có slide background; Apply: Focal-only + focal kèm khi copy image; replace ảnh **giữ** focal; plan [069](planning/069_VER_1_3_21_HERO_SLIDE_BACKGROUND_IMAGE_FOCAL_POINT_PLAN.md), runbook [hero-slide-background-focal-1.3.21](../docs/testing/hero-slide-background-focal-1.3.21.md), acceptance **HSF-***. **Source2026-11-13** — chờ build + HSF onsite/runtime.
 
 **Slider Editor UI Redesign** — đổi editor presentation/tổ chức control của Slider/Slide, không đổi frontend render/schema/save/motion. Nối053 P3/EF-SLIDER và phần Slider của EF-06; **Step Slider vẫn1.3.24**, không gộp. Source Concept01: P1 UX flow human “Đã test, đúng UX” (2026-11-09); P2/P3 frame lavender, scroll rail, native stage, static Arrow–Add–Pagination footer và Inspector states có source;19 selection/Add mocked tests + syntax10files PASS, presentation suite human10/10 PASS (64.42s, SSR/WP mocks). Human PASS thêm U02/U03/U05 ngày2026-11-12; còn U01/U04/U06/U07/U08/U09. **Chưa PASS**: native N01–03, WP/Gutenberg/iframe/assets evidence, 3–10Slide/limits, paired artifact/actual fidelity, geometry/perf. P0 pin WP/Gutenberg runtime + tagged API vẫn là gate trước khi coi là final. Harness `skvn-slider-editor-proof=1` là QA gate P1 đã retire, không phải UX sản phẩm; không chạy Swiper/autoplay trong editor; một mounted InnerBlocks tree, context/active state chỉ ở UI.
 
@@ -29,8 +33,11 @@ Checklist đầy đủ HERO-*/SED-* ở mục §1.3.21 bên dưới; process wai
 
 | Work package | Source / acceptance | Trạng thái / evidence cần tiếp |
 |---|---|---|
-| Hero Slider Contrast Repair | Plan044; HERO-UI-01–03, HERO-UX-01, HERO-TECH-01–03 | Đã có source, runtime Chờ kiểm chứng. Cần build human, ảnh before/after default+custom trên frontend/editor, winning declarations và smoke Product Showcase/Card Carousel/core button ngoài Hero. |
+| Hero Slider Contrast Repair | Plan044; HERO-UI-01–03, HERO-UX-01, HERO-TECH-01–03 | Human PASS2026-11-13 cho contrast (HERO-UI/UX). HERO-TECH-03 chớp vẫn chưa kết luận. |
 | Slider Editor UI Redesign | Plan062/063 + Concept01 artifact; U01–U09, AF01–10, N01–03, SED-ED01–04/SED-TECH01/SED-UI01 | Đã có source, runtime Chờ kiểm chứng. P0 pin WP/Gutenberg/tagged API; native N01–03/iframe/assets, 3–10Slide/limits, paired screenshots, geometry/perf và no-invalid-block còn thiếu. |
+| Hero Slide background fill | Plan068; HSB-UI-01–03, HSB-UX-01–02, HSB-TECH-01–02 | Source có; human đã test; HSB-* onsite Chờ kiểm chứng. |
+| Hero Slide background focal | Plan069; HSF-UI-01–02, HSF-UX-01–02, HSF-TECH-01–02 | Plan070 source 2026-11-13: inset đứng yên = 0, scale che translate. Chờ human PRC-01–06. HSF-TECH-01 chưa PASS. |
+| Slide overlay color | Plan071 | Planning 2026-11-13. Chưa code. Màu đặc, default `#073b5a`. |
 | Ngoài current scope | Blog archive, Woo Archive M2 inquiry/second language, ratio control060§12, Visual Sidebar054 Q1–Q3, Step Slider1.3.24 | Chưa start/deferred; không tự gán vào1.3.21 hoặc mở ratio setting trong patch1:1. Step Slider giữ018/1.3.24 và acceptance riêng. |
 
 ### Carry register từ1.3.20 →1.3.21 — không mất acceptance
@@ -1028,6 +1035,8 @@ Status: **IN PROGRESS (source) — CURRENT từ 2026-11-12, chờ human build + 
 
 **Process waiver2026-11-12:** human xác nhận Editor UI Slider đã được làm khi current vẫn1.3.20 và chưa bump1.3.21. Giữ source đó; không revert vì lệch thứ tự version. Đây không phải runtime PASS, không đóng SED-*/HERO-*, không bump metadata và không chuyển current. Cùng ngày chủ dự án PASS U02, U03, U05. Còn U01, U04, U06, U07, U08, U09. Contrast và hiện tượng chớp vẫn nghiệm thu riêng. **Superseded một phần 2026-11-12:** human đã chuyển current sang1.3.21; waiver chỉ còn nghĩa “không revert source editor đã làm sớm”, không còn chặn bump/chuyển mốc.
 
+**Scope amendment2026-11-12:** human chốt planning **Hero Slide background fill + Apply modal** vào1.3.21 — [068](planning/068_VER_1_3_21_HERO_SLIDE_BACKGROUND_FILL_AND_COPY_PLAN.md); acceptance HSB-*; chưa implement.
+
 **Scope amendment2026-11-09:** human yêu cầu thêm redesign phần Slider Editor UI vào1.3.21. **Contrast: đã có source, runtime Chờ kiểm chứng. Editor redesign: đã có source Concept01 (P1 UX flow được human xác nhận2026-11-09; P2/P3 source theo063§13), runtime Chờ kiểm chứng — supersede câu “PLANNED/Chưa làm, chưa start”.** Version1.3.21 giữ theo quyết định human, đây là mở scope đã duyệt cùng version, không đổi Version Naming Rule. Hình thức hotfix ngoài current áp phần contrast đã có; không dùng source editor để tự chuyển current khỏi1.3.20.
 
 Editor scope: canvas/preview/chrome, tổ chức Inspector/settings của Slider/Slide, nhận diện parent/slide và luồng Add/select/reorder/edit; audit Hero, Product Showcase, Card Carousel và Slider mặc định để xác định UI phù hợp từng variation. Kế thừa P3/EF-SLIDER và phần Slider của EF-06 từ053, cùng khung/spacing/asset contract. Layout cụ thể, palette và việc di chuyển control cần proposal/mockup trước coding; chưa phê duyệt một kiểu preview mới. Bảo toàn native InnerBlocks/List View/RichText, Undo/save/reopen và controls hiện hành; không custom slide store hoặc runtime Swiper/autoplay trên canvas. Step Slider vẫn1.3.24; không gộp sang đây.
@@ -1051,15 +1060,16 @@ Ngoài scope:
 
 Planning: `.context/planning/044_HERO_SLIDER_CONTRAST_AND_FLICKER_REPAIR_PLAN.md`
 Testing: `docs/testing/hero-slider-contrast-and-flicker-repair.md`
+Hero slide fill (addon): `.context/planning/068_VER_1_3_21_HERO_SLIDE_BACKGROUND_FILL_AND_COPY_PLAN.md` — `docs/testing/hero-slide-background-fill-1.3.21.md`
 Roadmap mapping: 039 §"M5 → 1.3.21".
 
 Acceptance (điểm tương ứng HERO-* trong 044 §7):
 - [ ] Source: selector matrix đúng — default thắng theme fallback, explicit color thắng default, Group color tới được heading, custom hover thắng hover fallback, preset Product Showcase/Card Carousel không đổi.
 - [ ] Human chạy build + PHP lint, báo output.
-- [ ] HERO-UI-01 PASS runtime: default text sáng trên gradient, có và không có ảnh.
-- [ ] HERO-UI-02 PASS runtime: palette/inline/Group/reset đúng, save-reopen không mất dữ liệu.
-- [ ] HERO-UI-03 PASS runtime: CTA normal/hover/focus, gradient và custom hover được giữ.
-- [ ] HERO-UX-01 PASS runtime: editor preview khớp frontend, stacked preview không Swiper.
+- [x] HERO-UI-01 PASS runtime: default text sáng trên gradient, có và không có ảnh. Human PASS2026-11-13.
+- [x] HERO-UI-02 PASS runtime: palette/inline/Group/reset đúng, save-reopen không mất dữ liệu. Human PASS2026-11-13.
+- [x] HERO-UI-03 PASS runtime: CTA normal/hover/focus, gradient và custom hover được giữ. Human PASS2026-11-13.
+- [x] HERO-UX-01 PASS runtime: editor preview khớp frontend, stacked preview không Swiper. Human PASS2026-11-13.
 - [ ] HERO-TECH-01/02: diff review, không invalid-block, regression Product Showcase/Card Carousel/core button ngoài Hero sạch.
 - [ ] HERO-TECH-03: kết luận chớp — tái hiện / không tái hiện trong môi trường đã ghi / chưa kiểm được.
 - [ ] Human approve kết quả visual.

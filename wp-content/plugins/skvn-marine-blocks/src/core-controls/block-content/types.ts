@@ -13,7 +13,8 @@ export type ContentFieldKind =
 	| 'slugs'
 	| 'enum'
 	| 'int'
-	| 'url';
+	| 'url'
+	| 'focal';
 
 export interface ContentField {
 	key: string;

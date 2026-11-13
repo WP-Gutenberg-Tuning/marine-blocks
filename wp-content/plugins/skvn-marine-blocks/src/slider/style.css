@@ -62,6 +62,8 @@
 .skvn-slide__bg {
 	inset: var(--skvn-parallax-inset, 0%);
 	position: absolute;
+	transform-origin: var(--skvn-slide-bg-pos-x, 50%)
+		var(--skvn-slide-bg-pos-y, 50%);
 }
 
 /* Promote compositor layer only when parallax is active (avoids GPU cost on
@@ -85,7 +87,8 @@
 	display: block;
 	height: 100%;
 	object-fit: cover;
-	object-position: center;
+	object-position: var(--skvn-slide-bg-pos-x, 50%)
+		var(--skvn-slide-bg-pos-y, 50%);
 	width: 100%;
 }
 
@@ -93,6 +96,8 @@
 	height: 100%;
 	inset: 0;
 	object-fit: cover;
+	object-position: var(--skvn-slide-bg-pos-x, 50%)
+		var(--skvn-slide-bg-pos-y, 50%);
 	position: absolute;
 	width: 100%;
 	z-index: 0;
@@ -540,6 +545,14 @@
 	justify-content: center;
 	min-height: clamp(30rem, 68vh, 48rem);
 	padding-inline: clamp(1.5rem, 5vw, 4rem);
+}
+
+.skvn-slider--hero .skvn-slide.skvn-slide--fill-transparent {
+	background: transparent;
+}
+
+.skvn-slider--hero .skvn-slide.skvn-slide--fill-custom {
+	/* Custom fill uses inline background from saved attributes / PHP render. */
 }
 
 .skvn-slider--hero .skvn-slide__content {

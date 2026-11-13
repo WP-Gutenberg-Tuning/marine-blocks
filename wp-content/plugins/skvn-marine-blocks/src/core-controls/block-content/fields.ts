@@ -46,6 +46,7 @@ const SLIDE_FIELDS: ContentField[] = [
 	{ key: 'backgroundImageId', kind: 'int', min: 0, max: 2147483647 },
 	{ key: 'backgroundImageUrl', kind: 'url' },
 	{ key: 'backgroundImageAlt', kind: 'plain' },
+	{ key: 'backgroundImageFocalPoint', kind: 'focal' },
 ];
 
 const CORE_HEADING_FIELDS: ContentField[] = [
@@ -157,6 +158,8 @@ export function emptyValueFor( field: ContentField ): unknown {
 			return [];
 		case 'int':
 			return field.min ?? 0;
+		case 'focal':
+			return { x: 0.5, y: 0.5 };
 		default:
 			return '';
 	}
@@ -279,6 +282,31 @@ export function normalizeFieldValue(
 			return isSafeUrl( raw )
 				? { ok: true, value: raw }
 				: { ok: false, code: 'url' };
+
+		case 'focal': {
+			if ( typeof raw !== 'object' || raw === null ) {
+				return { ok: false, code: 'field-type' };
+			}
+
+			const record = raw as Record< string, unknown >;
+			const x = Number( record.x );
+			const y = Number( record.y );
+
+			if ( ! Number.isFinite( x ) || ! Number.isFinite( y ) ) {
+				return { ok: false, code: 'field-type' };
+			}
+
+			const clamp = ( value: number ) =>
+				Math.min( 1, Math.max( 0, value ) );
+
+			return {
+				ok: true,
+				value: {
+					x: Math.round( clamp( x ) * 10000 ) / 10000,
+					y: Math.round( clamp( y ) * 10000 ) / 10000,
+				},
+			};
+		}
 
 		default:
 			return { ok: false, code: 'field-type' } as ContentResult< unknown >;

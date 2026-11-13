@@ -1,5 +1,7 @@
 # Decision — Slider Parallax (Both Depth) 1.3.8
 
+> **Revision 1.2 (2026-11-13)** — Plan 070. Resting `--skvn-parallax-inset` stays **0**. A negative inset zoomed the still image (~1.7× at medium) and made the editor focal crop miss the frontend. Edge cover during travel is Swiper scale: `S >= 1 + 2 * (translate / 100)`. Presets: subtle 15% / 1.30, medium 30% / 1.60, strong 50% / 2.00. Advanced Edge guard is removed from the Inspector; saved `parallaxInset` is ignored at runtime. Translate and Both raise scale to that floor. Scale-only does not. Sections below that prescribe a negative inset or scale ceiling 1.50 are historical.
+
 **Version:** 1.1  
 
 Status: IMPLEMENTED
