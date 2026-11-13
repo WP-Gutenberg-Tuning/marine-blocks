@@ -19,7 +19,7 @@ Human clarification2026-11-12: câu “Đẩy version, đã pass toàn bộ, nh�
 
 ### Scope và acceptance current1.3.21
 
-**Hero Slider Contrast Repair** — PATCH sửa cascade mặc định của Slider hiện có, không thêm block/attribute/dependency. Theme `style.css:98-115` đặt `color` lên `.wp-block-heading` ở (0,2,1) và thắng mọi rule Hero; carrier `color` trên `.skvn-slide__content` + `color: inherit` ở (0,3,0) đã có source. CTA mặc định white-pill + navy `#073b5a`, hover/focus `#eaf7ff`, guard `:not(.has-background)` ở (0,4,0) để thắng GP inline `a.wp-block-button__link` (0,2,1) mà không đụng background/gradient chọn tay. **Human PASS2026-11-13** cho HERO-UI-01–03 và HERO-UX-01. HERO-TECH-03 chớp vẫn chưa kết luận; contrast PASS không đồng nghĩa chớp đã sửa.
+**Hero Slider Contrast Repair** — PATCH sửa cascade mặc định của Slider hiện có, không thêm block/attribute/dependency. Theme `style.css:98-115` đặt `color` lên `.wp-block-heading` ở (0,2,1) và thắng mọi rule Hero; carrier `color` trên `.skvn-slide__content` + `color: inherit` ở (0,3,0) đã có source. CTA mặc định white-pill + navy `#073b5a`, hover/focus `#eaf7ff`, guard `:not(.has-background)` ở (0,4,0) để thắng GP inline `a.wp-block-button__link` (0,2,1) mà không đụng background/gradient chọn tay. **Human PASS2026-11-13** cho HERO-UI-01–03 và HERO-UX-01. **Human2026-11-13 (bổ sung): “đã hết chớp, các cái khác pass, đang sửa một số cái nhỏ”** — HERO-TECH-03 kết luận theo human: chớp **không còn tái hiện**; các mục còn lại human xác nhận pass ở mức UX. Đây là xác nhận nghiệm thu, **không phải lệnh chuyển mốc**: current vẫn1.3.21 IN PROGRESS cho tới khi human ra lệnh riêng, và các lỗi nhỏ đang sửa phải được ghi lại trước khi đóng.
 
 **Hero Slide background fill + copy/apply** — **scope amendment2026-11-12** (human Q&A + “OK, ghi lại”): per-slide fill trên Hero (default / custom solid+gradient / transparent), lớp dưới ảnh; modal Apply tách Fill vs Background image; plan [068](planning/068_VER_1_3_21_HERO_SLIDE_BACKGROUND_FILL_AND_COPY_PLAN.md), runbook [hero-slide-background-fill-1.3.21](../docs/testing/hero-slide-background-fill-1.3.21.md), acceptance **HSB-***. Human đã test; source implement — runtime HSB-* Chờ kiểm chứng; tách acceptance khỏi HERO-* (044 cố ý không schema).
 
@@ -33,12 +33,13 @@ Checklist đầy đủ HERO-*/SED-* ở mục §1.3.21 bên dưới; process wai
 
 | Work package | Source / acceptance | Trạng thái / evidence cần tiếp |
 |---|---|---|
-| Hero Slider Contrast Repair | Plan044; HERO-UI-01–03, HERO-UX-01, HERO-TECH-01–03 | Human PASS2026-11-13 cho contrast (HERO-UI/UX). HERO-TECH-03 chớp vẫn chưa kết luận. |
-| Slider Editor UI Redesign | Plan062/063 + Concept01 artifact; U01–U09, AF01–10, N01–03, SED-ED01–04/SED-TECH01/SED-UI01 | Đã có source, runtime Chờ kiểm chứng. P0 pin WP/Gutenberg/tagged API; native N01–03/iframe/assets, 3–10Slide/limits, paired screenshots, geometry/perf và no-invalid-block còn thiếu. |
+| Hero Slider Contrast Repair | Plan044; HERO-UI-01–03, HERO-UX-01, HERO-TECH-01–03 | **Human PASS2026-11-13** cho contrast (HERO-UI/UX) và **chớp đã hết**. HERO-TECH-01/02 (diff review, no-invalid-block, regression ngoài Hero) vẫn Chờ kiểm chứng hoặc carry khi chuyển mốc. |
+| Slider Editor UI Redesign | Plan062/063 + Concept01 artifact; U01–U09, AF01–10, N01–03, SED-ED01–04/SED-TECH01/SED-UI01 | Đã có source, runtime Chờ kiểm chứng. P0 pin WP/Gutenberg/tagged API; native N01–03/iframe/assets, 3–10Slide/limits, paired screenshots, geometry/perf và no-invalid-block còn thiếu. Hero editor stage: human A 2026-11-13, sàn 36rem, chờ xem sau reload. |
 | Hero Slide background fill | Plan068; HSB-UI-01–03, HSB-UX-01–02, HSB-TECH-01–02 | Source có; human đã test; HSB-* onsite Chờ kiểm chứng. |
 | Hero Slide background focal | Plan069; HSF-UI-01–02, HSF-UX-01–02, HSF-TECH-01–02 | Plan070 source 2026-11-13: inset đứng yên = 0, scale che translate. Chờ human PRC-01–06. HSF-TECH-01 chưa PASS. |
 | Slide overlay color | Plan071 | Planning 2026-11-13. Chưa code. Màu đặc, default `#073b5a`. |
 | Parallax Translate only | Plan072; PTO-01–05. Research mép: plan073 | Source 072: Translate only không gắn scale. Edge blur `parallaxBlur` 0–48, mặc định 0. Cả hai chờ human xem trên frontend sau build. |
+| Slider text stagger | Plan075; research074. STA-01–08, FAD-01–07 | Source 2026-11-13. Text motion Off / Stagger / Fade, mặc định Off. Chờ build và STA/FAD trên frontend. Đánh chữ §8.2 khi có nhu cầu, chưa code. |
 | Ngoài current scope | Blog archive, Woo Archive M2 inquiry/second language, ratio control060§12, Visual Sidebar054 Q1–Q3, Step Slider1.3.24 | Chưa start/deferred; không tự gán vào1.3.21 hoặc mở ratio setting trong patch1:1. Step Slider giữ018/1.3.24 và acceptance riêng. |
 
 ### Carry register từ1.3.20 →1.3.21 — không mất acceptance
@@ -1030,7 +1031,7 @@ Version rationale: feature thường tăng MINOR; **1.3.20 là ngoại lệ do h
 
 **Reference lock2026-11-09:** human xem Concept01 và nói “Good”, yêu cầu implementation bám artifact. [Plan062](planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) là contract bắt buộc: đọc canonical HTML/hash, AF01–10→source mapping, paired artifact/actual editor images và deviation register; không tự bỏ/đổi frame, bố cục hoặc nhãn. Reference accepted không là source/runtime PASS hoặc lệnh start; demo review controls/state không thành product implementation. Các câu chưa có mockup/layout dưới đây là checkpoint trước khi có reference, không gate hỏi lại bố cục Concept01; phần Inspector/variations/native feasibility còn phải audit.
 
-Status: **IN PROGRESS (source) — CURRENT từ 2026-11-12, chờ human build + kiểm chứng runtime**
+Status: **IN PROGRESS (source) — CURRENT từ 2026-11-12. Human2026-11-13: contrast PASS, chớp đã hết, các mục khác pass ở mức UX; đang sửa một số lỗi nhỏ nên chưa đóng mốc.** Còn HERO-TECH-01/02, P0/native N01–03, fidelity/perf và evidence kỹ thuật — chờ carry hoặc kiểm tiếp khi human ra lệnh.
 
 **Clarification2026-11-12:** câu “Đẩy version, đã pass toàn bộ…” của human thuộc **ngữ cảnh1.3.20** (ghi tại MILESTONES_HISTORY §1.3.20), **không** phải nghiệm thu1.3.21. Vì vậy HERO-*/SED-* giữ nguyên trạng thái Chờ kiểm chứng; current vẫn1.3.21; không archive, không chuyển1.3.22, metadata1.3.21. Commit tự chuyển1.3.22 (`563a66e`) đã revert (`cee8ed0`).
 
@@ -1072,7 +1073,7 @@ Acceptance (điểm tương ứng HERO-* trong 044 §7):
 - [x] HERO-UI-03 PASS runtime: CTA normal/hover/focus, gradient và custom hover được giữ. Human PASS2026-11-13.
 - [x] HERO-UX-01 PASS runtime: editor preview khớp frontend, stacked preview không Swiper. Human PASS2026-11-13.
 - [ ] HERO-TECH-01/02: diff review, không invalid-block, regression Product Showcase/Card Carousel/core button ngoài Hero sạch.
-- [ ] HERO-TECH-03: kết luận chớp — tái hiện / không tái hiện trong môi trường đã ghi / chưa kiểm được.
+- [x] HERO-TECH-03: kết luận chớp — human2026-11-13 “đã hết chớp”, không còn tái hiện trên build đang dùng. Contrast PASS và chớp hết là hai kết quả riêng, cùng ghi nhận ngày này.
 - [ ] Human approve kết quả visual.
 
 Acceptance bổ sung Editor redesign — **Chưa làm**, không thay HERO-*:
