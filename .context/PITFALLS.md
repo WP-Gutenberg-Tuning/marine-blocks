@@ -10,6 +10,14 @@
 
 
 
+### AP-14 — Agent không nâng stage Hero vì plan cấm đổi tỷ lệ, và lần đụng chiều cao đã làm vỡ editor
+
+- **Case 2026-11-13:** Human thấy stage Hero trong Slider Editor quá thấp. Ảnh preview chữ lớn sát mép trên và dưới. Không có log chat hay commit nào ghi một lượt đã sửa mỗi `356px` hoặc mỗi `480px` rồi thất bại. Agent trước dừng trước khi sửa, vì nhiệm vụ của họ là bám Concept01, không phải làm stage cao hơn.
+- **Vì sao dừng:** Plan 062/063 chốt sàn stage `356px` và bắt buộc có delta của human trước khi đổi tỷ lệ khung. Câu “content được grow, không clip” khiến agent coi ô thấp là đúng mẫu, không phải lỗi. DP-05 ghi lần gắn `max-height: 480px` lên wrapper Slider đã bóp cả rail, stage và footer; lệnh sửa là giữ trần trên chính slide. Sau đó đụng chiều cao trông như mở lại lỗi đã cấm. Rule nhìn thấy nằm ở `assets/css/slider-editor.css`, còn Hero frontend `clamp(30rem, 68vh, 48rem)` bị rule editor ghi đè, nên sửa `style.css` xong editor vẫn y nguyên.
+- **Rule:** Sàn Concept01 `356px` nằm ở `assets/css/slider-editor.css` (`.skvn-slider.skvn-slider--editor-focus .skvn-slide--editor`, specificity 0,3,0) và được plan 063 coi là override có chủ đích lên min-height slide. Trần `480px` nằm ở `src/slider/style.css` (`.skvn-slide--hero-max-height`, 0,1,0). DP-05 đã chuyển class này từ wrapper Slider sang `slide/edit.tsx` sau khi gắn ở cha làm hỏng cả editor. Đổi mỗi `480px`, hoặc chỉ nâng `356px` mà không gỡ trần trên selector mạnh hơn, stage vẫn kẹt. Frontend Hero `clamp(30rem, 68vh, 48rem)` không áp vào editor vì rule 356px thắng.
+- **Repair:** Human chọn A. Cùng file editor, selector `.skvn-slide--editor.skvn-slide--hero-max-height`: `min-height: 36rem`, `max-height: none`. Rail giữ `356px`. Slide không phải Hero giữ sàn 356px. File editor enqueue sau `style-view` và dùng `filemtime`, không cần build webpack cho rule này.
+- **Evidence:** Screenshot editor 2026-11-13, stage hẹp. Plan062 §3 ghi delta. Pitfall 9 trong `docs/debug-casebook/PITFALLS.md`. Chiều cao editor chưa được human đo lại.
+
 ### AP-13 — Kiểm DOM sau compile rồi bỏ sót CSS cache của first response
 
 - **Case2026-11-09:** header Home đẹp sau tải nhưng co/thiếu lúc đầu trên desktop. Agent trước đó chỉ xem computed DOM sau WindPress compiler:27212ký tự CSS có menu. Raw HTML thực trả cache21218ký tự, thiếu companion và utilities header; VFS `/mhf-header.css` đã mới.

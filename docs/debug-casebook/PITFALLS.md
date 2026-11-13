@@ -22,6 +22,7 @@ Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05)
 | Editor preview arrow reuse Swiper hook + CSS yếu | Circle “rỗng”, chevron xanh to/lệch; `aria-controls` trên preview button | Plugin editor CSS + `view.ts` selector | [CASE-006](slider/006_SLIDER_EDITOR_ARROW_PREVIEW_CSS_CASCADE.md) |
 | CSS vars build nhưng không emit define rule | Có `<style>` + `var(--x, inherit)`; hover không đổi; `--x` rỗng trên wrapper | PHP render_block adapter | [CASE-007](core-control/007_BUTTON_HOVER_CSS_VARS_BUILT_NOT_EMITTED.md) |
 | CSS frame extract sang file chưa enqueue | Root class/label hiện nhưng mất khung và màu nền | Editor asset graph + agent verification | [CASE-008](gutenberg/008_EDITOR_FRAME_CSS_EXTRACTED_NOT_ENQUEUED.md) |
+| Hero editor sửa một rule chiều cao | Stage Hero vẫn thấp sau khi đổi 356px hoặc 480px | `assets/css/slider-editor.css` thắng `style.css` | Pitfall 9, [AP-14](../../.context/PITFALLS.md#ap-14--sửa-chiều-cao-hero-editor-ở-rule-thua-cascade) |
 
 ---
 
@@ -305,6 +306,7 @@ không giữ appender Gutenberg.
 [ ] useSelect không return object literal; preset qua context nếu có
 [ ] IME typing: Highlight updates không flash cả slide stack
 [ ] CASE-004 / CASE-005 verification steps nếu chạm add-slide hoặc slide/edit.tsx
+[ ] Hero stage: đừng sửa riêng 356px hoặc riêng max-height 480px. Pitfall 9. Rail list giữ 356px
 ```
 
 ---
@@ -331,6 +333,25 @@ Sau `npm run build`, human onsite verify để promote case sang `ONSITE_VERIFIE
 **Tránh:** kiểm đầy đủ DOM class → selector → import → build output thực tế → registered/enqueued handle → editor document/iframe → matched/computed style. Search đúng file CSS được đăng ký, không chỉ thấy selector ở một nơi bất kỳ trong build. Chuyển owner phải atomic, không xóa cơ chế cũ khi replacement chưa nối đủ; runtime evidence chưa có thì ghi đúng giới hạn. Không đoán cache hoặc thêm `!important` khi chưa biết CSS có được tải không. Existing parse/VM tests không phải asset-loading regression guard.
 
 ---
+
+## Pitfall 9 — Agent không nâng stage Hero editor
+
+**Xảy ra 2026-11-13.** Human gửi ảnh Slider Editor: heading Hero, paragraph và nút nằm sát trong stage. Yêu cầu tăng chiều cao, thảo luận trước. Không thấy log một lượt sửa mỗi một rule rồi thất bại.
+
+Agent trước không làm được vì nhiệm vụ đang mở là bám Concept01. Plan 062/063 khóa sàn `356px` và đòi human duyệt trước khi đổi tỷ lệ. “Content được cao hơn, không cắt” đọc như ô thấp đã đúng. DP-05 thì ghi lần đặt `max-height: 480px` lên wrapper đã làm vỡ cả editor, và cách sửa là giữ trần trên slide. Lần này làm được sau khi human chọn phương án A, tức delta mà plan đang đòi. CSS chỉ là bước sau quyết định đó.
+
+**Cơ chế nếu đã quyết nâng mà sửa nhầm file:**
+
+- `assets/css/slider-editor.css`: `.skvn-slider.skvn-slider--editor-focus .skvn-slide--editor` có `min-height: 356px`. Đây là sàn stage ngắn của Concept01, specificity 0,3,0. File này enqueue handle `skvn-marine-slider-editor`, phụ thuộc `style-view`, version `filemtime`.
+- `src/slider/style.css`: `.skvn-slide--hero-max-height` có `max-height: 480px` và `min-height: 0`. Class chỉ thêm trong `slide/edit.tsx` khi preset là Hero. Specificity 0,1,0.
+
+Sửa `480px` trong `style.css` không nâng stage: rule 356px vẫn thắng `min-height`. Nâng 356px lên 36rem mà không gỡ trần trên selector mạnh hơn thì `max-height: 480px` vẫn kẹp hộp. Frontend `.skvn-slider--hero .skvn-slide` dùng `clamp(30rem, 68vh, 48rem)` nhưng thua rule editor.
+
+**Human chọn A.** Chỉ Hero trong editor: `min-height: 36rem`, `max-height: none`, selector `.skvn-slider.skvn-slider--editor-focus .skvn-slide--editor.skvn-slide--hero-max-height`. Danh sách slide giữ `max-height: 356px`. Slide không phải Hero giữ sàn 356px. Không đổi frontend.
+
+**Tránh:** Khi stage editor thấp, đo computed `min-height` và `max-height` trên `.skvn-slide--editor`, rồi tìm cả hai file. Rule mới phải thắng cả sàn 356px và trần 480px. Đừng kéo rail lên theo stage. Đừng dùng `68vh` trong post editor.
+
+**Chưa đo lại.** Source có. Human reload editor và đo chiều cao ô xanh khoảng 576px.
 
 ## Related
 

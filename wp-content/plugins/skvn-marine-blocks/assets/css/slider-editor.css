@@ -40,6 +40,10 @@
 .skvn-slider--editor-focus .skvn-slider-editor__picker label { display: block; font-size: 12px; line-height: 1.5; margin-bottom: 7px; }
 .skvn-slider--editor-focus .skvn-slider-editor__picker select { box-sizing: border-box; width: 100%; max-width: 100%; min-height: 36px; border: 1px solid #cdd6e3; border-radius: 6px; padding: 6px 10px; background: #fff; color: #243850; font: inherit; font-size: 12px; }
 .skvn-slider.skvn-slider--editor-focus .skvn-slide--editor { min-height: 356px; height: auto; padding: 38px; border: 0; border-radius: 9px; overflow: visible; }
+/* Hero only. 356px above stays the short-slide floor. Human 2026-11-13 A.
+   Must beat both this 356px rule and style.css .skvn-slide--hero-max-height
+   (max-height: 480px). Rail list stays 356px. Pitfall 9 / AP-14. */
+.skvn-slider.skvn-slider--editor-focus .skvn-slide--editor.skvn-slide--hero-max-height { max-height: none; min-height: 36rem; }
 .skvn-slider--editor-focus .skvn-slide--editor > .skvn-slide__media { border-radius: inherit; }
 .skvn-slider--editor-focus .skvn-slider-editor__empty { display: grid; place-items: center; min-height: 160px; padding: 20px; border: 1px dashed #b7bfdf; border-radius: 9px; color: #59677a; font-size: 13px; }
 .skvn-slider--editor-focus .skvn-slider-editor__footer { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; gap: 20px 24px; border-top: 1px solid #dce0ee; padding-top: 21px; margin-top: 23px; }
