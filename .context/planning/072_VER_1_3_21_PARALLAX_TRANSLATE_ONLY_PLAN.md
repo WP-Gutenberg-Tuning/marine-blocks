@@ -59,4 +59,4 @@ Không sửa PHP inset, CSS focal, attr đã lưu.
 6. Đảo ngược: trả dòng ghi scale cho depth `translate` là một sửa trong `view.ts`. Không migration.
 7. Human đã lệnh tiến hành trong cùng yêu cầu lập plan.
 
-**Status:** SOURCE cùng ngày lập plan.
+**Status:** SOURCE cùng ngày lập plan. Cách che dải fill mà không zoom: research [073](073_VER_1_3_21_PARALLAX_TRANSLATE_EDGE_RESEARCH.md), chưa code.

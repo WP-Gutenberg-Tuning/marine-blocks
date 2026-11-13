@@ -23,6 +23,7 @@ type SliderAttributes = {
 	parallaxTranslate: number;
 	parallaxScale: number;
 	parallaxInset: number;
+	parallaxBlur: number;
 };
 
 type SliderSaveProps = {
@@ -62,6 +63,7 @@ export function save({ attributes }: SliderSaveProps) {
 			parallaxTranslate: attributes.parallaxTranslate,
 			parallaxScale: attributes.parallaxScale,
 			parallaxInset: attributes.parallaxInset,
+			parallaxBlur: attributes.parallaxBlur,
 		}),
 	});
 

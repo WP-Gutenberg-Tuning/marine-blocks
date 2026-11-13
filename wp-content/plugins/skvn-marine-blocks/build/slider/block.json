@@ -122,6 +122,10 @@
     "parallaxInset": {
       "type": "number",
       "default": 35
+    },
+    "parallaxBlur": {
+      "type": "number",
+      "default": 0
     }
   },
   "allowedBlocks": [

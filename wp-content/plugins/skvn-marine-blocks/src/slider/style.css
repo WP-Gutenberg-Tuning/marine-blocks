@@ -64,6 +64,24 @@
 	position: absolute;
 	transform-origin: var(--skvn-slide-bg-pos-x, 50%)
 		var(--skvn-slide-bg-pos-y, 50%);
+	z-index: 1;
+}
+
+.skvn-slide__plate {
+	inset: 0;
+	position: absolute;
+	z-index: 0;
+}
+
+.skvn-slide__plate img {
+	display: block;
+	filter: blur(var(--skvn-parallax-blur, 0px));
+	height: 100%;
+	object-fit: cover;
+	object-position: var(--skvn-slide-bg-pos-x, 50%)
+		var(--skvn-slide-bg-pos-y, 50%);
+	transform: scale(var(--skvn-parallax-plate-scale, 1));
+	width: 100%;
 }
 
 /* Promote compositor layer only when parallax is active (avoids GPU cost on

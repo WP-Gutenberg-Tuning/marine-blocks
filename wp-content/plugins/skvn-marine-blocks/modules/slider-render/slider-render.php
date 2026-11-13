@@ -379,6 +379,12 @@ function skvn_marine_blocks_render_slider( $attributes, $content, $block ) {
 			0,
 			80
 		),
+		'parallaxBlur'      => skvn_marine_blocks_normalize_slider_integer(
+			$attributes['parallaxBlur'] ?? 0,
+			0,
+			0,
+			48
+		),
 	);
 
 	if ( '3-2-1' === $responsive_slides ) {

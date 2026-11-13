@@ -61,6 +61,7 @@ export type SliderAttributes = {
 	parallaxTranslate: number;
 	parallaxScale: number;
 	parallaxInset: number;
+	parallaxBlur: number;
 };
 
 type SliderEditProps = {
@@ -342,6 +343,26 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 							onChange={(parallaxAdvanced) =>
 								setAttributes({ parallaxAdvanced })
 							}
+						/>
+					) }
+					{ attributes.enableParallax &&
+						( ! attributes.parallaxAdvanced ||
+							attributes.parallaxDepth !== 'scale' ) && (
+						<RangeControl
+							help={__(
+								'Blurs a still copy of the image behind the one that moves, so the gap is not a flat color. 0 turns this off. The still image stays the same size. Has no effect in the editor.',
+								'skvn-marine-blocks'
+							)}
+							label={__('Edge blur', 'skvn-marine-blocks')}
+							max={48}
+							min={0}
+							onChange={(parallaxBlur) =>
+								setAttributes({
+									parallaxBlur: parallaxBlur ?? 0,
+								})
+							}
+							step={1}
+							value={attributes.parallaxBlur}
 						/>
 					) }
 					{ attributes.enableParallax && attributes.parallaxAdvanced && (

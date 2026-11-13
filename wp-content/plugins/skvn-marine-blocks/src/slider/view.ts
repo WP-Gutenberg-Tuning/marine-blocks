@@ -64,6 +64,7 @@ type SliderConfig = {
 	parallaxTranslate?: number;
 	parallaxScale?: number;
 	parallaxInset?: number;
+	parallaxBlur?: number;
 };
 
 type NormalizedSliderConfig = {
@@ -95,6 +96,7 @@ type NormalizedSliderConfig = {
 	parallaxTranslate: number;
 	parallaxScale: number;
 	parallaxInset: number;
+	parallaxBlur: number;
 };
 
 type SliderElement = HTMLElement & {
@@ -260,6 +262,7 @@ function parseSliderConfig(
 		parallaxTranslate: clampInteger( parsed.parallaxTranslate, 30, 0, 80 ),
 		parallaxScale: clampNumber( parsed.parallaxScale, 1.12, 1, 2 ),
 		parallaxInset: clampInteger( parsed.parallaxInset, 35, 0, 80 ),
+		parallaxBlur: clampInteger( parsed.parallaxBlur, 0, 0, 48 ),
 	};
 }
 
@@ -521,6 +524,40 @@ function initSlider( slider: SliderElement ): void {
 					: chosenScale;
 			const axis = direction === 'vertical' ? 'y' : 'x';
 			const durationMs = String( config.transitionDuration );
+
+			if ( includeTranslate && config.parallaxBlur > 0 ) {
+				const plateScale =
+					Math.round( ( coverScale + 0.12 ) * 100 ) / 100;
+				slider.style.setProperty(
+					'--skvn-parallax-blur',
+					`${ config.parallaxBlur }px`
+				);
+				slider.style.setProperty(
+					'--skvn-parallax-plate-scale',
+					String( plateScale )
+				);
+				slider
+					.querySelectorAll< HTMLElement >( '.skvn-slide__media' )
+					.forEach( ( media ) => {
+						if ( media.querySelector( '.skvn-slide__plate' ) ) {
+							return;
+						}
+						const source = media.querySelector< HTMLImageElement >(
+							'.skvn-slide__bg img'
+						);
+						if ( ! source?.src ) {
+							return;
+						}
+						const plate = document.createElement( 'div' );
+						const image = document.createElement( 'img' );
+						plate.className = 'skvn-slide__plate';
+						plate.setAttribute( 'aria-hidden', 'true' );
+						image.alt = '';
+						image.src = source.src;
+						plate.appendChild( image );
+						media.insertBefore( plate, media.firstChild );
+					} );
+			}
 
 			slider
 				.querySelectorAll< HTMLElement >( '.skvn-slide__bg' )
