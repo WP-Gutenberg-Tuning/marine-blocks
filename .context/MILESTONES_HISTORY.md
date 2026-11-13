@@ -8,11 +8,13 @@
 
 ## V1 / 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign — DONE
 
-Status: **DONE_WITH_CARRY_OVER** (human PASS2026-11-13)
+Status: **DONE** (human PASS2026-11-13; carry waived cùng ngày)
 Started: **2026-11-12**
 Transitioned: **2026-11-13** — human “Đã xong toàn phần 1.3.21” rồi lệnh “Chuyển sang 1.3.22 ngay”. Milestone development build, không release/deploy; metadata working bump sang1.3.22.
 
-Human PASS2026-11-13: acceptance1.3.21 nghiệm thu **toàn phần** — Hero contrast (HERO-UI-01–03, HERO-UX-01), HERO-TECH-03 chớp “đã hết”, Slider Editor UI Redesign, cùng addon fill/focal/parallax/text motion. Plan071 overlay color: human “đã test rồi, xong rồi pass”; **repo không có source `overlayColor`** tại thời điểm đóng — ghi để audit, không coi là code đã hoàn thành. Evidence kỹ thuật chưa thu thập (HERO-TECH-01/02, P0 pin WP/Gutenberg/tagged API, native N01–03/iframe/assets, 3–10Slide/limits, AF01–10 paired fidelity, geometry/perf, build/lint output) là carry sang1.3.22, không mở lại trạng thái và không hạ PASS của human.
+Human PASS2026-11-13: acceptance1.3.21 nghiệm thu **toàn phần** — Hero contrast (HERO-UI-01–03, HERO-UX-01), HERO-TECH-03 chớp “đã hết”, Slider Editor UI Redesign, cùng addon fill/focal/parallax/text motion. Plan071 overlay color: human “đã test rồi, xong rồi pass”; **repo không có source `overlayColor`** tại thời điểm đóng — ghi để audit, không coi là code đã hoàn thành.
+
+**Human waiver2026-11-13:** “Nói chung đã xong, pass, không cần carry over, cái nào lỗi sẽ phân tích sửa sau.” Các evidence kỹ thuật từng được liệt kê (HERO-TECH-01/02, P0 pin WP/Gutenberg/tagged API, native N01–03/iframe/assets, 3–10Slide/limits, AF01–10 paired fidelity, geometry/perf, build/lint output) **không còn là carry**; tên và checklist bên dưới chỉ giữ để audit lịch sử, không phải nghĩa vụ mở. Lỗi phát sinh sau này xử lý bằng task phân tích riêng, không mở lại trạng thái1.3.21.
 
 Snapshot bên dưới giữ nguyên nội dung/status tại thời điểm đóng; các dòng CURRENT/IN PROGRESS/“chưa archive” bên trong là lịch sử.
 ### 1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign (stack: M5) — archived snapshot
@@ -25,7 +27,7 @@ Snapshot bên dưới giữ nguyên nội dung/status tại thời điểm đón
 
 **Reference lock2026-11-09:** human xem Concept01 và nói “Good”, yêu cầu implementation bám artifact. [Plan062](planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) là contract bắt buộc: đọc canonical HTML/hash, AF01–10→source mapping, paired artifact/actual editor images và deviation register; không tự bỏ/đổi frame, bố cục hoặc nhãn. Reference accepted không là source/runtime PASS hoặc lệnh start; demo review controls/state không thành product implementation. Các câu chưa có mockup/layout dưới đây là checkpoint trước khi có reference, không gate hỏi lại bố cục Concept01; phần Inspector/variations/native feasibility còn phải audit.
 
-Status: **DONE theo human (2026-11-13)** — “Đã xong toàn phần 1.3.21”. Acceptance1.3.21 được human nghiệm thu toàn phần; **chưa archive, chưa bump metadata, current vẫn1.3.21 cho tới khi human ra lệnh transition riêng**. Carry khi chuyển mốc: HERO-TECH-01/02, P0/native N01–03, paired fidelity/geometry/perf và build/lint evidence. Plan071 (màu overlay) **chưa có source** — cần human chốt defer/carry, không tự coi là đã làm.
+Status: **DONE theo human (2026-11-13)** — “Đã xong toàn phần 1.3.21”, sau đó “không cần carry over, cái nào lỗi sẽ phân tích sửa sau”. Acceptance1.3.21 được human nghiệm thu toàn phần và **carry đã waived**; không archive lại, không mở lại trạng thái, current chuyển1.3.22 cùng ngày. Plan071 (màu overlay) **chưa có source** — giữ làm audit note, không coi là đã làm.
 
 **Clarification2026-11-12:** câu “Đẩy version, đã pass toàn bộ…” của human thuộc **ngữ cảnh1.3.20** (ghi tại MILESTONES_HISTORY §1.3.20), **không** phải nghiệm thu1.3.21. Vì vậy HERO-*/SED-* giữ nguyên trạng thái Chờ kiểm chứng; current vẫn1.3.21; không archive, không chuyển1.3.22, metadata1.3.21. Commit tự chuyển1.3.22 (`563a66e`) đã revert (`cee8ed0`).
 
