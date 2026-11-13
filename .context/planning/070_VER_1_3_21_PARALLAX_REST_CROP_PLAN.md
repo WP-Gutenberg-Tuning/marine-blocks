@@ -62,7 +62,8 @@ Scale hiện bị kẹp tối đa **1.50** ở `view.ts`, `slider-render.php` v�
 ## 4. Advanced
 
 - **Edge guard (inset)** bỏ khỏi Inspector. Attr `parallaxInset` giữ trong saved content, runtime không dùng. Tránh slider cũ mất block.
-- Depth **both** và **translate**: scale runtime = `max(scale đang chọn, 1 + 2 * translate / 100)`. Translate-only hiện sống nhờ inset; bỏ inset mà không có scale sàn thì hở mép.
+- Depth **both**: scale runtime = `max(scale đang chọn, 1 + 2 * translate / 100)`.
+- Depth **translate**: plan [072](072_VER_1_3_21_PARALLAX_TRANSLATE_ONLY_PLAN.md) thay câu dưới. Không gắn scale. Mé có thể lộ fill. Không trả inset.
 - Depth **scale**: không dịch, không cần sàn. Dùng đúng scale user chọn.
 - Help của Scale nói rõ: giá trị dưới sàn bị nâng để mép không hở. Help Intensity: ảnh đứng yên không phóng; zoom chỉ trong lúc chuyển slide.
 

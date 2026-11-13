@@ -510,11 +510,15 @@ function initSlider( slider: SliderElement ): void {
 				? config.parallaxScale
 				: presetScale[ intensity ];
 			const includeTranslate = depth !== 'scale';
+			// Plan 072: Translate only must not zoom. The cover-scale floor
+			// stays on Both (and on intensity presets, which use Both).
+			const includeScale = depth !== 'translate';
 			const coverScale =
 				Math.round( ( 1 + 2 * ( translateMag / 100 ) ) * 100 ) / 100;
-			const scaleVal = includeTranslate
-				? Math.max( chosenScale, coverScale )
-				: chosenScale;
+			const scaleVal =
+				depth === 'both'
+					? Math.max( chosenScale, coverScale )
+					: chosenScale;
 			const axis = direction === 'vertical' ? 'y' : 'x';
 			const durationMs = String( config.transitionDuration );
 
@@ -534,10 +538,12 @@ function initSlider( slider: SliderElement ): void {
 						);
 					}
 
-					bg.setAttribute(
-						'data-swiper-parallax-scale',
-						scaleVal.toFixed( 2 )
-					);
+					if ( includeScale ) {
+						bg.setAttribute(
+							'data-swiper-parallax-scale',
+							scaleVal.toFixed( 2 )
+						);
+					}
 
 					// Keep parallax transition in phase with slide speed
 					// (avoids desync / stutter on loopFix and manual nav).

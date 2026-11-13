@@ -38,6 +38,7 @@ Checklist đầy đủ HERO-*/SED-* ở mục §1.3.21 bên dưới; process wai
 | Hero Slide background fill | Plan068; HSB-UI-01–03, HSB-UX-01–02, HSB-TECH-01–02 | Source có; human đã test; HSB-* onsite Chờ kiểm chứng. |
 | Hero Slide background focal | Plan069; HSF-UI-01–02, HSF-UX-01–02, HSF-TECH-01–02 | Plan070 source 2026-11-13: inset đứng yên = 0, scale che translate. Chờ human PRC-01–06. HSF-TECH-01 chưa PASS. |
 | Slide overlay color | Plan071 | Planning 2026-11-13. Chưa code. Màu đặc, default `#073b5a`. |
+| Parallax Translate only | Plan072; PTO-01–05 | Source 2026-11-13. Translate only không gắn scale. Both và preset Intensity giữ sàn che mép của plan 070. Chờ human PTO-*. |
 | Ngoài current scope | Blog archive, Woo Archive M2 inquiry/second language, ratio control060§12, Visual Sidebar054 Q1–Q3, Step Slider1.3.24 | Chưa start/deferred; không tự gán vào1.3.21 hoặc mở ratio setting trong patch1:1. Step Slider giữ018/1.3.24 và acceptance riêng. |
 
 ### Carry register từ1.3.20 →1.3.21 — không mất acceptance

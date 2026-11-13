@@ -349,7 +349,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 							<SelectControl
 								label={__('Depth mechanism', 'skvn-marine-blocks')}
 								help={__(
-									'Both compounds a slide and a zoom for the strongest depth.',
+									'Both moves and zooms the background. Translate only moves it and can show the slide fill at the edge. Scale only zooms.',
 									'skvn-marine-blocks'
 								)}
 								onChange={(parallaxDepth) =>
@@ -383,10 +383,17 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 									/>
 									<RangeControl
 										label={__('Translate', 'skvn-marine-blocks')}
-										help={__(
-											'How far the background travels, in percent. During the change the slider also zooms enough to keep the edge covered.',
-											'skvn-marine-blocks'
-										)}
+										help={
+											attributes.parallaxDepth === 'translate'
+												? __(
+														'How far the background travels, in percent. Translate only does not zoom. The slide fill can show along the edge while the slide changes.',
+														'skvn-marine-blocks'
+												  )
+												: __(
+														'How far the background travels, in percent. During the change the slider also zooms enough to keep the edge covered.',
+														'skvn-marine-blocks'
+												  )
+										}
 										max={80}
 										min={0}
 										onChange={(parallaxTranslate) =>
@@ -402,10 +409,17 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 							{ attributes.parallaxDepth !== 'translate' && (
 								<RangeControl
 									label={__('Scale', 'skvn-marine-blocks')}
-									help={__(
-										'Zoom while the slide changes. If this is lower than the translate needs to hide the edge, the slider raises it.',
-										'skvn-marine-blocks'
-									)}
+									help={
+										attributes.parallaxDepth === 'both'
+											? __(
+													'Zoom while the slide changes. If this is lower than the translate needs to hide the edge, the slider raises it.',
+													'skvn-marine-blocks'
+											  )
+											: __(
+													'Zoom while the slide changes. The still image stays the same size.',
+													'skvn-marine-blocks'
+											  )
+									}
 									max={2}
 									min={1}
 									step={0.01}
