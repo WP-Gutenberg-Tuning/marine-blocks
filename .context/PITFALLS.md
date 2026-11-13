@@ -461,3 +461,10 @@ Xem DP-01. Nếu `view.ts` cần đọc 1 attribute, attribute đó phải có t
 - **Không phải:** overlay `#073b5a` (lớp riêng, opacity 0–80, default 35), cũng không phải pixel trong file ảnh.
 - **Chống tái diễn:** trước khi sửa focal hoặc bảo parallax “tự zoom”, đo rect `.skvn-slide__bg` so với `.skvn-slide__media` và đọc `--skvn-parallax-inset`. So editor (inset 0) với frontend. Đừng lấy `data-swiper-parallax-scale` làm độ zoom của slide đang xem.
 - **Fixed:** source 2026-11-13 theo plan 070 (inset đứng yên = 0, scale che translate). Chưa human xác nhận ảnh đứng yên. Chưa đóng HSF-TECH-01.
+
+### DP-09 — Slider viewport-below-header nhích size sau fade; tạm bỏ qua [2026-11-13]
+
+- **Case:** fade load đầu / chuyển trang xong, slider đổi size và tỉ lệ nhẹ. Đo lúc đã đứng yên, đang đăng nhập: `w 1903, h 407, ratio 4.676, initialized true, offset 120px, inlineH rỗng, scrollbar 17`.
+- **Chẩn đoán:** preset `viewport-below-header`. CSS fallback `--skvn-slider-viewport-offset: 5rem` (80px) nằm trong ảnh chụp View Transition. `view.ts` sau đó ghi `120px` (admin bar 32px + header ~88px). Swiper không set inline height. Scrollbar 17px làm hẹp bề ngang lúc ảnh chụp bị gỡ. Morph `::view-transition-group(root)` vẫn bật vì `inc/preloader.php` chỉ override old/new.
+- **Quyết định human:** cú nhảy lớn là admin bar, khách không bị 32px đó. Lệch còn lại ở load đầu (header so với 5rem ~8px, scrollbar 17px) tạm bỏ qua, không sửa trong mốc này.
+- **Chi tiết và hướng sửa sau:** `docs/debug-casebook/PITFALLS.md` Pitfall 10. Đừng trừ admin bar khỏi offset settled.

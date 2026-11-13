@@ -23,6 +23,7 @@ Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05)
 | CSS vars build nhưng không emit define rule | Có `<style>` + `var(--x, inherit)`; hover không đổi; `--x` rỗng trên wrapper | PHP render_block adapter | [CASE-007](core-control/007_BUTTON_HOVER_CSS_VARS_BUILT_NOT_EMITTED.md) |
 | CSS frame extract sang file chưa enqueue | Root class/label hiện nhưng mất khung và màu nền | Editor asset graph + agent verification | [CASE-008](gutenberg/008_EDITOR_FRAME_CSS_EXTRACTED_NOT_ENQUEUED.md) |
 | Hero editor sửa một rule chiều cao | Stage Hero vẫn thấp sau khi đổi 356px hoặc 480px | `assets/css/slider-editor.css` thắng `style.css` | Pitfall 9, [AP-14](../../.context/PITFALLS.md#ap-14--sửa-chiều-cao-hero-editor-ở-rule-thua-cascade) |
+| Slider đổi size sau fade load/chuyển trang | Khung và tỉ lệ nhích khi fade xong | Offset CSS `5rem` rồi JS ghi header + admin bar; scrollbar | Pitfall 10 |
 
 ---
 
@@ -352,6 +353,36 @@ Sửa `480px` trong `style.css` không nâng stage: rule 356px vẫn thắng `mi
 **Tránh:** Khi stage editor thấp, đo computed `min-height` và `max-height` trên `.skvn-slide--editor`, rồi tìm cả hai file. Rule mới phải thắng cả sàn 356px và trần 480px. Đừng kéo rail lên theo stage. Đừng dùng `68vh` trong post editor.
 
 **Chưa đo lại.** Source có. Human reload editor và đo chiều cao ô xanh khoảng 576px.
+
+## Pitfall 10 — Slider đổi size nhẹ sau fade load đầu
+
+**Xảy ra 2026-11-13.** Human: chuyển loading sang trang còn gượng; fade xong slider đổi size và tỉ lệ nhẹ. Đo sau khi trang đã đứng yên, đang đăng nhập:
+
+```text
+w 1903, h 407, ratio 4.676, initialized true, offset 120px, inlineH rỗng, scrollbar 17
+```
+
+**Human 2026-11-13:** phần nhảy lớn khi đăng nhập là admin bar; lần load đầu vẫn nhích nhẹ; tạm bỏ qua, không sửa trong mốc này.
+
+**State delta:**
+
+```text
+State A: trong fade — ảnh chụp View Transition, offset CSS fallback 5rem (80px)
+State B: fade xong — trang thật, offset JS 120px, scrollbar 17px
+Delta:   cao hơn khoảng 40px trong ảnh chụp; rộng hơn 17px
+```
+
+Chiều cao settled là `100dvh − 120px = 407`, nên viewport lúc đo khoảng 527px (cửa sổ thấp hoặc DevTools mở). `inlineH` rỗng: Swiper không ghi pixel height. Class preset là `viewport-below-header`. `view.ts` `syncViewportHeight()` chỉ chạy với preset này: đo `#masthead, .site-header` + `#wpadminbar`, ghi `--skvn-slider-viewport-offset`, rồi `updateSize()`.
+
+Ba chẩn đoán, chỉ số 2 được số đo chốt:
+
+1. Fade chuyển trang trong `inc/preloader.php` chỉ đổi `::view-transition-old(root)` và `::view-transition-new(root)`. `::view-transition-group(root)` vẫn nội suy width/height. Ảnh chụp được lấy trước khi script slider chạy. Plan 046 yêu cầu chỉ fade, không morph. Đây là cảm giác gượng.
+2. Fallback trong `src/slider/style.css` là `var(--skvn-slider-viewport-offset, 5rem)`. Sau script thành `120px`. 120px = admin bar 32px (chỉ khi đăng nhập) + header khoảng 88px. Khách không có 32px đó. Phần header so với 80px còn khoảng 8px.
+3. Scrollbar 17px xuất hiện khi ảnh chụp bị gỡ. Cao theo `dvh` gần như giữ, rộng giảm, `object-fit: cover` crop lại. Có với mọi người. Cùng kiểu trên overlay cũ: `html.skvn-preloading { overflow: hidden }` trong `inc/preloader.php`, class bị gỡ lúc fade overlay kết thúc.
+
+**Nếu sửa sau:** giữ hộp settled (offset thật, kể cả admin bar khi có). Đưa offset cuối vào trước ảnh chụp: cao header đã biết cộng `html.admin-bar` 32px, thay cho đoán `5rem`. Ổn scrollbar (`scrollbar-gutter: stable`) để rộng không đổi lúc fade xong. Tắt morph của `::view-transition-group(root)` nếu muốn fade không kéo size. Đừng gỡ admin bar khỏi phép đo — 120px là chiều cao đúng khi đang đăng nhập.
+
+**Đừng làm:** coi Swiper inline height là thủ phạm khi `style.height` trống. Đừng sửa preset Hero `clamp(30rem, 68vh, 48rem)` cho case này; rule viewport (0,3,0) thắng rule Hero (0,2,0).
 
 ## Related
 
