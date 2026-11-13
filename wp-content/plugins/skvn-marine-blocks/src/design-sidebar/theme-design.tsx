@@ -1,9 +1,9 @@
-import { Button, Notice, PanelBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
+import { Button, Notice, PanelBody, SelectControl, Spinner, TextControl, ToggleControl } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-type Group = 'palette' | 'heading' | 'fonts';
-type Values = Record< string, string | { size: string; weight: string } >;
+type Group = 'palette' | 'heading' | 'fonts' | 'product';
+type Values = Record< string, string | boolean | { size: string; weight: string } >;
 type SavedGroup = { value: Values; revision: string; canEdit: boolean };
 type Snapshot = {
 	available: boolean;
@@ -89,7 +89,8 @@ export function useThemeDesign( active: boolean ) {
 	}, [ activated, attempt, snapshot ] );
 	const retryRead = () => { if ( ! snapshot && ! sessionPending && ! readPending ) setAttempt( ( previous ) => previous + 1 ); };
 	const dirty = ( group: Group ) => JSON.stringify( drafts[ group ] ) !== JSON.stringify( snapshot?.groups?.[ group ].value );
-	const hasDraft = !! snapshot?.groups && ( [ 'palette', 'heading', 'fonts' ] as Group[] ).some( dirty );
+	const draftGroups = ( [ 'palette', 'heading', 'fonts', ...( snapshot?.groups?.product ? ( [ 'product' ] as const ) : [] ) ] ) as Group[];
+	const hasDraft = !! snapshot?.groups && draftGroups.some( dirty );
 	useEffect( () => {
 		if ( ! hasDraft ) return;
 		const warn = ( event: BeforeUnloadEvent ) => { event.preventDefault(); event.returnValue = ''; };
@@ -181,6 +182,24 @@ const labels: Record< Group, string > = {
 	palette: __( 'Brand colors', 'skvn-marine-blocks' ),
 	heading: __( 'Typography', 'skvn-marine-blocks' ),
 	fonts: __( 'Fonts', 'skvn-marine-blocks' ),
+	product: __( 'Product page', 'skvn-marine-blocks' ),
+};
+const productLabels: Record< string, string > = {
+	columns: __( 'Columns', 'skvn-marine-blocks' ),
+	ratio: __( 'Column ratio', 'skvn-marine-blocks' ),
+	width: __( 'Width', 'skvn-marine-blocks' ),
+	showGallery: __( 'Show gallery', 'skvn-marine-blocks' ),
+	showPrice: __( 'Show price', 'skvn-marine-blocks' ),
+	showExcerpt: __( 'Show excerpt', 'skvn-marine-blocks' ),
+	showMeta: __( 'Show product meta', 'skvn-marine-blocks' ),
+	showTabs: __( 'Show tabs', 'skvn-marine-blocks' ),
+	showTrust: __( 'Show trust signals', 'skvn-marine-blocks' ),
+	showContact: __( 'Show contact link', 'skvn-marine-blocks' ),
+	showQuote: __( 'Show quote button', 'skvn-marine-blocks' ),
+	titleScale: __( 'Title size', 'skvn-marine-blocks' ),
+	summaryGap: __( 'Column gap', 'skvn-marine-blocks' ),
+	specs: __( 'Specifications', 'skvn-marine-blocks' ),
+	ctaStyle: __( 'Quote button style', 'skvn-marine-blocks' ),
 };
 const paletteLabels = {
 	primary: __( 'Primary', 'skvn-marine-blocks' ), accent: __( 'Accent', 'skvn-marine-blocks' ),
@@ -210,7 +229,7 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 		</PanelBody>
 		{ snapshot.available && snapshot.groups && <>
 			<PanelBody><h2>{ __( 'Theme Design — SKVN Marine', 'skvn-marine-blocks' ) }</h2><p>{ __( 'Drafts do not preview in the canvas. Page Save does not save these settings. Local block overrides keep their own styles.', 'skvn-marine-blocks' ) }</p></PanelBody>
-			{ ( [ 'palette', 'heading', 'fonts' ] as Group[] ).map( ( group ) => {
+			{ ( [ 'palette', 'heading', 'fonts', ...( snapshot.groups.product ? ( [ 'product' ] as const ) : [] ) ] as Group[] ).map( ( group ) => {
 				const value = drafts[ group ] || snapshot.groups![ group ].value;
 				const canEdit = snapshot.groups![ group ].canEdit;
 				return <PanelBody key={ group } title={ labels[ group ] } initialOpen={ group === 'palette' }>
@@ -229,6 +248,47 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 							return <div key={ level }><TextControl label={ `${ level.toUpperCase() } ${ __( 'size', 'skvn-marine-blocks' ) }` } help={ __( 'Use px or rem, for example 2.25rem.', 'skvn-marine-blocks' ) } value={ heading.size } onChange={ ( size ) => change( group, { ...value, [ level ]: { ...heading, size } } ) } /><SelectControl label={ `${ level.toUpperCase() } ${ __( 'weight', 'skvn-marine-blocks' ) }` } value={ heading.weight } options={ [ 100, 200, 300, 400, 500, 600, 700, 800, 900 ].map( ( weight ) => ( { value: String( weight ), label: String( weight ) } ) ) } onChange={ ( weight ) => change( group, { ...value, [ level ]: { ...heading, weight } } ) } /></div>;
 						} ) }
 						{ group === 'fonts' && <><SelectControl label={ __( 'Font preset', 'skvn-marine-blocks' ) } options={ snapshot.presets || [] } value={ value.preset as string } onChange={ ( preset ) => change( group, { ...value, preset } ) } /><SelectControl label={ __( 'Heading font scope', 'skvn-marine-blocks' ) } options={ snapshot.scopes || [] } value={ value.scope as string } onChange={ ( scope ) => change( group, { ...value, scope } ) } /><p>{ __( 'Uses the existing theme font registry and delivery. No fonts are loaded for drafts.', 'skvn-marine-blocks' ) }</p></> }
+						{ group === 'product' && <>
+							<SelectControl label={ productLabels.columns } value={ value.columns as string } options={ [
+								{ label: __( 'Gallery left', 'skvn-marine-blocks' ), value: 'gallery-left' },
+								{ label: __( 'Gallery right', 'skvn-marine-blocks' ), value: 'gallery-right' },
+								{ label: __( 'Stacked', 'skvn-marine-blocks' ), value: 'stacked' },
+							] } onChange={ ( columns ) => change( group, { ...value, columns } ) } />
+							<SelectControl label={ productLabels.ratio } help={ __( 'Ignored when columns are stacked.', 'skvn-marine-blocks' ) } value={ value.ratio as string } options={ [
+								{ label: '1:1', value: '1-1' }, { label: '3:2', value: '3-2' }, { label: '2:3', value: '2-3' },
+							] } onChange={ ( ratio ) => change( group, { ...value, ratio } ) } />
+							<SelectControl label={ productLabels.width } value={ value.width as string } options={ [
+								{ label: __( 'Wide', 'skvn-marine-blocks' ), value: 'wide' },
+								{ label: __( 'Content', 'skvn-marine-blocks' ), value: 'content' },
+							] } onChange={ ( width ) => change( group, { ...value, width } ) } />
+							<ToggleControl label={ productLabels.showGallery } checked={ !! value.showGallery } onChange={ ( showGallery ) => change( group, { ...value, showGallery } ) } />
+							<ToggleControl label={ productLabels.showPrice } checked={ !! value.showPrice } onChange={ ( showPrice ) => change( group, { ...value, showPrice } ) } />
+							<ToggleControl label={ productLabels.showExcerpt } checked={ !! value.showExcerpt } onChange={ ( showExcerpt ) => change( group, { ...value, showExcerpt } ) } />
+							<ToggleControl label={ productLabels.showMeta } checked={ !! value.showMeta } onChange={ ( showMeta ) => change( group, { ...value, showMeta } ) } />
+							<ToggleControl label={ productLabels.showTabs } checked={ !! value.showTabs } onChange={ ( showTabs ) => change( group, { ...value, showTabs } ) } />
+							<ToggleControl label={ productLabels.showTrust } checked={ !! value.showTrust } onChange={ ( showTrust ) => change( group, { ...value, showTrust } ) } />
+							<ToggleControl label={ productLabels.showContact } checked={ !! value.showContact } onChange={ ( showContact ) => change( group, { ...value, showContact } ) } />
+							<ToggleControl label={ productLabels.showQuote } checked={ !! value.showQuote } onChange={ ( showQuote ) => change( group, { ...value, showQuote } ) } />
+							<SelectControl label={ productLabels.titleScale } value={ value.titleScale as string } options={ [
+								{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
+								{ label: __( 'Heading 2', 'skvn-marine-blocks' ), value: 'h2' },
+								{ label: __( 'Heading 3', 'skvn-marine-blocks' ), value: 'h3' },
+								{ label: __( 'Heading 4', 'skvn-marine-blocks' ), value: 'h4' },
+							] } onChange={ ( titleScale ) => change( group, { ...value, titleScale } ) } />
+							<SelectControl label={ productLabels.summaryGap } value={ value.summaryGap as string } options={ [
+								{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
+								{ label: __( 'Tight', 'skvn-marine-blocks' ), value: 'tight' },
+								{ label: __( 'Loose', 'skvn-marine-blocks' ), value: 'loose' },
+							] } onChange={ ( summaryGap ) => change( group, { ...value, summaryGap } ) } />
+							<SelectControl label={ productLabels.specs } value={ value.specs as string } options={ [
+								{ label: __( 'Default', 'skvn-marine-blocks' ), value: 'default' },
+								{ label: __( 'Compact', 'skvn-marine-blocks' ), value: 'compact' },
+							] } onChange={ ( specs ) => change( group, { ...value, specs } ) } />
+							<SelectControl label={ productLabels.ctaStyle } value={ value.ctaStyle as string } options={ [
+								{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
+								{ label: __( 'Primary', 'skvn-marine-blocks' ), value: 'primary' },
+							] } onChange={ ( ctaStyle ) => change( group, { ...value, ctaStyle } ) } />
+						</> }
 						<Button variant="primary" disabled={ ! dirty( group ) } onClick={ () => save( group ) }>{ __( 'Save group', 'skvn-marine-blocks' ) }</Button>
 						<Button variant="tertiary" onClick={ () => discard( group ) }>{ __( 'Discard draft and reload group', 'skvn-marine-blocks' ) }</Button>
 					</fieldset>
@@ -239,10 +299,21 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 	</>;
 }
 
+function formatProductValue( value: string | boolean | { size: string; weight: string } ) {
+	if ( typeof value === 'boolean' ) {
+		return value ? __( 'On', 'skvn-marine-blocks' ) : __( 'Off', 'skvn-marine-blocks' );
+	}
+	return String( value );
+}
+
 function ConflictComparison( { current, draft, group }: { current: Values; draft: Values; group: Group } ) {
-	const rows = Object.entries( current ).flatMap( ( [ key, value ] ) => typeof value === 'object'
-		? Object.entries( value ).map( ( [ field, saved ] ) => ( { label: `${ key.toUpperCase() } ${ field === 'size' ? __( 'size', 'skvn-marine-blocks' ) : __( 'weight', 'skvn-marine-blocks' ) }`, saved, draft: typeof draft[ key ] === 'object' ? ( draft[ key ] as Record< string, string > )[ field ] : '' } ) )
-		: [ { label: group === 'palette' ? paletteLabels[ key ] : key === 'preset' ? __( 'Font preset', 'skvn-marine-blocks' ) : __( 'Heading scope', 'skvn-marine-blocks' ), saved: value, draft: draft[ key ] as string } ] );
+	const rows = Object.entries( current ).flatMap( ( [ key, value ] ) => typeof value === 'object' && value !== null && 'size' in value
+		? Object.entries( value ).map( ( [ field, saved ] ) => ( { label: `${ key.toUpperCase() } ${ field === 'size' ? __( 'size', 'skvn-marine-blocks' ) : __( 'weight', 'skvn-marine-blocks' ) }`, saved, draft: typeof draft[ key ] === 'object' && draft[ key ] !== null && 'size' in ( draft[ key ] as object ) ? ( draft[ key ] as Record< string, string > )[ field ] : '' } ) )
+		: [ {
+			label: group === 'product' ? ( productLabels[ key ] || key ) : group === 'palette' ? paletteLabels[ key as keyof typeof paletteLabels ] : key === 'preset' ? __( 'Font preset', 'skvn-marine-blocks' ) : __( 'Heading scope', 'skvn-marine-blocks' ),
+			saved: group === 'product' ? formatProductValue( value ) : value,
+			draft: group === 'product' ? formatProductValue( draft[ key ] as string | boolean ) : draft[ key ] as string,
+		} ] );
 	return <table style={ { width: '100%', tableLayout: 'fixed', overflowWrap: 'anywhere' } }>
 		<caption>{ labels[ group ] }</caption>
 		<thead><tr><th scope="col">{ __( 'Setting', 'skvn-marine-blocks' ) }</th><th scope="col">{ __( 'Current saved', 'skvn-marine-blocks' ) }</th><th scope="col">{ __( 'Your draft', 'skvn-marine-blocks' ) }</th></tr></thead>

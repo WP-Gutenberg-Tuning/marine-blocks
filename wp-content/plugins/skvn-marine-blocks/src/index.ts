@@ -2,6 +2,7 @@ import { registerBlockType } from '@wordpress/blocks';
 
 import './core-controls';
 import './design-sidebar';
+import './product-design/panel';
 import spacerMetadata from './responsive-spacer/block.json';
 import { Edit as SpacerEdit } from './responsive-spacer/edit';
 import { save as spacerSave } from './responsive-spacer/save';

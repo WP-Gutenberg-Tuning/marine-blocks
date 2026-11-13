@@ -20,6 +20,7 @@ require_once __DIR__ . '/modules/category-grid/category-grid.php';
 require_once __DIR__ . '/modules/slider-render/slider-render.php';
 require_once __DIR__ . '/modules/feature-showcase-render/feature-showcase-render.php';
 require_once __DIR__ . '/modules/typography-settings/typography-settings.php';
+require_once __DIR__ . '/modules/product-design/product-design.php';
 require_once __DIR__ . '/modules/core-control/core-control.php';
 require_once __DIR__ . '/modules/sidebar-blog-content/sidebar-blog-content.php';
 require_once __DIR__ . '/modules/preloader-settings/preloader-settings.php';

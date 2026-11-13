@@ -79,7 +79,7 @@ function skvn_marine_heading_scope_choices(): array {
 function skvn_marine_design_sidebar_contract(): array {
 	return array(
 		'version' => 1,
-		'capabilities' => array( 'palette', 'heading', 'fonts' ),
+		'capabilities' => array( 'palette', 'heading', 'fonts', 'product' ),
 	);
 }
 

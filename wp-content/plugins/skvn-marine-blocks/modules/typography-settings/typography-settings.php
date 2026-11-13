@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 const SKVN_MARINE_BLOCKS_TYPOGRAPHY_OPTION = 'skvn_typography';
+const SKVN_MARINE_BLOCKS_PRODUCT_DESIGN_OPTION = 'skvn_product_design';
 
 add_action( 'admin_menu', 'skvn_marine_blocks_typography_menu' );
 add_action( 'admin_init', 'skvn_marine_blocks_register_typography_settings' );
@@ -58,7 +59,13 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 	global $wpdb;
 	static $held_owners = array();
 	$stylesheet = get_option( 'stylesheet' );
-	$owner = 'fonts' === $group ? 'theme_mods_' . $stylesheet : SKVN_MARINE_BLOCKS_TYPOGRAPHY_OPTION;
+	if ( 'fonts' === $group ) {
+		$owner = 'theme_mods_' . $stylesheet;
+	} elseif ( 'product' === $group ) {
+		$owner = SKVN_MARINE_BLOCKS_PRODUCT_DESIGN_OPTION;
+	} else {
+		$owner = SKVN_MARINE_BLOCKS_TYPOGRAPHY_OPTION;
+	}
 	if ( isset( $held_owners[ $owner ] ) ) {
 		return new WP_Error( 'busy', __( 'A settings hook attempted a recursive save. Your draft is kept.', 'skvn-marine-blocks' ), array( 'status' => 503 ) );
 	}
@@ -81,7 +88,11 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 		}
 		// get_theme_mods() also preserves WP's deprecated-location migration when
 		// the modern owner is absent. Both font keys are committed in ONE update.
-		$value = 'fonts' === $group ? get_theme_mods() : ( is_array( $persisted['value'] ) ? $persisted['value'] : array() );
+		if ( 'fonts' === $group ) {
+			$value = get_theme_mods();
+		} else {
+			$value = is_array( $persisted['value'] ) ? $persisted['value'] : array();
+		}
 		$value = is_array( $value ) ? $value : array();
 		$current = skvn_marine_blocks_design_snapshot()['groups'][ $group ];
 		if ( ! hash_equals( $current['revision'], $revision ) ) {
@@ -93,6 +104,8 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 				// Same per-key filter and old-value contract as WP set_theme_mod().
 				$value[ $key ] = apply_filters( "pre_set_theme_mod_{$key}", $next, isset( $value[ $key ] ) ? $value[ $key ] : false );
 			}
+		} elseif ( 'product' === $group ) {
+			$value = skvn_marine_blocks_sanitize_product_design( $raw );
 		} else {
 			// Merge the other registered group; the native registered sanitizer
 			// still owns its established policy for unrecognized option keys.
@@ -111,12 +124,24 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 			return $check;
 		}
 		$saved = skvn_marine_blocks_design_snapshot()['groups'][ $group ];
-		$expected = 'fonts' === $group ? $raw : skvn_marine_blocks_sanitize_typography( array( $group => $raw ) )[ $group ];
+		if ( 'fonts' === $group ) {
+			$expected = $raw;
+		} elseif ( 'product' === $group ) {
+			$expected = skvn_marine_blocks_sanitize_product_design( $raw );
+		} else {
+			$expected = skvn_marine_blocks_sanitize_typography( array( $group => $raw ) )[ $group ];
+		}
 		$physical = is_array( $check['value'] ) ? $check['value'] : array();
-		$physical_group = 'fonts' === $group ? array(
-			'preset' => skvn_marine_sanitize_font_preset( isset( $physical['skvn_font_preset'] ) && is_string( $physical['skvn_font_preset'] ) ? $physical['skvn_font_preset'] : 'instrument' ),
-			'scope' => skvn_marine_sanitize_heading_scope( isset( $physical['skvn_font_heading_scope'] ) && is_string( $physical['skvn_font_heading_scope'] ) ? $physical['skvn_font_heading_scope'] : 'h1-h3' ),
-		) : skvn_marine_blocks_sanitize_typography( $physical )[ $group ];
+		if ( 'fonts' === $group ) {
+			$physical_group = array(
+				'preset' => skvn_marine_sanitize_font_preset( isset( $physical['skvn_font_preset'] ) && is_string( $physical['skvn_font_preset'] ) ? $physical['skvn_font_preset'] : 'instrument' ),
+				'scope' => skvn_marine_sanitize_heading_scope( isset( $physical['skvn_font_heading_scope'] ) && is_string( $physical['skvn_font_heading_scope'] ) ? $physical['skvn_font_heading_scope'] : 'h1-h3' ),
+			);
+		} elseif ( 'product' === $group ) {
+			$physical_group = skvn_marine_blocks_sanitize_product_design( $physical );
+		} else {
+			$physical_group = skvn_marine_blocks_sanitize_typography( $physical )[ $group ];
+		}
 		if ( $physical_group !== $expected || $saved['value'] !== $expected ) {
 			return new WP_Error( 'storage_error', __( 'The saved values differ from your draft, possibly because of a settings filter. Your draft is kept. Reload this group to review saved settings.', 'skvn-marine-blocks' ) );
 		}
@@ -145,6 +170,12 @@ function skvn_marine_blocks_design_snapshot() {
 		'heading' => $typography['heading'],
 		'fonts' => array( 'preset' => skvn_marine_get_font_preset(), 'scope' => skvn_marine_get_heading_scope() ),
 	);
+	$contract = skvn_marine_design_sidebar_contract();
+	if ( is_array( $contract ) && isset( $contract['capabilities'] ) && is_array( $contract['capabilities'] ) && in_array( 'product', $contract['capabilities'], true ) ) {
+		$values['product'] = skvn_marine_blocks_sanitize_product_design(
+			get_option( SKVN_MARINE_BLOCKS_PRODUCT_DESIGN_OPTION, array() )
+		);
+	}
 	foreach ( $values as $group => $value ) {
 		$result['groups'][ $group ] = array(
 			'value' => $value,
@@ -199,7 +230,7 @@ function skvn_marine_blocks_design_settings_ajax() {
 		wp_send_json_success( skvn_marine_blocks_design_snapshot() );
 	}
 	$group = isset( $_POST['group'] ) && is_string( $_POST['group'] ) ? sanitize_key( wp_unslash( $_POST['group'] ) ) : '';
-	if ( 'save' !== $operation || ! in_array( $group, array( 'palette', 'heading', 'fonts' ), true ) ) {
+	if ( 'save' !== $operation || ! in_array( $group, array( 'palette', 'heading', 'fonts', 'product' ), true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Unknown settings group.', 'skvn-marine-blocks' ) ), 400 );
 	}
 	if ( ! skvn_marine_blocks_design_theme_supported() || ! current_user_can( 'fonts' === $group ? 'edit_theme_options' : 'manage_options' ) ) {
@@ -209,7 +240,36 @@ function skvn_marine_blocks_design_settings_ajax() {
 	$revision = isset( $_POST['revision'] ) && is_string( $_POST['revision'] ) ? sanitize_text_field( wp_unslash( $_POST['revision'] ) ) : '';
 	$raw = isset( $_POST['value'] ) && is_string( $_POST['value'] ) ? json_decode( wp_unslash( $_POST['value'] ), true ) : null;
 	$valid = is_array( $raw ) && count( $raw ) === count( $current['groups'][ $group ]['value'] );
-	if ( 'fonts' === $group ) {
+	if ( 'product' === $group ) {
+		$valid = is_array( $raw ) && 14 === count( $raw );
+		$defaults = skvn_marine_blocks_get_default_product_design();
+		$allowlists = array(
+			'columns'    => array( 'gallery-left', 'gallery-right', 'stacked' ),
+			'ratio'      => array( '1-1', '3-2', '2-3' ),
+			'width'      => array( 'wide', 'content' ),
+			'titleScale' => array( 'current', 'h2', 'h3', 'h4' ),
+			'summaryGap' => array( 'current', 'tight', 'loose' ),
+			'specs'      => array( 'default', 'compact' ),
+			'ctaStyle'   => array( 'current', 'primary' ),
+		);
+		foreach ( $defaults as $key => $ignored ) {
+			if ( ! isset( $raw[ $key ] ) ) {
+				$valid = false;
+				break;
+			}
+			if ( str_starts_with( $key, 'show' ) ) {
+				if ( ! is_bool( $raw[ $key ] ) ) {
+					$valid = false;
+					break;
+				}
+			} elseif ( isset( $allowlists[ $key ] ) ) {
+				if ( ! is_string( $raw[ $key ] ) || ! in_array( $raw[ $key ], $allowlists[ $key ], true ) ) {
+					$valid = false;
+					break;
+				}
+			}
+		}
+	} elseif ( 'fonts' === $group ) {
 		$valid = $valid && isset( $raw['preset'], $raw['scope'] ) && is_string( $raw['preset'] ) && is_string( $raw['scope'] )
 			&& array_key_exists( $raw['preset'], skvn_marine_font_presets() ) && array_key_exists( $raw['scope'], skvn_marine_heading_scope_choices() );
 	} else {
@@ -237,6 +297,107 @@ function skvn_marine_blocks_design_settings_ajax() {
 		), isset( $data['status'] ) ? $data['status'] : 500 );
 	}
 	wp_send_json_success( $saved );
+}
+
+// ---------------------------------------------------------------------------
+// Product page design — site defaults
+// ---------------------------------------------------------------------------
+
+/**
+ * Default product page design (14 keys).
+ *
+ * Keep in sync with skvn_marine_get_default_product_design() in theme.
+ *
+ * @return array<string,mixed>
+ */
+function skvn_marine_blocks_get_default_product_design() {
+	return array(
+		'columns'     => 'gallery-left',
+		'ratio'       => '1-1',
+		'width'       => 'wide',
+		'showGallery' => true,
+		'showPrice'   => true,
+		'showExcerpt' => true,
+		'showMeta'    => true,
+		'showTabs'    => true,
+		'showTrust'   => true,
+		'showContact' => true,
+		'showQuote'   => true,
+		'titleScale'  => 'current',
+		'summaryGap'  => 'current',
+		'specs'       => 'default',
+		'ctaStyle'    => 'current',
+	);
+}
+
+/**
+ * Sanitize a bool product design flag.
+ *
+ * @param mixed $value Raw value.
+ * @return bool
+ */
+function skvn_marine_blocks_sanitize_product_design_bool( $value ) {
+	return true === $value || 1 === $value;
+}
+
+/**
+ * Sanitize site-level product page design.
+ *
+ * Keep in sync with skvn_marine_sanitize_product_design() in theme.
+ *
+ * @param mixed $raw Raw stored value.
+ * @return array<string,mixed>
+ */
+function skvn_marine_blocks_sanitize_product_design( $raw ) {
+	$defaults = skvn_marine_blocks_get_default_product_design();
+
+	if ( ! is_array( $raw ) ) {
+		return $defaults;
+	}
+
+	$allowlists = array(
+		'columns'    => array( 'gallery-left', 'gallery-right', 'stacked' ),
+		'ratio'      => array( '1-1', '3-2', '2-3' ),
+		'width'      => array( 'wide', 'content' ),
+		'titleScale' => array( 'current', 'h2', 'h3', 'h4' ),
+		'summaryGap' => array( 'current', 'tight', 'loose' ),
+		'specs'      => array( 'default', 'compact' ),
+		'ctaStyle'   => array( 'current', 'primary' ),
+	);
+
+	$out = array();
+
+	foreach ( $defaults as $key => $default ) {
+		if ( str_starts_with( $key, 'show' ) ) {
+			$out[ $key ] = isset( $raw[ $key ] ) ? skvn_marine_blocks_sanitize_product_design_bool( $raw[ $key ] ) : $default;
+			continue;
+		}
+
+		if ( isset( $allowlists[ $key ] ) ) {
+			$out[ $key ] = ( isset( $raw[ $key ] ) && is_string( $raw[ $key ] ) && in_array( $raw[ $key ], $allowlists[ $key ], true ) )
+				? $raw[ $key ]
+				: $default;
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Sanitize per-product override meta.
+ *
+ * @param mixed $raw Raw meta value.
+ * @return array<string,mixed>
+ */
+function skvn_marine_blocks_sanitize_product_design_meta( $raw ) {
+	if ( ! is_array( $raw ) || ( ! skvn_marine_blocks_sanitize_product_design_bool( $raw['override'] ?? false ) ) ) {
+		return array( 'override' => false );
+	}
+
+	return array_merge(
+		array( 'override' => true ),
+		skvn_marine_blocks_sanitize_product_design( $raw )
+	);
 }
 
 // ---------------------------------------------------------------------------

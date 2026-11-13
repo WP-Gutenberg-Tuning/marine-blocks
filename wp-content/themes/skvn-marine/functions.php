@@ -17,6 +17,7 @@ $skvn_marine_includes = array(
 	'inc/media.php',
 	'inc/plugin-notices.php',
 	'inc/woocommerce.php',
+	'inc/product-design.php',
 	'inc/windpress.php',
 	'inc/typography.php',
 	'inc/customizer.php',

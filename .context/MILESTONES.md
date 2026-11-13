@@ -1036,7 +1036,7 @@ Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
 - [ ] PDP-TRACE-01 — Trước implementation lập execution plan và đối chiếu từng acceptance liên quan của **1.3.5**: kế thừa phần đã có, chỉ triển khai delta; không xóa acceptance hoặc đánh dấu 1.3.5 completed. Archive scope vẫn ở nơi cũ.
 - [ ] Tạo runbook onsite với URL/fixtures/steps/expected/evidence, human duyệt trước completion. SemVer đã chốt; bắt đầu/chuyển current cần lệnh riêng.
 
-Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Execution plan có sẵn nhưng **planning-only, chưa code, chưa start**: [067](planning/067_VER_1_3_22_PRODUCT_PAGE_DESIGN_CONTROLS_EXECUTION_PLAN.md) — chỉ thi hành sau lệnh transition riêng của human. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
+Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Execution plan [067](planning/067_VER_1_3_22_PRODUCT_PAGE_DESIGN_CONTROLS_EXECUTION_PLAN.md) đã mở khoá; implementation **Chưa làm**. Agent cửa sổ ngắn làm một gói P1–P5 theo §12–20, không đọc lại toàn bộ quyết định. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
 
 ### 1.3.23 — Post Page Basic Design Controls
 

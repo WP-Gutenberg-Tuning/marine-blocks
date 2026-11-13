@@ -113,21 +113,36 @@ function skvn_marine_woocommerce_single_quote_cta() {
 		return;
 	}
 
-	$quote_url   = esc_url( skvn_marine_get_product_quote_url( $product ) );
+	$design = skvn_marine_get_product_design( $product->get_id() );
+
+	if ( empty( $design['showQuote'] ) && empty( $design['showContact'] ) && empty( $design['showTrust'] ) ) {
+		return;
+	}
+
 	$contact_url = esc_url( home_url( '/lien-he/' ) );
+	$primary_classes = array( 'skvn-product-cta-primary' );
+	if ( ! empty( $design['ctaStyle'] ) && 'primary' === $design['ctaStyle'] ) {
+		$primary_classes[] = 'skvn-button';
+		$primary_classes[] = 'skvn-button--primary';
+	}
 
 	?>
 	<div class="skvn-product-cta-zone">
-		<a class="skvn-product-cta-primary" href="<?php echo $quote_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped above ?>">
+		<?php if ( ! empty( $design['showQuote'] ) ) : ?>
+			<?php $quote_url = esc_url( skvn_marine_get_product_quote_url( $product ) ); ?>
+		<a class="<?php echo esc_attr( implode( ' ', $primary_classes ) ); ?>" href="<?php echo $quote_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped above ?>">
 			<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
 			<?php esc_html_e( 'Yêu cầu báo giá sản phẩm này', 'skvn-marine' ); ?>
 		</a>
+		<p class="skvn-product-cta-note"><?php esc_html_e( 'Phản hồi báo giá trong vòng 24h làm việc', 'skvn-marine' ); ?></p>
+		<?php endif; ?>
+		<?php if ( ! empty( $design['showContact'] ) ) : ?>
 		<a class="skvn-product-cta-secondary" href="<?php echo $contact_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped above ?>">
 			<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
 			<?php esc_html_e( 'Liên hệ tư vấn trực tiếp', 'skvn-marine' ); ?>
 		</a>
-		<p class="skvn-product-cta-note"><?php esc_html_e( 'Phản hồi báo giá trong vòng 24h làm việc', 'skvn-marine' ); ?></p>
-
+		<?php endif; ?>
+		<?php if ( ! empty( $design['showTrust'] ) ) : ?>
 		<div class="skvn-product-trust" role="list">
 			<div class="skvn-product-trust__item" role="listitem">
 				<span class="skvn-product-trust__icon" aria-hidden="true">🏅</span>
@@ -142,6 +157,7 @@ function skvn_marine_woocommerce_single_quote_cta() {
 				<span class="skvn-product-trust__label"><?php esc_html_e( 'Bảo hành 24 tháng', 'skvn-marine' ); ?></span>
 			</div>
 		</div>
+		<?php endif; ?>
 	</div>
 	<?php
 }
@@ -154,6 +170,14 @@ function skvn_marine_woocommerce_single_quote_cta() {
  */
 function skvn_marine_woocommerce_product_tabs( array $tabs ): array {
 	unset( $tabs['description'], $tabs['additional_information'], $tabs['reviews'] );
+
+	if ( function_exists( 'is_product' ) && is_product() ) {
+		$product_id = get_queried_object_id();
+		$design     = skvn_marine_get_product_design( $product_id );
+		if ( empty( $design['showTabs'] ) ) {
+			return array();
+		}
+	}
 
 	$tabs['skvn_product_info'] = array(
 		'title'    => __( 'Product Info', 'skvn-marine' ),
