@@ -5,6 +5,9 @@
  */
 define( 'ABSPATH', __DIR__ );
 
+// Mocked WP hook API: the module registers init/meta-box hooks at load time.
+function add_action( ...$args ) {}
+
 /**
  * Minimal esc_url_raw stub for URL key tests.
  *

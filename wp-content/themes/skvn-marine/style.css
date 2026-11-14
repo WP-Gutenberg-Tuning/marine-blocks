@@ -3507,7 +3507,7 @@ body.skvn-has-footer-page .site {
 .skvn-product-layout {
 	--skvn-page-gutter: 1rem;
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 	column-gap: 3rem;
 	row-gap: 2.5rem;
 	align-items: start;
@@ -3582,6 +3582,8 @@ body.skvn-pdp-specs-compact .skvn-tab-product-info__specs table.shop_attributes 
 .woocommerce div.product .up-sells,
 .woocommerce div.product .related {
 	grid-column: 1 / -1;
+	min-width: 0;
+	width: 100%;
 }
 
 /* Hide GP sidebar on single product page */
@@ -4340,12 +4342,14 @@ body.single-product .content-area {
 	padding: 0.625rem 0.75rem;
 }
 
-/* Related products */
-.woocommerce div.product .related.products {
+/* Related products + upsells (Woo loop below hero) */
+.woocommerce div.product .related.products,
+.woocommerce div.product .up-sells {
 	margin-top: 3rem;
 }
 
-.woocommerce div.product .related.products > h2 {
+.woocommerce div.product .related.products > h2,
+.woocommerce div.product .up-sells > h2 {
 	font-size: 0.625rem;
 	text-transform: uppercase;
 	letter-spacing: 0.18em;
@@ -4354,9 +4358,38 @@ body.single-product .content-area {
 	margin-bottom: 1.25rem;
 }
 
+.woocommerce div.product .related.products > ul.products,
+.woocommerce div.product .up-sells > ul.products {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 1rem;
+	width: 100%;
+	min-width: 0;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.woocommerce div.product .related.products > ul.products::before,
+.woocommerce div.product .related.products > ul.products::after,
+.woocommerce div.product .up-sells > ul.products::before,
+.woocommerce div.product .up-sells > ul.products::after {
+	content: none;
+	display: none;
+}
+
+.woocommerce div.product .related.products > ul.products > li.product,
+.woocommerce div.product .up-sells > ul.products > li.product {
+	float: none;
+	clear: none;
+	width: auto;
+	max-width: none;
+	margin: 0;
+}
+
 .woocommerce ul.products {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 1rem;
 	list-style: none;
 	margin: 0;

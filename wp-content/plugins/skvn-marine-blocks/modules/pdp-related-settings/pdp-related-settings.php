@@ -24,6 +24,10 @@ const SKVN_MARINE_BLOCKS_PDP_RELATED_COLLECTION_BLOCK = 'skvn-marine/product-col
 /** Serialized block opener in post_content (plan076 §6 list + copy preflight). */
 const SKVN_MARINE_BLOCKS_PDP_RELATED_COLLECTION_MARKER = '<!-- wp:skvn-marine/product-collection';
 
+add_action( 'init', 'skvn_marine_blocks_register_pdp_related_meta' );
+add_action( 'add_meta_boxes', 'skvn_marine_blocks_pdp_related_meta_box' );
+add_action( 'save_post_product', 'skvn_marine_blocks_pdp_related_save_classic', 10, 2 );
+
 /**
  * Default related card profile (15 keys, no override).
  *
@@ -361,4 +365,292 @@ function skvn_marine_blocks_pdp_related_copy_from_page( $page_id ) {
 	update_option( SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION, $value );
 
 	return $value;
+}
+
+// ---------------------------------------------------------------------------
+// Per-product override meta — REST + classic editor (plan076 §9)
+// ---------------------------------------------------------------------------
+
+/**
+ * Register the per-product related override meta for the block editor REST API.
+ *
+ * @return void
+ */
+function skvn_marine_blocks_register_pdp_related_meta() {
+	if ( ! post_type_exists( 'product' ) ) {
+		return;
+	}
+
+	register_post_meta(
+		'product',
+		SKVN_MARINE_BLOCKS_PDP_RELATED_META,
+		array(
+			'type'              => 'object',
+			'single'            => true,
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type'                 => 'object',
+					'additionalProperties' => false,
+					'properties'           => skvn_marine_blocks_pdp_related_rest_schema_properties(),
+				),
+			),
+			'auth_callback'     => static function ( $allowed, $meta_key, $post_id ) {
+				unset( $allowed, $meta_key );
+				return current_user_can( 'edit_post', $post_id );
+			},
+			'sanitize_callback' => 'skvn_marine_blocks_sanitize_pdp_related_meta',
+		)
+	);
+}
+
+/**
+ * REST schema properties for the per-product related override meta.
+ *
+ * @return array<string,array<string,mixed>>
+ */
+function skvn_marine_blocks_pdp_related_rest_schema_properties() {
+	$props = array(
+		'override' => array(
+			'type' => 'boolean',
+		),
+	);
+	$enums = array(
+		'imageRatio'        => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
+		'mediaLayout'       => array( 'flush', 'padded', 'floating' ),
+		'chipStyle'         => array( 'tag', 'hashtag', 'dot', 'plain' ),
+		'productActionMode' => array( 'view', 'quote', 'both', 'custom' ),
+	);
+	$bools = array(
+		'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories',
+		'showSpecChips', 'chipAllowTags', 'chipAllowCategories',
+	);
+	$ints = array(
+		'displayTagLimit' => array( 'min' => 0, 'max' => 10 ),
+		'relatedCount'    => array( 'min' => 1, 'max' => 10 ),
+	);
+
+	foreach ( skvn_marine_blocks_get_default_pdp_related() as $key => $default ) {
+		if ( in_array( $key, $bools, true ) ) {
+			$props[ $key ] = array( 'type' => 'boolean' );
+			continue;
+		}
+		if ( isset( $enums[ $key ] ) ) {
+			$props[ $key ] = array(
+				'type' => 'string',
+				'enum' => $enums[ $key ],
+			);
+			continue;
+		}
+		if ( isset( $ints[ $key ] ) ) {
+			$props[ $key ] = array(
+				'type'    => 'integer',
+				'minimum' => $ints[ $key ]['min'],
+				'maximum' => $ints[ $key ]['max'],
+			);
+			continue;
+		}
+		if ( 'customActionUrl' === $key || 'chipColorScheme' === $key ) {
+			$props[ $key ] = array( 'type' => 'string' );
+		}
+	}
+
+	return $props;
+}
+
+/**
+ * Classic editor meta box when the block editor is off for products.
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_meta_box() {
+	if ( function_exists( 'use_block_editor_for_post_type' ) && use_block_editor_for_post_type( 'product' ) ) {
+		return;
+	}
+
+	add_meta_box(
+		'skvn-pdp-related',
+		__( 'Related products', 'skvn-marine-blocks' ),
+		'skvn_marine_blocks_pdp_related_meta_box_render',
+		'product',
+		'side',
+		'default'
+	);
+}
+
+/**
+ * Render classic related override meta box.
+ *
+ * @param WP_Post $post Product post.
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_meta_box_render( $post ) {
+	wp_nonce_field( 'skvn_pdp_related_nonce', 'skvn_pdp_related_nonce' );
+	$meta    = get_post_meta( $post->ID, SKVN_MARINE_BLOCKS_PDP_RELATED_META, true );
+	$stored  = is_array( $meta ) ? $meta : array( 'override' => false );
+	$enabled = ! empty( $stored['override'] );
+	$profile = $enabled ? skvn_marine_blocks_sanitize_pdp_related( $stored ) : skvn_marine_blocks_get_default_pdp_related();
+
+	skvn_marine_blocks_pdp_related_classic_fields( $profile, $enabled, 'skvn_pdp_related_' );
+}
+
+/**
+ * Output shared classic related fields.
+ *
+ * Classic keeps every field active while the override is on; the disabled
+ * rules (allowlist follows its show switch) stay in the block editor panel
+ * only, so a classic save never silently drops a stored key whose companion
+ * switch is currently off.
+ *
+ * @param array<string,mixed> $profile Profile values.
+ * @param bool                $enabled Whether override is on.
+ * @param string              $prefix  Field name prefix.
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_classic_fields( array $profile, bool $enabled, string $prefix ) {
+	$disabled = $enabled ? '' : ' disabled="disabled"';
+	?>
+	<p>
+		<label>
+			<input type="checkbox" name="<?php echo esc_attr( $prefix ); ?>override" value="1" <?php checked( $enabled ); ?> />
+			<?php esc_html_e( 'Override related products', 'skvn-marine-blocks' ); ?>
+		</label>
+	</p>
+	<?php if ( ! $enabled ) : ?>
+		<p><?php esc_html_e( 'Using the site default.', 'skvn-marine-blocks' ); ?></p>
+	<?php endif; ?>
+	<p>
+		<label><input type="checkbox" name="<?php echo esc_attr( $prefix ); ?>useCustomRelatedCard" value="1" <?php checked( ! empty( $profile['useCustomRelatedCard'] ) ); echo $disabled; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $disabled is a fixed attribute fragment. ?> /> <?php esc_html_e( 'Use SKVN related cards', 'skvn-marine-blocks' ); ?></label>
+	</p>
+	<?php
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $disabled is a fixed attribute fragment.
+	echo skvn_marine_blocks_pdp_related_classic_controls_html( $profile, $prefix, $disabled );
+}
+
+/**
+ * Build classic related control markup.
+ *
+ * @param array<string,mixed> $profile  Profile values.
+ * @param string              $prefix   Field name prefix.
+ * @param string              $disabled Disabled attribute fragment.
+ * @return string
+ */
+function skvn_marine_blocks_pdp_related_classic_controls_html( array $profile, string $prefix, string $disabled ) {
+	ob_start();
+
+	$selects = array(
+		'imageRatio'        => array(
+			'label'   => __( 'Image ratio', 'skvn-marine-blocks' ),
+			'options' => array( '1:1' => '1:1', '4:3' => '4:3', '3:2' => '3:2', '16:9' => '16:9', 'auto' => __( 'Auto', 'skvn-marine-blocks' ) ),
+		),
+		'mediaLayout'       => array(
+			'label'   => __( 'Media layout', 'skvn-marine-blocks' ),
+			'options' => array(
+				'flush'    => __( 'Flush', 'skvn-marine-blocks' ),
+				'padded'   => __( 'Padded', 'skvn-marine-blocks' ),
+				'floating' => __( 'Floating', 'skvn-marine-blocks' ),
+			),
+		),
+		'chipStyle'         => array(
+			'label'   => __( 'Chip style', 'skvn-marine-blocks' ),
+			'options' => array(
+				'tag'     => __( 'Tag', 'skvn-marine-blocks' ),
+				'hashtag' => __( 'Hashtag', 'skvn-marine-blocks' ),
+				'dot'     => __( 'Dot', 'skvn-marine-blocks' ),
+				'plain'   => __( 'Plain', 'skvn-marine-blocks' ),
+			),
+		),
+		'chipColorScheme'   => array(
+			'label'   => __( 'Chip color', 'skvn-marine-blocks' ),
+			'options' => array(
+				''        => __( 'None', 'skvn-marine-blocks' ),
+				'primary' => __( 'Primary', 'skvn-marine-blocks' ),
+				'accent'  => __( 'Accent', 'skvn-marine-blocks' ),
+				'surface' => __( 'Surface', 'skvn-marine-blocks' ),
+				'text'    => __( 'Text', 'skvn-marine-blocks' ),
+			),
+		),
+		'productActionMode' => array(
+			'label'   => __( 'Card action', 'skvn-marine-blocks' ),
+			'options' => array(
+				'view'   => __( 'View product', 'skvn-marine-blocks' ),
+				'quote'  => __( 'Request quote', 'skvn-marine-blocks' ),
+				'both'   => __( 'Both', 'skvn-marine-blocks' ),
+				'custom' => __( 'Custom URL', 'skvn-marine-blocks' ),
+			),
+		),
+	);
+
+	foreach ( $selects as $key => $field ) {
+		echo '<p><label for="' . esc_attr( $prefix . $key ) . '">' . esc_html( $field['label'] ) . '</label><br />';
+		echo '<select id="' . esc_attr( $prefix . $key ) . '" name="' . esc_attr( $prefix . $key ) . '"' . $disabled . '>';
+		foreach ( $field['options'] as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $profile[ $key ] ?? '', $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></p>';
+	}
+
+	echo '<p><label for="' . esc_attr( $prefix . 'customActionUrl' ) . '">' . esc_html__( 'Custom action URL', 'skvn-marine-blocks' ) . '</label><br />';
+	echo '<input type="text" id="' . esc_attr( $prefix . 'customActionUrl' ) . '" name="' . esc_attr( $prefix . 'customActionUrl' ) . '" value="' . esc_attr( (string) ( $profile['customActionUrl'] ?? '' ) ) . '" class="widefat"' . $disabled . ' /></p>';
+
+	echo '<p><label for="' . esc_attr( $prefix . 'displayTagLimit' ) . '">' . esc_html__( 'Chip limit per product', 'skvn-marine-blocks' ) . '</label><br />';
+	echo '<input type="number" id="' . esc_attr( $prefix . 'displayTagLimit' ) . '" name="' . esc_attr( $prefix . 'displayTagLimit' ) . '" min="0" max="10" step="1" value="' . esc_attr( (string) ( $profile['displayTagLimit'] ?? 3 ) ) . '"' . $disabled . ' /></p>';
+
+	echo '<p><label for="' . esc_attr( $prefix . 'relatedCount' ) . '">' . esc_html__( 'Related products count', 'skvn-marine-blocks' ) . '</label><br />';
+	echo '<input type="number" id="' . esc_attr( $prefix . 'relatedCount' ) . '" name="' . esc_attr( $prefix . 'relatedCount' ) . '" min="1" max="10" step="1" value="' . esc_attr( (string) ( $profile['relatedCount'] ?? 4 ) ) . '"' . $disabled . ' /></p>';
+
+	$toggles = array(
+		'showImage'             => __( 'Show image', 'skvn-marine-blocks' ),
+		'showProductTags'       => __( 'Show product tags', 'skvn-marine-blocks' ),
+		'showProductCategories' => __( 'Show product categories', 'skvn-marine-blocks' ),
+		'showSpecChips'         => __( 'Show specification chips', 'skvn-marine-blocks' ),
+		'chipAllowTags'         => __( 'Allow product tags', 'skvn-marine-blocks' ),
+		'chipAllowCategories'   => __( 'Allow product categories', 'skvn-marine-blocks' ),
+	);
+
+	foreach ( $toggles as $key => $label ) {
+		$checked = ! empty( $profile[ $key ] ) ? ' checked="checked"' : '';
+		echo '<p><label><input type="checkbox" name="' . esc_attr( $prefix . $key ) . '" value="1"' . $checked . $disabled . ' /> ' . esc_html( $label ) . '</label></p>';
+	}
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Save classic meta box submission.
+ *
+ * The block editor never sends this nonce, so the handler returns there and
+ * REST keeps write ownership with the meta sanitize callback.
+ *
+ * @param int     $post_id Post ID.
+ * @param WP_Post $post    Post object.
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_save_classic( $post_id, $post ) {
+	unset( $post );
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! isset( $_POST['skvn_pdp_related_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skvn_pdp_related_nonce'] ) ), 'skvn_pdp_related_nonce' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$prefix   = 'skvn_pdp_related_';
+	$override = isset( $_POST[ $prefix . 'override' ] );
+	if ( ! $override ) {
+		update_post_meta( $post_id, SKVN_MARINE_BLOCKS_PDP_RELATED_META, array( 'override' => false ) );
+		return;
+	}
+
+	$raw = array( 'override' => true );
+	foreach ( array( 'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories', 'showSpecChips', 'chipAllowTags', 'chipAllowCategories' ) as $key ) {
+		$raw[ $key ] = isset( $_POST[ $prefix . $key ] );
+	}
+	foreach ( array( 'imageRatio', 'mediaLayout', 'chipStyle', 'chipColorScheme', 'productActionMode', 'customActionUrl', 'displayTagLimit', 'relatedCount' ) as $key ) {
+		$raw[ $key ] = isset( $_POST[ $prefix . $key ] ) && is_string( $_POST[ $prefix . $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $prefix . $key ] ) ) : '';
+	}
+
+	update_post_meta( $post_id, SKVN_MARINE_BLOCKS_PDP_RELATED_META, skvn_marine_blocks_sanitize_pdp_related_meta( $raw ) );
 }

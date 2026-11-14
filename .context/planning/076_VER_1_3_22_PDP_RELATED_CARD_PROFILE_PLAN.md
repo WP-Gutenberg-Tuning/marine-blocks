@@ -1,6 +1,6 @@
 # V1 / 1.3.22 — PDP Related Card Profile & Chips (scope addition)
 
-Created: **2026-11-14**. Status: **IN PROGRESS — P1 source added 2026-11-14 (schema/sanitize/resolve + module + theme mirror + 2 include; human đã build), P2 source added 2026-11-14 (Theme Design group `related` + copy action + contract capabilities; chưa build/lint), **P2.1 copy/list hardening 2026-11-14** (marker filter + DFS first block + `tools/tests/pdp-related-copy-blocks.test.php`); P3–P5 Chưa làm; P0 preflight trước P4**.
+Created: **2026-11-14**. Status: **IN PROGRESS — P1 source added 2026-11-14 (schema/sanitize/resolve + module + theme mirror + 2 include; human đã build), P2 source added 2026-11-14 (Theme Design group `related` + copy action + contract capabilities; đã commit `7e2051c`), **P2.1 copy/list hardening 2026-11-14** (marker filter + DFS first block + `tools/tests/pdp-related-copy-blocks.test.php`), P3 source added 2026-11-14 (register meta REST schema + classic meta box + `src/pdp-related/panel.tsx` + 1 import index.ts; chưa build/lint); P4–P5 Chưa làm; P0 preflight trước P4**.
 
 Decision doc: `docs/decisions/pdp-related-card-profile.md` (ACTIVE, chốt 2026-11-14; amend cùng ngày: `useCustomRelatedCard`, columns clamp).
 Human duyệt scope addition vào current **V1 / 1.3.22 — Product Page Basic Design Controls** cùng ngày qua Q&A 9 điểm. Không bump metadata, không chuyển current, không release/deploy. Commit `feature patch:` theo precedent scope addition, chỉ khi human yêu cầu. Plan067 §12–20 giữ nguyên hiệu lực; phối hợp cùng-file xem §2.
