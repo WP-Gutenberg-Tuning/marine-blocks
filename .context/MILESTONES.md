@@ -1038,6 +1038,26 @@ Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
 
 Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Execution plan [067](planning/067_VER_1_3_22_PRODUCT_PAGE_DESIGN_CONTROLS_EXECUTION_PLAN.md) đã mở khoá; implementation **Chưa làm**. Agent cửa sổ ngắn làm một gói P1–P5 theo §12–20, không đọc lại toàn bộ quyết định. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
 
+### Scope addition 2026-11-14 — PDP Related Card Profile & Chips (trong 1.3.22)
+
+Human duyệt scope addition vào current **1.3.22** qua Q&A 9 điểm (không bump, không chuyển current; kế thừa ngoại lệ đánh số 1.3.22). Decision `docs/decisions/pdp-related-card-profile.md` (ACTIVE); planning [076](planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md). Chốt: site default = **Theme Design group `related`** (option `skvn_pdp_related`, 15 key); owner **`useCustomRelatedCard`** default **off** — inactive = Woo native (kể cả option đã save); override per-product = panel + classic meta; presenter **`related`** — grouped specs 3/`+N` (P0 gate 060); chip hai lớp + allowlist UI disabled khi `show*` off; `imageRatio` 1:1; khi active: `posts_per_page = relatedCount`, **`columns = clamp(relatedCount, 1, 4)`**; **Copy card settings** v1 (first block only, bật owner, not linked).
+
+Defer v1: **upsells** (D5), **intersection bật** (D4 — chỉ ship off, không code nhánh bật), **token typography/color theo vai trò** (v1 theme-styled default; copy action không copy các key này).
+
+Acceptance draft (scope addition) — tất cả **Chưa làm**:
+- [ ] REL-UI-01 — Card related khi `useCustomRelatedCard` on; design family Collection; CTA onsite review; columns/count layout; không nested link; screenshot desktop/mobile/zoom.
+- [ ] REL-UI-02 — Chips theo term từng SP; cap `displayTagLimit` + `+N` informational; allowlist off → không chip; category chip chỉ khi bật; không picklist term.
+- [ ] REL-UX-01 — Group `related`: owner toggle; save/discard/revision; Copy first-block notice, bật owner; source block không link sau copy.
+- [ ] REL-UX-02 — Per-product panel: override on/off, Use site default, reopen còn meta; classic editor cùng field.
+- [ ] REL-TECH-01 — `useCustomRelatedCard` off → Woo native, không enqueue; plugin off → không swap; Woo off → không fatal.
+- [ ] REL-TECH-02 — Active: args đổi count + columns clamp; inactive: args nguyên; archive/grid/carousel không regression (060).
+- [ ] REL-TECH-03 — Sanitize/escape/permissions đúng (`manage_options` option + copy, `edit_post` meta); key lạ bỏ; int bounds; không leak query attrs.
+- [ ] REL-TRACE-01 — Plan067 checklist không bị tick từ scope này; 1.3.5 checklist giữ nguyên; deferred baseline 1.3.20 chạy trước runtime follow-up.
+
+Plan067 §12–20 giữ nguyên hiệu lực. Phối hợp ba file chung (`modules/typography-settings/typography-settings.php`, `src/design-sidebar/theme-design.tsx`, `inc/customizer.php`) theo sequencing plan076 §2: mặc định P1–P4 plan067 chạy trước; nếu đảo thứ tự phải viết cơ chế group hỗ trợ cả hai, không ghi đè nhánh `product`. Runbook tạo khi implement: `docs/testing/pdp-related-card-1.3.22.md`. Bắt đầu implement cần lệnh human riêng.
+
+Source P1 2026-11-14 (human lệnh "Bám vào plan và làm 076"): plan067 đã implement + commit trước đó (`8d3aea9`) nên sequencing P1–P4 plan067 thỏa; P1 plan076 theo §10 — `modules/pdp-related-settings/pdp-related-settings.php` (mới: 15 default + bool + bounded-int + sanitize + meta sanitize + resolve `skvn_marine_blocks_get_pdp_related()` + `skvn_marine_blocks_pdp_related_is_active()`, constants `skvn_pdp_related`/`_skvn_pdp_related`), `inc/pdp-related.php` (mới, chỉ defaults/sanitize/getter, plugin vắng → defaults an toàn không đọc DB), `skvn-marine-blocks.php` 1 require, theme `functions.php` 1 include. Chưa build/lint (human chạy); meta register/panel/copy action/UI là P2–P3; hook/template/presenter là P4 sau gate P0. REL-* giữ Chưa làm.
+
 ### 1.3.23 — Post Page Basic Design Controls
 
 Status: **PLANNED — implementation Chưa làm, chưa start**.

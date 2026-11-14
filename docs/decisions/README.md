@@ -65,6 +65,7 @@ docs/decisions/.assets/  hình minh hoạ
 | [`collection-carousel-engine-keep-swiper.md`](collection-carousel-engine-keep-swiper.md) | none | Giữ Swiper cho collection carousel (chưa implement) |
 | [`product-data-model.md`](product-data-model.md) | none | WooCommerce native products/attributes |
 | [`product-card-grid-layout-contract.md`](product-card-grid-layout-contract.md) | none | CSS contract cho product card grid |
+| [`pdp-related-card-profile.md`](pdp-related-card-profile.md) | V1 / 1.3.22 | PDP Related: profile `related`, Woo query, chip rules v1 — ACTIVE, scope addition 1.3.22 |
 | [`woo-catalog-css-migration-1.5.0.md`](woo-catalog-css-migration-1.5.0.md) | V1 / 1.5.0 | Pending — CSS chuyển sang plugin woo-catalog |
 
 ### Editor controls & animation
