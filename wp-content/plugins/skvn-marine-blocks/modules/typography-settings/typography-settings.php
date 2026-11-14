@@ -207,15 +207,35 @@ function skvn_marine_blocks_design_snapshot() {
 	return $result;
 }
 
-/** Only editor transport configuration; no theme CSS or draft preview in admin chrome. */
+/**
+ * Editor transport for design sidebar flags. No theme CSS in admin chrome.
+ *
+ * Booleans must stay JSON booleans. wp_localize_script casts every scalar
+ * through (string), so true becomes "1" and canUseDesignSidebar() (=== true)
+ * never passes. See .context/PITFALLS.md DP-10.
+ */
 function skvn_marine_blocks_design_bootstrap() {
-	$screen = get_current_screen();
-	wp_localize_script( 'skvn-marine-blocks-editor', 'skvnMarineDesign', array(
-		'url' => admin_url( 'admin-ajax.php' ),
-		'nonce' => wp_create_nonce( 'skvn_marine_design_settings' ),
+	if ( ! wp_script_is( 'skvn-marine-blocks-editor', 'registered' ) ) {
+		return;
+	}
+
+	$screen  = get_current_screen();
+	$payload = array(
+		'url'                  => admin_url( 'admin-ajax.php' ),
+		'nonce'                => wp_create_nonce( 'skvn_marine_design_settings' ),
 		'woocommerceAvailable' => class_exists( 'WooCommerce' ),
-		'postEditor' => $screen && 'post' === $screen->base && $screen->is_block_editor(),
-	) );
+		'postEditor'           => (bool) ( $screen && 'post' === $screen->base && $screen->is_block_editor() ),
+	);
+	$json    = wp_json_encode( $payload, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
+	if ( ! is_string( $json ) ) {
+		return;
+	}
+
+	wp_add_inline_script(
+		'skvn-marine-blocks-editor',
+		'window.skvnMarineDesign = ' . $json . ';',
+		'before'
+	);
 }
 
 /** Authenticated, read-only token recovery. No settings values are returned or written. */

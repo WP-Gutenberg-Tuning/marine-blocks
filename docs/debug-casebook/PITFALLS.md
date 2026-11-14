@@ -24,6 +24,7 @@ Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05)
 | CSS frame extract sang file chưa enqueue | Root class/label hiện nhưng mất khung và màu nền | Editor asset graph + agent verification | [CASE-008](gutenberg/008_EDITOR_FRAME_CSS_EXTRACTED_NOT_ENQUEUED.md) |
 | Hero editor sửa một rule chiều cao | Stage Hero vẫn thấp sau khi đổi 356px hoặc 480px | `assets/css/slider-editor.css` thắng `style.css` | Pitfall 9, [AP-14](../../.context/PITFALLS.md#ap-14--sửa-chiều-cao-hero-editor-ở-rule-thua-cascade) |
 | Slider đổi size sau fade load/chuyển trang | Khung và tỉ lệ nhích khi fade xong | Offset CSS `5rem` rồi JS ghi header + admin bar; scrollbar | Pitfall 10 |
+| Marine Blocks không có trong sidebar editor | Page / SKVN Page Display / GeneratePress còn; Preferences → Panels chỉ WindPress | `wp_localize_script` ép boolean thành `"1"` | Pitfall 11, [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14) |
 
 ---
 
@@ -383,6 +384,22 @@ Ba chẩn đoán, chỉ số 2 được số đo chốt:
 **Nếu sửa sau:** giữ hộp settled (offset thật, kể cả admin bar khi có). Đưa offset cuối vào trước ảnh chụp: cao header đã biết cộng `html.admin-bar` 32px, thay cho đoán `5rem`. Ổn scrollbar (`scrollbar-gutter: stable`) để rộng không đổi lúc fade xong. Tắt morph của `::view-transition-group(root)` nếu muốn fade không kéo size. Đừng gỡ admin bar khỏi phép đo — 120px là chiều cao đúng khi đang đăng nhập.
 
 **Đừng làm:** coi Swiper inline height là thủ phạm khi `style.height` trống. Đừng sửa preset Hero `clamp(30rem, 68vh, 48rem)` cho case này; rule viewport (0,3,0) thắng rule Hero (0,2,0).
+
+## Pitfall 11 — Sidebar Marine Blocks không mount vì boolean thành `"1"`
+
+**Xảy ra 2026-11-14.** Human mở page editor, không thấy Marine Blocks. Preferences → Panels chỉ có WindPress. Plugin đã build và upload.
+
+**State delta:**
+
+```text
+State A (kỳ vọng): postEditor === true (boolean) → PluginSidebar mount
+State B (lỗi):     postEditor === "1" (string) → DesignSidebar trả null
+Delta:             wp_localize_script ép (string) true thành "1"
+```
+
+Chi tiết, consumer `woocommerceAvailable === false`, và fix: [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14).
+
+**Đừng làm:** đổ cho bundle cũ khi `skvnMarineDesign` đã có trên trang và lệch file chỉ khoảng trăm byte. Đừng tìm Marine Blocks trong Preferences → Panels. Đừng nới `=== true` thành truthy rồi giữ `wp_localize_script`.
 
 ## Related
 
