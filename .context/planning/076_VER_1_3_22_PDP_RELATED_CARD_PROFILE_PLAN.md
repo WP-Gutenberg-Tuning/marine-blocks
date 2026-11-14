@@ -1,6 +1,6 @@
 # V1 / 1.3.22 — PDP Related Card Profile & Chips (scope addition)
 
-Created: **2026-11-14**. Status: **IN PROGRESS — P1 source added 2026-11-14 (schema/sanitize/resolve + module + theme mirror + 2 include), chưa build/lint, chưa runtime evidence; P2–P5 Chưa làm**.
+Created: **2026-11-14**. Status: **IN PROGRESS — P1 source added 2026-11-14 (schema/sanitize/resolve + module + theme mirror + 2 include; human đã build), P2 source added 2026-11-14 (Theme Design group `related` + copy action + contract capabilities; chưa build/lint), **P2.1 copy/list hardening 2026-11-14** (marker filter + DFS first block + `tools/tests/pdp-related-copy-blocks.test.php`); P3–P5 Chưa làm; P0 preflight trước P4**.
 
 Decision doc: `docs/decisions/pdp-related-card-profile.md` (ACTIVE, chốt 2026-11-14; amend cùng ngày: `useCustomRelatedCard`, columns clamp).
 Human duyệt scope addition vào current **V1 / 1.3.22 — Product Page Basic Design Controls** cùng ngày qua Q&A 9 điểm. Không bump metadata, không chuyển current, không release/deploy. Commit `feature patch:` theo precedent scope addition, chỉ khi human yêu cầu. Plan067 §12–20 giữ nguyên hiệu lực; phối hợp cùng-file xem §2.
@@ -93,8 +93,8 @@ Nơi: trong panel group `related` của Theme Design (§7). D2: copy một lần
 
 - UI: Toggle đầu panel `Use SKVN related cards` (`useCustomRelatedCard`). `SelectControl` "Source page" liệt kê các page published có chứa block `skvn-marine/product-collection` + nút `Copy card settings` + help: **"Uses the first Product Collection block on the page only."** + notice sau copy: "Copied. Not linked to the source block." Presentation controls (trừ owner toggle) **disabled** khi `useCustomRelatedCard` false.
 - Server (plugin, capability `manage_options` + nonce):
-  - Danh sách page: WP_Query native `post_type=page`, `post_status=publish`, `s='<!-- wp:skvn-marine/product-collection'` (LIKE post_content), cap số lượng hợp lý (≤200), không custom SQL; runbook ghi nên dùng trang có **một** block mẫu.
-  - `parse_blocks` trang được chọn → lấy attrs block product-collection **đầu tiên** → map CHỈ key nằm trong schema §3 (trừ `useCustomRelatedCard` từ block) → sanitize từng key bằng cùng hàm §4 → merge với option hiện tại → set `useCustomRelatedCard` **true** → ghi option `skvn_pdp_related` → trả snapshot mới.
+  - Danh sách page: WP_Query native `post_type=page`, `post_status=publish`, ≤200, không custom SQL; **lọc PHP** `str_contains( post_content, '<!-- wp:skvn-marine/product-collection' )` (tránh false negative của WP search). Runbook ghi nên dùng trang có **một** block mẫu.
+  - `parse_blocks` trang được chọn → **DFS document order** (`innerBlocks` kể cả Group/Columns) lấy attrs block product-collection **đầu tiên** → map CHỈ key nằm trong schema §3 (trừ `useCustomRelatedCard` từ block) → sanitize từng key bằng cùng hàm §4 → merge với option hiện tại → set `useCustomRelatedCard` **true** → ghi option `skvn_pdp_related` → trả snapshot mới.
   - **Không copy**: `categories`, `tags`, `relation`, `orderMode`, `layout`, `heading`, `eyebrow`, `itemsToShow`, responsive preset, autoplay, typography token keys (chưa có trong schema v1 — ghi limitation trong UI help text).
 - Không có page nào khớp: select hiện trạng thái rỗng, không nút bấm được.
 
@@ -202,6 +202,7 @@ php -l wp-content/themes/skvn-marine/inc/pdp-related.php
 
 ```bash
 php tools/tests/pdp-related-sanitize.test.php
+php tools/tests/pdp-related-copy-blocks.test.php
 ```
 
 - Module PHP mới nằm ngoài `build/` — trước zip/upload human chạy `node tools/build-deploy-artifact.mjs` + `bash tools/package-plugin-zip.sh` và kiểm zip có `modules/pdp-related-settings/pdp-related-settings.php` + `inc/templates/related-product-card.php` theo deploy artifact workflow.

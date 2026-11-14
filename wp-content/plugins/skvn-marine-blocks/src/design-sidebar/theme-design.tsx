@@ -2,8 +2,8 @@ import { Button, Notice, PanelBody, SelectControl, Spinner, TextControl, ToggleC
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-type Group = 'palette' | 'heading' | 'fonts' | 'product';
-type Values = Record< string, string | boolean | { size: string; weight: string } >;
+type Group = 'palette' | 'heading' | 'fonts' | 'product' | 'related';
+type Values = Record< string, string | boolean | number | { size: string; weight: string } >;
 type SavedGroup = { value: Values; revision: string; canEdit: boolean };
 type Snapshot = {
 	available: boolean;
@@ -62,6 +62,12 @@ export function useThemeDesign( active: boolean ) {
 	const [ sessionError, setSessionError ] = useState( '' );
 	const [ sessionPending, setSessionPending ] = useState( false );
 	const [ readPending, setReadPending ] = useState( false );
+	const [ relatedPages, setRelatedPages ] = useState< { label: string; value: string }[] | null >( null );
+	const [ copyPageId, setCopyPageId ] = useState( '' );
+	const [ copyStatus, setCopyStatus ] = useState( '' );
+	const [ copyFailed, setCopyFailed ] = useState( false );
+	const [ copyPending, setCopyPending ] = useState( false );
+	const [ pagesPending, setPagesPending ] = useState( false );
 	const lifecycle = useRef( new AbortController() );
 	// Once activated, closing the panel must not cancel a read or discard drafts.
 	useEffect( () => { if ( active ) setActivated( true ); }, [ active ] );
@@ -89,7 +95,7 @@ export function useThemeDesign( active: boolean ) {
 	}, [ activated, attempt, snapshot ] );
 	const retryRead = () => { if ( ! snapshot && ! sessionPending && ! readPending ) setAttempt( ( previous ) => previous + 1 ); };
 	const dirty = ( group: Group ) => JSON.stringify( drafts[ group ] ) !== JSON.stringify( snapshot?.groups?.[ group ].value );
-	const draftGroups = ( [ 'palette', 'heading', 'fonts', ...( snapshot?.groups?.product ? ( [ 'product' ] as const ) : [] ) ] ) as Group[];
+	const draftGroups = ( [ 'palette', 'heading', 'fonts', ...( snapshot?.groups?.product ? ( [ 'product' ] as const ) : [] ), ...( snapshot?.groups?.related ? ( [ 'related' ] as const ) : [] ) ] ) as Group[];
 	const hasDraft = !! snapshot?.groups && draftGroups.some( dirty );
 	useEffect( () => {
 		if ( ! hasDraft ) return;
@@ -130,6 +136,43 @@ export function useThemeDesign( active: boolean ) {
 			setStatuses( ( previous ) => ( { ...previous, [ group ]: __( 'Draft discarded. Current saved values loaded for this group.', 'skvn-marine-blocks' ) } ) );
 		} catch ( failure ) { recordSessionError( failure ); setStatuses( ( previous ) => ( { ...previous, [ group ]: failure instanceof Error ? failure.message : __( 'Could not reload this group. Your draft is kept.', 'skvn-marine-blocks' ) } ) ); }
 		finally { setPending( ( previous ) => ( { ...previous, [ group ]: false } ) ); }
+	};
+	useEffect( () => {
+		if ( ! snapshot?.groups?.related || ! snapshot.groups.related.canEdit || null !== relatedPages ) return;
+		const controller = new AbortController();
+		let live = true;
+		setPagesPending( true );
+		request< { pages: { label: string; value: string }[] } >( { operation: 'copyRelatedPages' }, controller.signal ).then( ( result ) => {
+			if ( ! live ) return;
+			setRelatedPages( Array.isArray( result.pages ) ? result.pages : [] );
+			setPagesPending( false );
+		} ).catch( ( failure ) => {
+			if ( ! live || failure.name === 'AbortError' ) return;
+			setRelatedPages( [] );
+			setPagesPending( false );
+			setCopyFailed( true );
+			setCopyStatus( failure instanceof Error ? failure.message : __( 'Source pages could not be loaded. Your settings are unchanged.', 'skvn-marine-blocks' ) );
+			recordSessionError( failure );
+		} );
+		return () => { live = false; controller.abort(); };
+	}, [ snapshot, relatedPages ] );
+	const copyRelated = async () => {
+		if ( copyPending || pagesPending || ! copyPageId || ! snapshot?.groups?.related ) return;
+		setCopyPending( true );
+		try {
+			const current = await request< Snapshot >( { operation: 'copyRelated', pageId: copyPageId }, lifecycle.current.signal );
+			const saved = current.groups?.related;
+			if ( ! saved ) throw new Error( __( 'The copy response was incomplete. Your settings are unchanged.', 'skvn-marine-blocks' ) );
+			setSnapshot( ( previous ) => previous && ( { ...previous, groups: { ...previous.groups!, related: saved } } ) );
+			setDrafts( ( previous ) => ( { ...previous, related: saved.value } ) );
+			setConflicts( ( previous ) => ( { ...previous, related: undefined } ) );
+			setCopyFailed( false );
+			setCopyStatus( __( 'Copied. Not linked to the source block.', 'skvn-marine-blocks' ) );
+		} catch ( failure ) {
+			recordSessionError( failure );
+			setCopyFailed( true );
+			setCopyStatus( failure instanceof Error ? failure.message : __( 'Copy failed. Your settings are unchanged.', 'skvn-marine-blocks' ) );
+		} finally { setCopyPending( false ); }
 	};
 	const resolveConflict = ( group: Group, useCurrent: boolean ) => {
 		const current = conflicts[ group ];
@@ -175,7 +218,7 @@ export function useThemeDesign( active: boolean ) {
 			setSessionError( failure instanceof Error ? failure.message : __( 'Sign in, then refresh your session. Your draft is kept.', 'skvn-marine-blocks' ) );
 		} finally { setSessionPending( false ); }
 	};
-	return { snapshot, drafts, error, statuses, pending, conflicts, dirty, hasDraft, sessionError, sessionPending, readPending, retryRead, refreshSession, change, save, discard, resolveConflict, refreshAccess };
+	return { snapshot, drafts, error, statuses, pending, conflicts, dirty, hasDraft, sessionError, sessionPending, readPending, retryRead, refreshSession, change, save, discard, resolveConflict, refreshAccess, copyRelated, relatedPages, copyPageId, setCopyPageId, copyStatus, copyFailed, copyPending, pagesPending };
 }
 
 const labels: Record< Group, string > = {
@@ -183,6 +226,7 @@ const labels: Record< Group, string > = {
 	heading: __( 'Typography', 'skvn-marine-blocks' ),
 	fonts: __( 'Fonts', 'skvn-marine-blocks' ),
 	product: __( 'Product page', 'skvn-marine-blocks' ),
+	related: __( 'Related products', 'skvn-marine-blocks' ),
 };
 const productLabels: Record< string, string > = {
 	columns: __( 'Columns', 'skvn-marine-blocks' ),
@@ -201,12 +245,29 @@ const productLabels: Record< string, string > = {
 	specs: __( 'Specifications', 'skvn-marine-blocks' ),
 	ctaStyle: __( 'Quote button style', 'skvn-marine-blocks' ),
 };
+const relatedLabels: Record< string, string > = {
+	useCustomRelatedCard: __( 'Use SKVN related cards', 'skvn-marine-blocks' ),
+	showImage: __( 'Show image', 'skvn-marine-blocks' ),
+	imageRatio: __( 'Image ratio', 'skvn-marine-blocks' ),
+	mediaLayout: __( 'Media layout', 'skvn-marine-blocks' ),
+	showProductTags: __( 'Show product tags', 'skvn-marine-blocks' ),
+	showProductCategories: __( 'Show product categories', 'skvn-marine-blocks' ),
+	showSpecChips: __( 'Show specification chips', 'skvn-marine-blocks' ),
+	chipStyle: __( 'Chip style', 'skvn-marine-blocks' ),
+	chipColorScheme: __( 'Chip color', 'skvn-marine-blocks' ),
+	productActionMode: __( 'Card action', 'skvn-marine-blocks' ),
+	customActionUrl: __( 'Custom action URL', 'skvn-marine-blocks' ),
+	chipAllowTags: __( 'Allow product tags', 'skvn-marine-blocks' ),
+	chipAllowCategories: __( 'Allow product categories', 'skvn-marine-blocks' ),
+	displayTagLimit: __( 'Chip limit per product', 'skvn-marine-blocks' ),
+	relatedCount: __( 'Related products count', 'skvn-marine-blocks' ),
+};
 const paletteLabels = {
 	primary: __( 'Primary', 'skvn-marine-blocks' ), accent: __( 'Accent', 'skvn-marine-blocks' ),
 	surface: __( 'Surface', 'skvn-marine-blocks' ), text: __( 'Text', 'skvn-marine-blocks' ),
 };
 export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesign > } ) {
-	const { snapshot, drafts, error, statuses, pending, conflicts, dirty, hasDraft, sessionError, sessionPending, readPending, retryRead, refreshSession, change, save, discard, resolveConflict, refreshAccess } = model;
+	const { snapshot, drafts, error, statuses, pending, conflicts, dirty, hasDraft, sessionError, sessionPending, readPending, retryRead, refreshSession, change, save, discard, resolveConflict, refreshAccess, copyRelated, relatedPages, copyPageId, setCopyPageId, copyStatus, copyFailed, copyPending, pagesPending } = model;
 	const [ exporting, setExporting ] = useState( false );
 	const busy = readPending || sessionPending || Object.values( pending ).some( Boolean );
 	const recovery = <PanelBody>
@@ -229,9 +290,10 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 		</PanelBody>
 		{ snapshot.available && snapshot.groups && <>
 			<PanelBody><h2>{ __( 'Theme Design — SKVN Marine', 'skvn-marine-blocks' ) }</h2><p>{ __( 'Drafts do not preview in the canvas. Page Save does not save these settings. Local block overrides keep their own styles.', 'skvn-marine-blocks' ) }</p></PanelBody>
-			{ ( [ 'palette', 'heading', 'fonts', ...( snapshot.groups.product ? ( [ 'product' ] as const ) : [] ) ] as Group[] ).map( ( group ) => {
+			{ ( [ 'palette', 'heading', 'fonts', ...( snapshot.groups.product ? ( [ 'product' ] as const ) : [] ), ...( snapshot.groups.related ? ( [ 'related' ] as const ) : [] ) ] as Group[] ).map( ( group ) => {
 				const value = drafts[ group ] || snapshot.groups![ group ].value;
 				const canEdit = snapshot.groups![ group ].canEdit;
+				const relatedLocked = 'related' === group && ! value.useCustomRelatedCard;
 				return <PanelBody key={ group } title={ labels[ group ] } initialOpen={ group === 'palette' }>
 					{ ! canEdit && <><p>{ __( 'This group cannot be saved with the current theme or permissions. Your draft is kept.', 'skvn-marine-blocks' ) }</p><Button variant="secondary" disabled={ busy } onClick={ () => refreshAccess( group ) }>{ __( 'Refresh permissions', 'skvn-marine-blocks' ) }</Button></> }
 					{ conflicts[ group ] && <Notice status="warning" isDismissible={ false }>
@@ -289,6 +351,59 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 								{ label: __( 'Primary', 'skvn-marine-blocks' ), value: 'primary' },
 							] } onChange={ ( ctaStyle ) => change( group, { ...value, ctaStyle } ) } />
 						</> }
+						{ group === 'related' && <>
+							<ToggleControl label={ relatedLabels.useCustomRelatedCard } checked={ !! value.useCustomRelatedCard } onChange={ ( useCustomRelatedCard ) => change( group, { ...value, useCustomRelatedCard } ) } />
+							<SelectControl label={ relatedLabels.imageRatio } value={ String( value.imageRatio ?? '' ) } disabled={ relatedLocked } options={ [
+								{ label: '1:1', value: '1:1' },
+								{ label: '4:3', value: '4:3' },
+								{ label: '3:2', value: '3:2' },
+								{ label: '16:9', value: '16:9' },
+								{ label: __( 'Auto', 'skvn-marine-blocks' ), value: 'auto' },
+							] } onChange={ ( imageRatio ) => change( group, { ...value, imageRatio } ) } />
+							<SelectControl label={ relatedLabels.mediaLayout } value={ String( value.mediaLayout ?? '' ) } disabled={ relatedLocked } options={ [
+								{ label: __( 'Flush', 'skvn-marine-blocks' ), value: 'flush' },
+								{ label: __( 'Padded', 'skvn-marine-blocks' ), value: 'padded' },
+								{ label: __( 'Floating', 'skvn-marine-blocks' ), value: 'floating' },
+							] } onChange={ ( mediaLayout ) => change( group, { ...value, mediaLayout } ) } />
+							<ToggleControl label={ relatedLabels.showImage } checked={ !! value.showImage } disabled={ relatedLocked } onChange={ ( showImage ) => change( group, { ...value, showImage } ) } />
+							<ToggleControl label={ relatedLabels.showProductTags } checked={ !! value.showProductTags } disabled={ relatedLocked } onChange={ ( showProductTags ) => change( group, { ...value, showProductTags } ) } />
+							<ToggleControl label={ relatedLabels.showProductCategories } checked={ !! value.showProductCategories } disabled={ relatedLocked } onChange={ ( showProductCategories ) => change( group, { ...value, showProductCategories } ) } />
+							<ToggleControl label={ relatedLabels.showSpecChips } checked={ !! value.showSpecChips } disabled={ relatedLocked } onChange={ ( showSpecChips ) => change( group, { ...value, showSpecChips } ) } />
+							<SelectControl label={ relatedLabels.chipStyle } value={ String( value.chipStyle ?? '' ) } disabled={ relatedLocked } options={ [
+								{ label: __( 'Tag', 'skvn-marine-blocks' ), value: 'tag' },
+								{ label: __( 'Hashtag', 'skvn-marine-blocks' ), value: 'hashtag' },
+								{ label: __( 'Dot', 'skvn-marine-blocks' ), value: 'dot' },
+								{ label: __( 'Plain', 'skvn-marine-blocks' ), value: 'plain' },
+							] } onChange={ ( chipStyle ) => change( group, { ...value, chipStyle } ) } />
+							<SelectControl label={ relatedLabels.chipColorScheme } value={ String( value.chipColorScheme ?? '' ) } disabled={ relatedLocked } options={ [
+								{ label: __( 'None', 'skvn-marine-blocks' ), value: '' },
+								...Object.entries( paletteLabels ).map( ( [ scheme, schemeLabel ] ) => ( { label: schemeLabel, value: scheme } ) ),
+							] } onChange={ ( chipColorScheme ) => change( group, { ...value, chipColorScheme } ) } />
+							<SelectControl label={ relatedLabels.productActionMode } value={ String( value.productActionMode ?? '' ) } disabled={ relatedLocked } options={ [
+								{ label: __( 'View product', 'skvn-marine-blocks' ), value: 'view' },
+								{ label: __( 'Request quote', 'skvn-marine-blocks' ), value: 'quote' },
+								{ label: __( 'Both', 'skvn-marine-blocks' ), value: 'both' },
+								{ label: __( 'Custom URL', 'skvn-marine-blocks' ), value: 'custom' },
+							] } onChange={ ( productActionMode ) => change( group, { ...value, productActionMode } ) } />
+							{ 'custom' === value.productActionMode && <TextControl label={ relatedLabels.customActionUrl } value={ String( value.customActionUrl ?? '' ) } disabled={ relatedLocked } onChange={ ( customActionUrl ) => change( group, { ...value, customActionUrl } ) } /> }
+							<TextControl label={ relatedLabels.displayTagLimit } help={ __( '0 shows all terms.', 'skvn-marine-blocks' ) } type="number" min={ 0 } max={ 10 } value={ String( value.displayTagLimit ?? '' ) } disabled={ relatedLocked } onChange={ ( next ) => { const limit = parseInt( next, 10 ); if ( Number.isNaN( limit ) ) return; change( group, { ...value, displayTagLimit: Math.min( 10, Math.max( 0, limit ) ) } ); } } />
+							<TextControl label={ relatedLabels.relatedCount } type="number" min={ 1 } max={ 10 } value={ String( value.relatedCount ?? '' ) } disabled={ relatedLocked } onChange={ ( next ) => { const count = parseInt( next, 10 ); if ( Number.isNaN( count ) ) return; change( group, { ...value, relatedCount: Math.min( 10, Math.max( 1, count ) ) } ); } } />
+							<h3 style={ { margin: '1em 0 0.25em' } }>{ __( 'Chip sources (allowlist)', 'skvn-marine-blocks' ) }</h3>
+							<p>{ __( 'Terms come from each related product. No fixed term picklist.', 'skvn-marine-blocks' ) }</p>
+							<ToggleControl label={ relatedLabels.chipAllowTags } checked={ !! value.chipAllowTags } disabled={ relatedLocked || ! value.showProductTags } onChange={ ( chipAllowTags ) => change( group, { ...value, chipAllowTags } ) } />
+							<ToggleControl label={ relatedLabels.chipAllowCategories } checked={ !! value.chipAllowCategories } disabled={ relatedLocked || ! value.showProductCategories } onChange={ ( chipAllowCategories ) => change( group, { ...value, chipAllowCategories } ) } />
+							{ canEdit && <>
+								<h3 style={ { margin: '1em 0 0.25em' } }>{ __( 'Copy card settings', 'skvn-marine-blocks' ) }</h3>
+								<p>{ __( 'Uses the first Product Collection block on the page only. Card styling is copied; query, layout and typography token keys are not.', 'skvn-marine-blocks' ) }</p>
+								{ null === relatedPages
+									? <p><Spinner />{ pagesPending ? __( 'Looking for source pages…', 'skvn-marine-blocks' ) : '' }</p>
+									: <SelectControl label={ __( 'Source page', 'skvn-marine-blocks' ) } value={ copyPageId } disabled={ 0 === relatedPages.length } options={ 0 === relatedPages.length
+										? [ { label: __( 'No pages with a Product Collection block found.', 'skvn-marine-blocks' ), value: '' } ]
+										: [ { label: __( 'Select a page', 'skvn-marine-blocks' ), value: '' }, ...relatedPages ] } onChange={ setCopyPageId } /> }
+								<Button variant="secondary" disabled={ null === relatedPages || 0 === relatedPages.length || ! copyPageId || copyPending } onClick={ copyRelated }>{ copyPending ? __( 'Copying…', 'skvn-marine-blocks' ) : __( 'Copy card settings', 'skvn-marine-blocks' ) }</Button>
+								{ copyStatus && <Notice status={ copyFailed ? 'error' : 'success' } isDismissible={ false }>{ copyStatus }</Notice> }
+							</> }
+						</> }
 						<Button variant="primary" disabled={ ! dirty( group ) } onClick={ () => save( group ) }>{ __( 'Save group', 'skvn-marine-blocks' ) }</Button>
 						<Button variant="tertiary" onClick={ () => discard( group ) }>{ __( 'Discard draft and reload group', 'skvn-marine-blocks' ) }</Button>
 					</fieldset>
@@ -299,7 +414,7 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 	</>;
 }
 
-function formatProductValue( value: string | boolean | { size: string; weight: string } ) {
+function formatProductValue( value: string | boolean | number | { size: string; weight: string } ) {
 	if ( typeof value === 'boolean' ) {
 		return value ? __( 'On', 'skvn-marine-blocks' ) : __( 'Off', 'skvn-marine-blocks' );
 	}
@@ -310,9 +425,9 @@ function ConflictComparison( { current, draft, group }: { current: Values; draft
 	const rows = Object.entries( current ).flatMap( ( [ key, value ] ) => typeof value === 'object' && value !== null && 'size' in value
 		? Object.entries( value ).map( ( [ field, saved ] ) => ( { label: `${ key.toUpperCase() } ${ field === 'size' ? __( 'size', 'skvn-marine-blocks' ) : __( 'weight', 'skvn-marine-blocks' ) }`, saved, draft: typeof draft[ key ] === 'object' && draft[ key ] !== null && 'size' in ( draft[ key ] as object ) ? ( draft[ key ] as Record< string, string > )[ field ] : '' } ) )
 		: [ {
-			label: group === 'product' ? ( productLabels[ key ] || key ) : group === 'palette' ? paletteLabels[ key as keyof typeof paletteLabels ] : key === 'preset' ? __( 'Font preset', 'skvn-marine-blocks' ) : __( 'Heading scope', 'skvn-marine-blocks' ),
-			saved: group === 'product' ? formatProductValue( value ) : value,
-			draft: group === 'product' ? formatProductValue( draft[ key ] as string | boolean ) : draft[ key ] as string,
+			label: group === 'product' ? ( productLabels[ key ] || key ) : group === 'related' ? ( relatedLabels[ key ] || key ) : group === 'palette' ? paletteLabels[ key as keyof typeof paletteLabels ] : key === 'preset' ? __( 'Font preset', 'skvn-marine-blocks' ) : __( 'Heading scope', 'skvn-marine-blocks' ),
+			saved: group === 'product' || group === 'related' ? formatProductValue( value ) : value,
+			draft: group === 'product' || group === 'related' ? formatProductValue( draft[ key ] as string | boolean | number ) : draft[ key ] as string,
 		} ] );
 	return <table style={ { width: '100%', tableLayout: 'fixed', overflowWrap: 'anywhere' } }>
 		<caption>{ labels[ group ] }</caption>

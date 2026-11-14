@@ -63,6 +63,8 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 		$owner = 'theme_mods_' . $stylesheet;
 	} elseif ( 'product' === $group ) {
 		$owner = SKVN_MARINE_BLOCKS_PRODUCT_DESIGN_OPTION;
+	} elseif ( 'related' === $group ) {
+		$owner = SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION;
 	} else {
 		$owner = SKVN_MARINE_BLOCKS_TYPOGRAPHY_OPTION;
 	}
@@ -106,6 +108,8 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 			}
 		} elseif ( 'product' === $group ) {
 			$value = skvn_marine_blocks_sanitize_product_design( $raw );
+		} elseif ( 'related' === $group ) {
+			$value = skvn_marine_blocks_sanitize_pdp_related( $raw );
 		} else {
 			// Merge the other registered group; the native registered sanitizer
 			// still owns its established policy for unrecognized option keys.
@@ -128,6 +132,8 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 			$expected = $raw;
 		} elseif ( 'product' === $group ) {
 			$expected = skvn_marine_blocks_sanitize_product_design( $raw );
+		} elseif ( 'related' === $group ) {
+			$expected = skvn_marine_blocks_sanitize_pdp_related( $raw );
 		} else {
 			$expected = skvn_marine_blocks_sanitize_typography( array( $group => $raw ) )[ $group ];
 		}
@@ -139,6 +145,8 @@ function skvn_marine_blocks_design_save_group( $group, $raw, $revision ) {
 			);
 		} elseif ( 'product' === $group ) {
 			$physical_group = skvn_marine_blocks_sanitize_product_design( $physical );
+		} elseif ( 'related' === $group ) {
+			$physical_group = skvn_marine_blocks_sanitize_pdp_related( $physical );
 		} else {
 			$physical_group = skvn_marine_blocks_sanitize_typography( $physical )[ $group ];
 		}
@@ -174,6 +182,11 @@ function skvn_marine_blocks_design_snapshot() {
 	if ( is_array( $contract ) && isset( $contract['capabilities'] ) && is_array( $contract['capabilities'] ) && in_array( 'product', $contract['capabilities'], true ) ) {
 		$values['product'] = skvn_marine_blocks_sanitize_product_design(
 			get_option( SKVN_MARINE_BLOCKS_PRODUCT_DESIGN_OPTION, array() )
+		);
+	}
+	if ( is_array( $contract ) && isset( $contract['capabilities'] ) && is_array( $contract['capabilities'] ) && in_array( 'related', $contract['capabilities'], true ) ) {
+		$values['related'] = skvn_marine_blocks_sanitize_pdp_related(
+			get_option( SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION, array() )
 		);
 	}
 	foreach ( $values as $group => $value ) {
@@ -229,8 +242,26 @@ function skvn_marine_blocks_design_settings_ajax() {
 	if ( 'read' === $operation ) {
 		wp_send_json_success( skvn_marine_blocks_design_snapshot() );
 	}
+	if ( 'copyRelatedPages' === $operation || 'copyRelated' === $operation ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'code' => 'unavailable', 'canEdit' => false, 'message' => __( 'You cannot copy card settings.', 'skvn-marine-blocks' ) ), 403 );
+		}
+		if ( 'copyRelatedPages' === $operation ) {
+			wp_send_json_success( array( 'pages' => skvn_marine_blocks_pdp_related_collection_pages() ) );
+		}
+		$page_id = isset( $_POST['pageId'] ) && is_scalar( $_POST['pageId'] ) ? absint( $_POST['pageId'] ) : 0;
+		$copied  = skvn_marine_blocks_pdp_related_copy_from_page( $page_id );
+		if ( is_wp_error( $copied ) ) {
+			wp_send_json_error( array(
+				'code'    => $copied->get_error_code(),
+				'message' => $copied->get_error_message(),
+				'canEdit' => current_user_can( 'manage_options' ),
+			), 400 );
+		}
+		wp_send_json_success( skvn_marine_blocks_design_snapshot() );
+	}
 	$group = isset( $_POST['group'] ) && is_string( $_POST['group'] ) ? sanitize_key( wp_unslash( $_POST['group'] ) ) : '';
-	if ( 'save' !== $operation || ! in_array( $group, array( 'palette', 'heading', 'fonts', 'product' ), true ) ) {
+	if ( 'save' !== $operation || ! in_array( $group, array( 'palette', 'heading', 'fonts', 'product', 'related' ), true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Unknown settings group.', 'skvn-marine-blocks' ) ), 400 );
 	}
 	if ( ! skvn_marine_blocks_design_theme_supported() || ! current_user_can( 'fonts' === $group ? 'edit_theme_options' : 'manage_options' ) ) {
@@ -239,7 +270,7 @@ function skvn_marine_blocks_design_settings_ajax() {
 	$current = skvn_marine_blocks_design_snapshot();
 	$revision = isset( $_POST['revision'] ) && is_string( $_POST['revision'] ) ? sanitize_text_field( wp_unslash( $_POST['revision'] ) ) : '';
 	$raw = isset( $_POST['value'] ) && is_string( $_POST['value'] ) ? json_decode( wp_unslash( $_POST['value'] ), true ) : null;
-	$valid = is_array( $raw ) && count( $raw ) === count( $current['groups'][ $group ]['value'] );
+	$valid = is_array( $raw ) && in_array( $group, array( 'palette', 'heading', 'fonts' ), true ) && count( $raw ) === count( $current['groups'][ $group ]['value'] );
 	if ( 'product' === $group ) {
 		$valid = is_array( $raw ) && 14 === count( $raw );
 		$defaults = skvn_marine_blocks_get_default_product_design();
@@ -264,6 +295,49 @@ function skvn_marine_blocks_design_settings_ajax() {
 				}
 			} elseif ( isset( $allowlists[ $key ] ) ) {
 				if ( ! is_string( $raw[ $key ] ) || ! in_array( $raw[ $key ], $allowlists[ $key ], true ) ) {
+					$valid = false;
+					break;
+				}
+			}
+		}
+	} elseif ( 'related' === $group ) {
+		$valid = is_array( $raw ) && 15 === count( $raw );
+		$related_defaults = skvn_marine_blocks_get_default_pdp_related();
+		$related_enums    = array(
+			'imageRatio'        => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
+			'mediaLayout'       => array( 'flush', 'padded', 'floating' ),
+			'chipStyle'         => array( 'tag', 'hashtag', 'dot', 'plain' ),
+			'productActionMode' => array( 'view', 'quote', 'both', 'custom' ),
+		);
+		$related_bools = array( 'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories', 'showSpecChips', 'chipAllowTags', 'chipAllowCategories' );
+		$related_ints  = array( 'displayTagLimit' => array( 0, 10 ), 'relatedCount' => array( 1, 10 ) );
+		foreach ( $related_defaults as $key => $ignored ) {
+			if ( ! isset( $raw[ $key ] ) ) {
+				$valid = false;
+				break;
+			}
+			if ( in_array( $key, $related_bools, true ) ) {
+				if ( ! is_bool( $raw[ $key ] ) ) {
+					$valid = false;
+					break;
+				}
+			} elseif ( isset( $related_enums[ $key ] ) ) {
+				if ( ! is_string( $raw[ $key ] ) || ! in_array( $raw[ $key ], $related_enums[ $key ], true ) ) {
+					$valid = false;
+					break;
+				}
+			} elseif ( isset( $related_ints[ $key ] ) ) {
+				if ( ! is_int( $raw[ $key ] ) || $raw[ $key ] < $related_ints[ $key ][0] || $raw[ $key ] > $related_ints[ $key ][1] ) {
+					$valid = false;
+					break;
+				}
+			} elseif ( 'customActionUrl' === $key ) {
+				if ( ! is_string( $raw[ $key ] ) ) {
+					$valid = false;
+					break;
+				}
+			} elseif ( 'chipColorScheme' === $key ) {
+				if ( ! is_string( $raw[ $key ] ) || ( '' !== $raw[ $key ] && ! preg_match( '/^[a-z0-9_-]+$/', $raw[ $key ] ) ) ) {
 					$valid = false;
 					break;
 				}
