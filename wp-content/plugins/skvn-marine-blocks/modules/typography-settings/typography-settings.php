@@ -213,10 +213,24 @@ function skvn_marine_blocks_design_snapshot() {
  * Booleans must stay JSON booleans. wp_localize_script casts every scalar
  * through (string), so true becomes "1" and canUseDesignSidebar() (=== true)
  * never passes. See .context/PITFALLS.md DP-10.
+ *
+ * Also enqueues the plugin-owned Theme Design sidebar spacing stylesheet.
+ * PluginSidebar renders in the parent document editor, so the style rides this
+ * hook (dep wp-components), never the block editorStyle bundle or the canvas iframe.
  */
 function skvn_marine_blocks_design_bootstrap() {
 	if ( ! wp_script_is( 'skvn-marine-blocks-editor', 'registered' ) ) {
 		return;
+	}
+
+	$sidebar_style = dirname( __DIR__, 2 ) . '/assets/css/design-sidebar.css';
+	if ( file_exists( $sidebar_style ) ) {
+		wp_enqueue_style(
+			'skvn-marine-blocks-design-sidebar',
+			plugins_url( 'assets/css/design-sidebar.css', dirname( __DIR__, 2 ) . '/skvn-marine-blocks.php' ),
+			array( 'wp-components' ),
+			filemtime( $sidebar_style )
+		);
 	}
 
 	$screen  = get_current_screen();

@@ -302,7 +302,7 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 						<Button variant="secondary" disabled={ busy } onClick={ () => resolveConflict( group, true ) }>{ __( 'Use current values', 'skvn-marine-blocks' ) }</Button>
 						<Button variant="secondary" disabled={ busy || ! canEdit } onClick={ () => resolveConflict( group, false ) }>{ __( 'Keep my draft', 'skvn-marine-blocks' ) }</Button>
 					</Notice> }
-					<fieldset disabled={ ! canEdit || busy || !! sessionError || !! conflicts[ group ] } style={ { border: 0, padding: 0, margin: 0, minWidth: 0 } }>
+					<fieldset className="skvn-theme-design" disabled={ ! canEdit || busy || !! sessionError || !! conflicts[ group ] }>
 						<legend>{ labels[ group ] }</legend>
 						{ group === 'palette' && Object.entries( paletteLabels ).map( ( [ key, label ] ) => <TextControl key={ key } label={ label } help={ __( 'Hex color, for example #0369a1.', 'skvn-marine-blocks' ) } value={ value[ key ] as string } onChange={ ( color ) => change( group, { ...value, [ key ]: color } ) } /> ) }
 						{ group === 'heading' && [ 'h1', 'h2', 'h3', 'h4' ].map( ( level ) => {
@@ -311,45 +311,54 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 						} ) }
 						{ group === 'fonts' && <><SelectControl label={ __( 'Font preset', 'skvn-marine-blocks' ) } options={ snapshot.presets || [] } value={ value.preset as string } onChange={ ( preset ) => change( group, { ...value, preset } ) } /><SelectControl label={ __( 'Heading font scope', 'skvn-marine-blocks' ) } options={ snapshot.scopes || [] } value={ value.scope as string } onChange={ ( scope ) => change( group, { ...value, scope } ) } /><p>{ __( 'Uses the existing theme font registry and delivery. No fonts are loaded for drafts.', 'skvn-marine-blocks' ) }</p></> }
 						{ group === 'product' && <>
-							<SelectControl label={ productLabels.columns } value={ value.columns as string } options={ [
-								{ label: __( 'Gallery left', 'skvn-marine-blocks' ), value: 'gallery-left' },
-								{ label: __( 'Gallery right', 'skvn-marine-blocks' ), value: 'gallery-right' },
-								{ label: __( 'Stacked', 'skvn-marine-blocks' ), value: 'stacked' },
-							] } onChange={ ( columns ) => change( group, { ...value, columns } ) } />
-							<SelectControl label={ productLabels.ratio } help={ __( 'Ignored when columns are stacked.', 'skvn-marine-blocks' ) } value={ value.ratio as string } options={ [
-								{ label: '1:1', value: '1-1' }, { label: '3:2', value: '3-2' }, { label: '2:3', value: '2-3' },
-							] } onChange={ ( ratio ) => change( group, { ...value, ratio } ) } />
-							<SelectControl label={ productLabels.width } value={ value.width as string } options={ [
-								{ label: __( 'Wide', 'skvn-marine-blocks' ), value: 'wide' },
-								{ label: __( 'Content', 'skvn-marine-blocks' ), value: 'content' },
-							] } onChange={ ( width ) => change( group, { ...value, width } ) } />
-							<ToggleControl label={ productLabels.showGallery } checked={ !! value.showGallery } onChange={ ( showGallery ) => change( group, { ...value, showGallery } ) } />
-							<ToggleControl label={ productLabels.showPrice } checked={ !! value.showPrice } onChange={ ( showPrice ) => change( group, { ...value, showPrice } ) } />
-							<ToggleControl label={ productLabels.showExcerpt } checked={ !! value.showExcerpt } onChange={ ( showExcerpt ) => change( group, { ...value, showExcerpt } ) } />
-							<ToggleControl label={ productLabels.showMeta } checked={ !! value.showMeta } onChange={ ( showMeta ) => change( group, { ...value, showMeta } ) } />
-							<ToggleControl label={ productLabels.showTabs } checked={ !! value.showTabs } onChange={ ( showTabs ) => change( group, { ...value, showTabs } ) } />
-							<ToggleControl label={ productLabels.showTrust } checked={ !! value.showTrust } onChange={ ( showTrust ) => change( group, { ...value, showTrust } ) } />
-							<ToggleControl label={ productLabels.showContact } checked={ !! value.showContact } onChange={ ( showContact ) => change( group, { ...value, showContact } ) } />
-							<ToggleControl label={ productLabels.showQuote } checked={ !! value.showQuote } onChange={ ( showQuote ) => change( group, { ...value, showQuote } ) } />
-							<SelectControl label={ productLabels.titleScale } value={ value.titleScale as string } options={ [
-								{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
-								{ label: __( 'Heading 2', 'skvn-marine-blocks' ), value: 'h2' },
-								{ label: __( 'Heading 3', 'skvn-marine-blocks' ), value: 'h3' },
-								{ label: __( 'Heading 4', 'skvn-marine-blocks' ), value: 'h4' },
-							] } onChange={ ( titleScale ) => change( group, { ...value, titleScale } ) } />
-							<SelectControl label={ productLabels.summaryGap } value={ value.summaryGap as string } options={ [
-								{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
-								{ label: __( 'Tight', 'skvn-marine-blocks' ), value: 'tight' },
-								{ label: __( 'Loose', 'skvn-marine-blocks' ), value: 'loose' },
-							] } onChange={ ( summaryGap ) => change( group, { ...value, summaryGap } ) } />
-							<SelectControl label={ productLabels.specs } value={ value.specs as string } options={ [
-								{ label: __( 'Default', 'skvn-marine-blocks' ), value: 'default' },
-								{ label: __( 'Compact', 'skvn-marine-blocks' ), value: 'compact' },
-							] } onChange={ ( specs ) => change( group, { ...value, specs } ) } />
-							<SelectControl label={ productLabels.ctaStyle } value={ value.ctaStyle as string } options={ [
-								{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
-								{ label: __( 'Primary', 'skvn-marine-blocks' ), value: 'primary' },
-							] } onChange={ ( ctaStyle ) => change( group, { ...value, ctaStyle } ) } />
+							<div className="skvn-theme-design__section">
+								<h3>{ __( 'Layout', 'skvn-marine-blocks' ) }</h3>
+								<SelectControl label={ productLabels.columns } value={ value.columns as string } options={ [
+									{ label: __( 'Gallery left', 'skvn-marine-blocks' ), value: 'gallery-left' },
+									{ label: __( 'Gallery right', 'skvn-marine-blocks' ), value: 'gallery-right' },
+									{ label: __( 'Stacked', 'skvn-marine-blocks' ), value: 'stacked' },
+								] } onChange={ ( columns ) => change( group, { ...value, columns } ) } />
+								<SelectControl label={ productLabels.ratio } help={ __( 'Ignored when columns are stacked.', 'skvn-marine-blocks' ) } value={ value.ratio as string } options={ [
+									{ label: '1:1', value: '1-1' }, { label: '3:2', value: '3-2' }, { label: '2:3', value: '2-3' },
+								] } onChange={ ( ratio ) => change( group, { ...value, ratio } ) } />
+								<SelectControl label={ productLabels.width } value={ value.width as string } options={ [
+									{ label: __( 'Wide', 'skvn-marine-blocks' ), value: 'wide' },
+									{ label: __( 'Content', 'skvn-marine-blocks' ), value: 'content' },
+								] } onChange={ ( width ) => change( group, { ...value, width } ) } />
+							</div>
+							<div className="skvn-theme-design__section skvn-theme-design__toggles">
+								<h3>{ __( 'Visibility', 'skvn-marine-blocks' ) }</h3>
+								<ToggleControl label={ productLabels.showGallery } checked={ !! value.showGallery } onChange={ ( showGallery ) => change( group, { ...value, showGallery } ) } />
+								<ToggleControl label={ productLabels.showPrice } checked={ !! value.showPrice } onChange={ ( showPrice ) => change( group, { ...value, showPrice } ) } />
+								<ToggleControl label={ productLabels.showExcerpt } checked={ !! value.showExcerpt } onChange={ ( showExcerpt ) => change( group, { ...value, showExcerpt } ) } />
+								<ToggleControl label={ productLabels.showMeta } checked={ !! value.showMeta } onChange={ ( showMeta ) => change( group, { ...value, showMeta } ) } />
+								<ToggleControl label={ productLabels.showTabs } checked={ !! value.showTabs } onChange={ ( showTabs ) => change( group, { ...value, showTabs } ) } />
+								<ToggleControl label={ productLabels.showTrust } checked={ !! value.showTrust } onChange={ ( showTrust ) => change( group, { ...value, showTrust } ) } />
+								<ToggleControl label={ productLabels.showContact } checked={ !! value.showContact } onChange={ ( showContact ) => change( group, { ...value, showContact } ) } />
+								<ToggleControl label={ productLabels.showQuote } checked={ !! value.showQuote } onChange={ ( showQuote ) => change( group, { ...value, showQuote } ) } />
+							</div>
+							<div className="skvn-theme-design__section">
+								<h3>{ __( 'Type', 'skvn-marine-blocks' ) }</h3>
+								<SelectControl label={ productLabels.titleScale } value={ value.titleScale as string } options={ [
+									{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
+									{ label: __( 'Heading 2', 'skvn-marine-blocks' ), value: 'h2' },
+									{ label: __( 'Heading 3', 'skvn-marine-blocks' ), value: 'h3' },
+									{ label: __( 'Heading 4', 'skvn-marine-blocks' ), value: 'h4' },
+								] } onChange={ ( titleScale ) => change( group, { ...value, titleScale } ) } />
+								<SelectControl label={ productLabels.summaryGap } value={ value.summaryGap as string } options={ [
+									{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
+									{ label: __( 'Tight', 'skvn-marine-blocks' ), value: 'tight' },
+									{ label: __( 'Loose', 'skvn-marine-blocks' ), value: 'loose' },
+								] } onChange={ ( summaryGap ) => change( group, { ...value, summaryGap } ) } />
+								<SelectControl label={ productLabels.specs } value={ value.specs as string } options={ [
+									{ label: __( 'Default', 'skvn-marine-blocks' ), value: 'default' },
+									{ label: __( 'Compact', 'skvn-marine-blocks' ), value: 'compact' },
+								] } onChange={ ( specs ) => change( group, { ...value, specs } ) } />
+								<SelectControl label={ productLabels.ctaStyle } value={ value.ctaStyle as string } options={ [
+									{ label: __( 'Current', 'skvn-marine-blocks' ), value: 'current' },
+									{ label: __( 'Primary', 'skvn-marine-blocks' ), value: 'primary' },
+								] } onChange={ ( ctaStyle ) => change( group, { ...value, ctaStyle } ) } />
+							</div>
 						</> }
 						{ group === 'related' && <>
 							<ToggleControl label={ relatedLabels.useCustomRelatedCard } checked={ !! value.useCustomRelatedCard } onChange={ ( useCustomRelatedCard ) => change( group, { ...value, useCustomRelatedCard } ) } />
@@ -404,8 +413,10 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 								{ copyStatus && <Notice status={ copyFailed ? 'error' : 'success' } isDismissible={ false }>{ copyStatus }</Notice> }
 							</> }
 						</> }
-						<Button variant="primary" disabled={ ! dirty( group ) } onClick={ () => save( group ) }>{ __( 'Save group', 'skvn-marine-blocks' ) }</Button>
-						<Button variant="tertiary" onClick={ () => discard( group ) }>{ __( 'Discard draft and reload group', 'skvn-marine-blocks' ) }</Button>
+						<div className="skvn-theme-design__actions">
+							<Button variant="primary" disabled={ ! dirty( group ) } onClick={ () => save( group ) }>{ __( 'Save group', 'skvn-marine-blocks' ) }</Button>
+							<Button variant="tertiary" onClick={ () => discard( group ) }>{ __( 'Discard draft and reload group', 'skvn-marine-blocks' ) }</Button>
+						</div>
 					</fieldset>
 					<p role="status" aria-live="polite">{ pending[ group ] ? __( 'Saving or reloading…', 'skvn-marine-blocks' ) : statuses[ group ] || ( dirty( group ) ? __( 'Unsaved site design draft', 'skvn-marine-blocks' ) : __( 'Saved values', 'skvn-marine-blocks' ) ) }</p>
 				</PanelBody>;
