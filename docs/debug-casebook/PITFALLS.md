@@ -25,6 +25,7 @@ Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05)
 | Hero editor sửa một rule chiều cao | Stage Hero vẫn thấp sau khi đổi 356px hoặc 480px | `assets/css/slider-editor.css` thắng `style.css` | Pitfall 9, [AP-14](../../.context/PITFALLS.md#ap-14--sửa-chiều-cao-hero-editor-ở-rule-thua-cascade) |
 | Slider đổi size sau fade load/chuyển trang | Khung và tỉ lệ nhích khi fade xong | Offset CSS `5rem` rồi JS ghi header + admin bar; scrollbar | Pitfall 10 |
 | Marine Blocks không có trong sidebar editor | Page / SKVN Page Display / GeneratePress còn; Preferences → Panels chỉ WindPress | `wp_localize_script` ép boolean thành `"1"` | Pitfall 11, [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14) |
+| PDP related panel bật, frontend không đổi | Native Woo related (placeholder + nút outline); không có `.skvn-related-shared-card` | Theme chưa cập nhật (swap ở theme); option/meta owner off; gate `assets_ready`; path Woo; spread `override` | Pitfall 12, [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15) |
 
 ---
 
@@ -400,6 +401,34 @@ Delta:             wp_localize_script ép (string) true thành "1"
 Chi tiết, consumer `woocommerceAvailable === false`, và fix: [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14).
 
 **Đừng làm:** đổ cho bundle cũ khi `skvnMarineDesign` đã có trên trang và lệch file chỉ khoảng trăm byte. Đừng tìm Marine Blocks trong Preferences → Panels. Đừng nới `=== true` thành truthy rồi giữ `wp_localize_script`.
+
+## Pitfall 12 — PDP related: editor bật SKVN cards, frontend vẫn Woo native
+
+**Xảy ra 2026-11-15.** Panel sản phẩm Override + Use SKVN related cards (Floating, Both, chips) bật. Frontend related không đổi.
+
+**State delta:**
+
+```text
+State A (kỳ vọng): related.php → related-product-card.php → .skvn-related-shared-card
+State B (lỗi):     related.php → Woo content-product.php
+                   placeholder “HÌNH SẮP CẬP NHẬT” + nút outline Request a Quote
+Delta:             template không swap. Không phải card SKVN thiếu CSS.
+```
+
+**Case này do gì (thứ tự):**
+
+1. **Theme chưa cập nhật — human chốt onsite 2026-11-15.** Panel thuộc plugin nên editor bật. Swap Woo (`add_filter('wc_get_template_part')`) chỉ register khi theme load `inc/pdp-related.php`. Theme cũ = DOM native, không fatal. 1.3.22 vẫn cần zip theme+plugin cùng gói. Độc lập plugin/theme = tension 1.4.0, ideation `docs/ideations/pdp-related-theme-plugin-independence.md`.
+2. **Owner chưa persist — runtime local.** `wp option get skvn_pdp_related` → option không tồn tại. Default `useCustomRelatedCard: false` → P4 **cố ý** giữ Woo native. Panel document ≠ Theme Design; cần **Update** sản phẩm mới ghi `_skvn_pdp_related`. Toggle inspector không phải bằng chứng DB.
+3. **Spread `override`.** `{ override: true, ...defaults, ...stored }` để `stored.override: false` thắng. Toggle Override không ghi. Đổi control khác (`setRelated`) mới gắn `override: true` trong memory → editor trông bật, meta có thể vẫn off.
+4. **Swap gắn `assets_ready` lúc enqueue.** Header `is_active()` false (đúng khi option/meta chưa có) → không swap cả khi render. CSS enqueue fail cũng ra native HTML.
+5. **Path Woo so tuyệt đối** `plugin_path()/templates/content-product.php` — tokenize/realpath/`WP_PLUGIN_DIR` lệch thì không swap.
+6. **Meta không phải array** (JSON string / `stdClass`) → bỏ override, rơi về option site.
+
+Local runtime đã có adapter + `product-card.css` khi theme đủ file. Không phải upsells, không phải DP-10.
+
+Chi tiết và source fix: [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15).
+
+**Đừng làm:** sửa CSS related/placeholder khi DOM vẫn `li.product` native. Đừng deploy mỗi plugin khi swap còn nằm theme. Đừng coi panel checked là owner on. Đừng gắn swap vào enqueue-time CSS. Đừng spread `...stored` sau `override: true`.
 
 ## Related
 

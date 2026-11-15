@@ -3,6 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { registerPlugin } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
+import { COLOR_PALETTE_OPTIONS } from '../collection/constants';
 
 type RelatedMeta = Record< string, string | boolean | number > & { override?: boolean };
 
@@ -18,6 +19,10 @@ const defaults: RelatedMeta = {
 	chipColorScheme: '',
 	productActionMode: 'quote',
 	customActionUrl: '',
+	actionBackgroundColor: '',
+	actionTextColor: '',
+	actionHoverBackgroundColor: '',
+	actionHoverTextColor: '',
 	chipAllowTags: true,
 	chipAllowCategories: false,
 	displayTagLimit: 3,
@@ -44,20 +49,20 @@ function PdpRelatedPanel() {
 		? meta._skvn_pdp_related
 		: { override: false } ) as RelatedMeta;
 
-	const overrideOn = stored.override === true;
+	const overrideOn = stored.override === true || stored.override === 1;
 	const values = overrideOn ? { ...defaults, ...stored } : defaults;
 	const disabled = ! overrideOn;
 
 	const setRelated = ( patch: Partial< RelatedMeta > ) => {
 		const next = overrideOn
 			? { ...stored, ...patch, override: true }
-			: { override: true, ...defaults, ...patch };
+			: { ...defaults, ...patch, override: true };
 		setMeta( { ...meta, _skvn_pdp_related: next } );
 	};
 
 	const setOverride = ( enabled: boolean ) => {
 		if ( enabled ) {
-			setMeta( { ...meta, _skvn_pdp_related: { override: true, ...defaults, ...stored } } );
+			setMeta( { ...meta, _skvn_pdp_related: { ...defaults, ...stored, override: true } } );
 		} else {
 			setMeta( { ...meta, _skvn_pdp_related: { override: false } } );
 		}
@@ -145,6 +150,34 @@ function PdpRelatedPanel() {
 					onChange={ ( customActionUrl ) => setRelated( { customActionUrl } ) }
 				/>
 			) }
+			<SelectControl
+				label={ __( 'Button background', 'skvn-marine-blocks' ) }
+				value={ String( values.actionBackgroundColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionBackgroundColor ) => setRelated( { actionBackgroundColor } ) }
+			/>
+			<SelectControl
+				label={ __( 'Button text', 'skvn-marine-blocks' ) }
+				value={ String( values.actionTextColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionTextColor ) => setRelated( { actionTextColor } ) }
+			/>
+			<SelectControl
+				label={ __( 'Button hover background', 'skvn-marine-blocks' ) }
+				value={ String( values.actionHoverBackgroundColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionHoverBackgroundColor ) => setRelated( { actionHoverBackgroundColor } ) }
+			/>
+			<SelectControl
+				label={ __( 'Button hover text', 'skvn-marine-blocks' ) }
+				value={ String( values.actionHoverTextColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionHoverTextColor ) => setRelated( { actionHoverTextColor } ) }
+			/>
 			<TextControl
 				label={ __( 'Chip limit per product', 'skvn-marine-blocks' ) }
 				help={ __( '0 shows all terms.', 'skvn-marine-blocks' ) }

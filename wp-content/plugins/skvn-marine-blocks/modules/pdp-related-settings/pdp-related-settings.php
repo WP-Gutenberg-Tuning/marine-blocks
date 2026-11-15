@@ -29,7 +29,30 @@ add_action( 'add_meta_boxes', 'skvn_marine_blocks_pdp_related_meta_box' );
 add_action( 'save_post_product', 'skvn_marine_blocks_pdp_related_save_classic', 10, 2 );
 
 /**
- * Default related card profile (15 keys, no override).
+ * Collection CTA palette slugs (empty = inherit card CSS).
+ *
+ * Keep in sync with COLOR_PALETTE_OPTIONS and cards.php $color_allowed.
+ *
+ * @return array<int,string>
+ */
+function skvn_marine_blocks_pdp_related_action_color_slugs() {
+	return array(
+		'',
+		'skvn-blue-950',
+		'skvn-blue-900',
+		'skvn-blue-700',
+		'skvn-mint-100',
+		'skvn-gold-300',
+		'skvn-teal-600',
+		'skvn-sky-50',
+		'skvn-slate-700',
+		'skvn-slate-900',
+		'skvn-white',
+	);
+}
+
+/**
+ * Default related card profile (19 keys, no override).
  *
  * Keep in sync with skvn_marine_get_default_pdp_related() in theme.
  *
@@ -37,21 +60,25 @@ add_action( 'save_post_product', 'skvn_marine_blocks_pdp_related_save_classic', 
  */
 function skvn_marine_blocks_get_default_pdp_related() {
 	return array(
-		'useCustomRelatedCard'  => false,
-		'showImage'             => true,
-		'imageRatio'            => '1:1',
-		'mediaLayout'           => 'flush',
-		'showProductTags'       => true,
-		'showProductCategories' => false,
-		'showSpecChips'         => true,
-		'chipStyle'             => 'tag',
-		'chipColorScheme'       => '',
-		'productActionMode'     => 'quote',
-		'customActionUrl'       => '',
-		'chipAllowTags'         => true,
-		'chipAllowCategories'   => false,
-		'displayTagLimit'       => 3,
-		'relatedCount'          => 4,
+		'useCustomRelatedCard'       => false,
+		'showImage'                  => true,
+		'imageRatio'                 => '1:1',
+		'mediaLayout'                => 'flush',
+		'showProductTags'            => true,
+		'showProductCategories'      => false,
+		'showSpecChips'              => true,
+		'chipStyle'                  => 'tag',
+		'chipColorScheme'            => '',
+		'productActionMode'          => 'quote',
+		'customActionUrl'            => '',
+		'actionBackgroundColor'      => '',
+		'actionTextColor'            => '',
+		'actionHoverBackgroundColor' => '',
+		'actionHoverTextColor'       => '',
+		'chipAllowTags'              => true,
+		'chipAllowCategories'        => false,
+		'displayTagLimit'            => 3,
+		'relatedCount'               => 4,
 	);
 }
 
@@ -115,11 +142,16 @@ function skvn_marine_blocks_sanitize_pdp_related( $raw ) {
 		return $defaults;
 	}
 
-	$enums = array(
-		'imageRatio'        => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
-		'mediaLayout'       => array( 'flush', 'padded', 'floating' ),
-		'chipStyle'         => array( 'tag', 'hashtag', 'dot', 'plain' ),
-		'productActionMode' => array( 'view', 'quote', 'both', 'custom' ),
+	$action_colors = skvn_marine_blocks_pdp_related_action_color_slugs();
+	$enums         = array(
+		'imageRatio'                 => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
+		'mediaLayout'                => array( 'flush', 'padded', 'floating' ),
+		'chipStyle'                  => array( 'tag', 'hashtag', 'dot', 'plain' ),
+		'productActionMode'          => array( 'view', 'quote', 'both', 'custom' ),
+		'actionBackgroundColor'      => $action_colors,
+		'actionTextColor'            => $action_colors,
+		'actionHoverBackgroundColor' => $action_colors,
+		'actionHoverTextColor'       => $action_colors,
 	);
 
 	$bools = array(
@@ -178,7 +210,7 @@ function skvn_marine_blocks_sanitize_pdp_related( $raw ) {
  * Sanitize per-product override meta.
  *
  * Missing/broken override drops every other key; a valid override keeps the
- * sanitized 15 keys and pulls nothing from the site option.
+ * sanitized 19 keys and pulls nothing from the site option.
  *
  * @param mixed $raw Raw meta value.
  * @return array<string,mixed>
@@ -213,12 +245,36 @@ function skvn_marine_blocks_get_pdp_related( $product_id ) {
 		return $site;
 	}
 
-	$meta = get_post_meta( $product_id, SKVN_MARINE_BLOCKS_PDP_RELATED_META, true );
+	$meta = skvn_marine_blocks_pdp_related_cast_stored(
+		get_post_meta( $product_id, SKVN_MARINE_BLOCKS_PDP_RELATED_META, true )
+	);
 	if ( ! is_array( $meta ) || ! skvn_marine_blocks_sanitize_pdp_related_bool( $meta['override'] ?? false ) ) {
 		return $site;
 	}
 
 	return skvn_marine_blocks_sanitize_pdp_related( $meta );
+}
+
+/**
+ * Coerce stored related meta into an array.
+ *
+ * REST/object meta is usually a PHP array. Gutenberg or a JSON column can
+ * leave a JSON string or stdClass; those must not fall through to the site
+ * default (owner off → native related, editor still shows the saved object).
+ *
+ * @param mixed $raw get_post_meta() value.
+ * @return array<string,mixed>|null
+ */
+function skvn_marine_blocks_pdp_related_cast_stored( $raw ) {
+	if ( is_object( $raw ) ) {
+		$raw = get_object_vars( $raw );
+	}
+	if ( is_string( $raw ) && '' !== $raw ) {
+		$decoded = json_decode( $raw, true );
+		$raw     = is_array( $decoded ) ? $decoded : null;
+	}
+
+	return is_array( $raw ) ? $raw : null;
 }
 
 /**
@@ -414,11 +470,16 @@ function skvn_marine_blocks_pdp_related_rest_schema_properties() {
 			'type' => 'boolean',
 		),
 	);
-	$enums = array(
-		'imageRatio'        => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
-		'mediaLayout'       => array( 'flush', 'padded', 'floating' ),
-		'chipStyle'         => array( 'tag', 'hashtag', 'dot', 'plain' ),
-		'productActionMode' => array( 'view', 'quote', 'both', 'custom' ),
+	$action_colors = skvn_marine_blocks_pdp_related_action_color_slugs();
+	$enums         = array(
+		'imageRatio'                 => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
+		'mediaLayout'                => array( 'flush', 'padded', 'floating' ),
+		'chipStyle'                  => array( 'tag', 'hashtag', 'dot', 'plain' ),
+		'productActionMode'          => array( 'view', 'quote', 'both', 'custom' ),
+		'actionBackgroundColor'      => $action_colors,
+		'actionTextColor'            => $action_colors,
+		'actionHoverBackgroundColor' => $action_colors,
+		'actionHoverTextColor'       => $action_colors,
 	);
 	$bools = array(
 		'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories',
@@ -537,6 +598,20 @@ function skvn_marine_blocks_pdp_related_classic_fields( array $profile, bool $en
 function skvn_marine_blocks_pdp_related_classic_controls_html( array $profile, string $prefix, string $disabled ) {
 	ob_start();
 
+	$action_color_options = array(
+		''               => __( 'Inherit (default)', 'skvn-marine-blocks' ),
+		'skvn-blue-950'  => __( 'SKVN Blue 950', 'skvn-marine-blocks' ),
+		'skvn-blue-900'  => __( 'SKVN Blue 900', 'skvn-marine-blocks' ),
+		'skvn-blue-700'  => __( 'SKVN Blue 700', 'skvn-marine-blocks' ),
+		'skvn-mint-100'  => __( 'SKVN Mint 100', 'skvn-marine-blocks' ),
+		'skvn-gold-300'  => __( 'SKVN Gold 300', 'skvn-marine-blocks' ),
+		'skvn-teal-600'  => __( 'SKVN Teal 600', 'skvn-marine-blocks' ),
+		'skvn-sky-50'    => __( 'SKVN Sky 50', 'skvn-marine-blocks' ),
+		'skvn-slate-700' => __( 'SKVN Slate 700', 'skvn-marine-blocks' ),
+		'skvn-slate-900' => __( 'SKVN Slate 900', 'skvn-marine-blocks' ),
+		'skvn-white'     => __( 'SKVN White', 'skvn-marine-blocks' ),
+	);
+
 	$selects = array(
 		'imageRatio'        => array(
 			'label'   => __( 'Image ratio', 'skvn-marine-blocks' ),
@@ -577,6 +652,22 @@ function skvn_marine_blocks_pdp_related_classic_controls_html( array $profile, s
 				'both'   => __( 'Both', 'skvn-marine-blocks' ),
 				'custom' => __( 'Custom URL', 'skvn-marine-blocks' ),
 			),
+		),
+		'actionBackgroundColor' => array(
+			'label'   => __( 'Button background', 'skvn-marine-blocks' ),
+			'options' => $action_color_options,
+		),
+		'actionTextColor' => array(
+			'label'   => __( 'Button text', 'skvn-marine-blocks' ),
+			'options' => $action_color_options,
+		),
+		'actionHoverBackgroundColor' => array(
+			'label'   => __( 'Button hover background', 'skvn-marine-blocks' ),
+			'options' => $action_color_options,
+		),
+		'actionHoverTextColor' => array(
+			'label'   => __( 'Button hover text', 'skvn-marine-blocks' ),
+			'options' => $action_color_options,
 		),
 	);
 
@@ -648,7 +739,7 @@ function skvn_marine_blocks_pdp_related_save_classic( $post_id, $post ) {
 	foreach ( array( 'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories', 'showSpecChips', 'chipAllowTags', 'chipAllowCategories' ) as $key ) {
 		$raw[ $key ] = isset( $_POST[ $prefix . $key ] );
 	}
-	foreach ( array( 'imageRatio', 'mediaLayout', 'chipStyle', 'chipColorScheme', 'productActionMode', 'customActionUrl', 'displayTagLimit', 'relatedCount' ) as $key ) {
+	foreach ( array( 'imageRatio', 'mediaLayout', 'chipStyle', 'chipColorScheme', 'productActionMode', 'customActionUrl', 'actionBackgroundColor', 'actionTextColor', 'actionHoverBackgroundColor', 'actionHoverTextColor', 'displayTagLimit', 'relatedCount' ) as $key ) {
 		$raw[ $key ] = isset( $_POST[ $prefix . $key ] ) && is_string( $_POST[ $prefix . $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $prefix . $key ] ) ) : '';
 	}
 

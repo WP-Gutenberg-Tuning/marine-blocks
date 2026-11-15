@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Default related card profile (15 keys, no override).
+ * Default related card profile (19 keys, no override).
  *
  * Keep in sync with skvn_marine_blocks_get_default_pdp_related() in plugin.
  *
@@ -32,10 +32,14 @@ function skvn_marine_get_default_pdp_related() {
 		'showProductCategories' => false,
 		'showSpecChips'         => true,
 		'chipStyle'             => 'tag',
-		'chipColorScheme'       => '',
-		'productActionMode'     => 'quote',
-		'customActionUrl'       => '',
-		'chipAllowTags'         => true,
+		'chipColorScheme'            => '',
+		'productActionMode'          => 'quote',
+		'customActionUrl'            => '',
+		'actionBackgroundColor'      => '',
+		'actionTextColor'            => '',
+		'actionHoverBackgroundColor' => '',
+		'actionHoverTextColor'       => '',
+		'chipAllowTags'              => true,
 		'chipAllowCategories'   => false,
 		'displayTagLimit'       => 3,
 		'relatedCount'          => 4,
@@ -104,11 +108,28 @@ function skvn_marine_sanitize_pdp_related( $raw ) {
 		return $defaults;
 	}
 
-	$enums = array(
-		'imageRatio'        => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
-		'mediaLayout'       => array( 'flush', 'padded', 'floating' ),
-		'chipStyle'         => array( 'tag', 'hashtag', 'dot', 'plain' ),
-		'productActionMode' => array( 'view', 'quote', 'both', 'custom' ),
+	$action_colors = array(
+		'',
+		'skvn-blue-950',
+		'skvn-blue-900',
+		'skvn-blue-700',
+		'skvn-mint-100',
+		'skvn-gold-300',
+		'skvn-teal-600',
+		'skvn-sky-50',
+		'skvn-slate-700',
+		'skvn-slate-900',
+		'skvn-white',
+	);
+	$enums         = array(
+		'imageRatio'                 => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
+		'mediaLayout'                => array( 'flush', 'padded', 'floating' ),
+		'chipStyle'                  => array( 'tag', 'hashtag', 'dot', 'plain' ),
+		'productActionMode'          => array( 'view', 'quote', 'both', 'custom' ),
+		'actionBackgroundColor'      => $action_colors,
+		'actionTextColor'            => $action_colors,
+		'actionHoverBackgroundColor' => $action_colors,
+		'actionHoverTextColor'       => $action_colors,
 	);
 
 	$bools = array(
@@ -195,6 +216,17 @@ add_filter( 'woocommerce_output_related_products_args', 'skvn_marine_related_pro
 add_filter( 'wc_get_template_part', 'skvn_marine_related_template_part', 50, 3 );
 
 /**
+ * Product ID for the related profile (main query, not the related item).
+ */
+function skvn_marine_related_product_id(): int {
+	if ( ! empty( $GLOBALS['skvn_marine_related_product_id'] ) ) {
+		return (int) $GLOBALS['skvn_marine_related_product_id'];
+	}
+
+	return (int) get_queried_object_id();
+}
+
+/**
  * Enqueue the shared card stylesheet only on a product page with an active profile.
  */
 function skvn_marine_related_enqueue_card_assets() {
@@ -205,12 +237,13 @@ function skvn_marine_related_enqueue_card_assets() {
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		return;
 	}
+	$GLOBALS['skvn_marine_related_product_id'] = (int) get_queried_object_id();
 	if ( ! function_exists( 'skvn_marine_blocks_render_product_card' )
 		|| ! function_exists( 'skvn_marine_blocks_pdp_related_is_active' )
 		|| ! function_exists( 'skvn_marine_blocks_enqueue_product_card_assets' ) ) {
 		return;
 	}
-	$resolved = skvn_marine_get_pdp_related( (int) get_queried_object_id() );
+	$resolved = skvn_marine_get_pdp_related( skvn_marine_related_product_id() );
 	if ( ! skvn_marine_blocks_pdp_related_is_active( $resolved ) ) {
 		return;
 	}
@@ -241,6 +274,11 @@ function skvn_marine_related_unmark_loop( $template_name ) {
 
 /**
  * True when the SKVN related card may replace native related items.
+ *
+ * Owner on is enough to swap. CSS enqueue is retried here when the
+ * wp_enqueue_scripts pass missed (is_active false in the header, path
+ * compare later). A missing stylesheet still swaps — native markup with
+ * no visual change is worse than unstyled SKVN cards.
  */
 function skvn_marine_related_shared_card_ready(): bool {
 	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
@@ -249,15 +287,20 @@ function skvn_marine_related_shared_card_ready(): bool {
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		return false;
 	}
-	if ( empty( $GLOBALS['skvn_marine_related_card_assets_ready'] ) ) {
-		return false;
-	}
 	if ( ! function_exists( 'skvn_marine_blocks_render_product_card' )
 		|| ! function_exists( 'skvn_marine_blocks_pdp_related_is_active' ) ) {
 		return false;
 	}
-	$resolved = skvn_marine_get_pdp_related( (int) get_queried_object_id() );
-	return skvn_marine_blocks_pdp_related_is_active( $resolved );
+	$resolved = skvn_marine_get_pdp_related( skvn_marine_related_product_id() );
+	if ( ! skvn_marine_blocks_pdp_related_is_active( $resolved ) ) {
+		return false;
+	}
+	if ( empty( $GLOBALS['skvn_marine_related_card_assets_ready'] )
+		&& function_exists( 'skvn_marine_blocks_enqueue_product_card_assets' ) ) {
+		$GLOBALS['skvn_marine_related_card_assets_ready'] = skvn_marine_blocks_enqueue_product_card_assets();
+	}
+
+	return true;
 }
 
 /**
@@ -271,7 +314,7 @@ function skvn_marine_related_products_args( $args ) {
 	if ( ! skvn_marine_related_shared_card_ready() ) {
 		return $args;
 	}
-	$resolved = skvn_marine_get_pdp_related( (int) get_queried_object_id() );
+	$resolved = skvn_marine_get_pdp_related( skvn_marine_related_product_id() );
 	$count    = isset( $resolved['relatedCount'] ) && is_int( $resolved['relatedCount'] ) ? $resolved['relatedCount'] : 4;
 	$count    = min( 10, max( 1, $count ) );
 	if ( ! is_array( $args ) ) {
@@ -302,13 +345,43 @@ function skvn_marine_related_template_part( $template, $slug, $name ) {
 	if ( defined( 'WC_TEMPLATE_DEBUG_MODE' ) && WC_TEMPLATE_DEBUG_MODE ) {
 		return $template;
 	}
-	$woocommerce = function_exists( 'WC' ) ? WC() : null;
-	if ( ! $woocommerce || ! method_exists( $woocommerce, 'plugin_path' )
-		|| wp_normalize_path( $template ) !== wp_normalize_path( $woocommerce->plugin_path() . '/templates/content-product.php' ) ) {
+	if ( ! skvn_marine_related_is_woo_default_content_product( $template ) ) {
 		return $template;
 	}
 	$adapter = get_stylesheet_directory() . '/inc/templates/related-product-card.php';
 	return is_readable( $adapter ) ? $adapter : $template;
+}
+
+/**
+ * True when $template is Woo's bundled content-product.php, not a theme override.
+ *
+ * Exact plugin_path() compare fails when locate/cache returns a realpath or
+ * token-expanded WP_PLUGIN_DIR that differs only by symlink or slash mix.
+ *
+ * @param string $template Located template path.
+ */
+function skvn_marine_related_is_woo_default_content_product( $template ): bool {
+	$normalized = wp_normalize_path( (string) $template );
+	if ( '' === $normalized ) {
+		return false;
+	}
+	$woocommerce = function_exists( 'WC' ) ? WC() : null;
+	if ( ! $woocommerce || ! method_exists( $woocommerce, 'plugin_path' ) ) {
+		return false;
+	}
+	$expected = wp_normalize_path( $woocommerce->plugin_path() . '/templates/content-product.php' );
+	if ( $normalized === $expected ) {
+		return true;
+	}
+	$real_template = realpath( $template );
+	$real_expected = realpath( $expected );
+	if ( $real_template && $real_expected
+		&& wp_normalize_path( $real_template ) === wp_normalize_path( $real_expected ) ) {
+		return true;
+	}
+	$suffix = '/woocommerce/templates/content-product.php';
+
+	return substr( $normalized, -strlen( $suffix ) ) === $suffix;
 }
 
 /**
@@ -318,7 +391,7 @@ function skvn_marine_related_template_part( $template, $slug, $name ) {
  * @param WC_Product $product Current related product.
  */
 function skvn_marine_related_shared_product_content( $product ): void {
-	$html      = skvn_marine_blocks_render_product_card( $product, skvn_marine_get_pdp_related( (int) get_queried_object_id() ), 'related' );
+	$html      = skvn_marine_blocks_render_product_card( $product, skvn_marine_get_pdp_related( skvn_marine_related_product_id() ), 'related' );
 	$callbacks = array(
 		'woocommerce_before_shop_loop_item'       => array( 'woocommerce_template_loop_product_link_open' ),
 		'woocommerce_before_shop_loop_item_title' => array( 'woocommerce_show_product_loop_sale_flash', 'woocommerce_template_loop_product_thumbnail' ),

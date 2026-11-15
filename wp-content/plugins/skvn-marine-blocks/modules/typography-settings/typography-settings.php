@@ -335,13 +335,18 @@ function skvn_marine_blocks_design_settings_ajax() {
 			}
 		}
 	} elseif ( 'related' === $group ) {
-		$valid = is_array( $raw ) && 15 === count( $raw );
 		$related_defaults = skvn_marine_blocks_get_default_pdp_related();
+		$valid            = is_array( $raw ) && count( $related_defaults ) === count( $raw );
+		$action_colors    = skvn_marine_blocks_pdp_related_action_color_slugs();
 		$related_enums    = array(
-			'imageRatio'        => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
-			'mediaLayout'       => array( 'flush', 'padded', 'floating' ),
-			'chipStyle'         => array( 'tag', 'hashtag', 'dot', 'plain' ),
-			'productActionMode' => array( 'view', 'quote', 'both', 'custom' ),
+			'imageRatio'                 => array( '1:1', '4:3', '3:2', '16:9', 'auto' ),
+			'mediaLayout'                => array( 'flush', 'padded', 'floating' ),
+			'chipStyle'                  => array( 'tag', 'hashtag', 'dot', 'plain' ),
+			'productActionMode'          => array( 'view', 'quote', 'both', 'custom' ),
+			'actionBackgroundColor'      => $action_colors,
+			'actionTextColor'            => $action_colors,
+			'actionHoverBackgroundColor' => $action_colors,
+			'actionHoverTextColor'       => $action_colors,
 		);
 		$related_bools = array( 'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories', 'showSpecChips', 'chipAllowTags', 'chipAllowCategories' );
 		$related_ints  = array( 'displayTagLimit' => array( 0, 10 ), 'relatedCount' => array( 1, 10 ) );

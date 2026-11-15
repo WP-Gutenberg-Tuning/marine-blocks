@@ -71,6 +71,12 @@ $GLOBALS['skvn_marine_related_card_assets_ready'] = true;
 skvn_marine_related_mark_loop( 'single-product/related.php' );
 check_hook( strpos( $template_filter( '/woo/templates/content-product.php', 'content', 'product' ), 'inc/templates/related-product-card.php' ) !== false, 'Related loop selects the related adapter' );
 check_hook( $template_filter( '/custom/content-product.php', 'content', 'product' ) === '/custom/content-product.php', 'Existing related template override is respected' );
+$GLOBALS['skvn_marine_related_card_assets_ready'] = false;
+$GLOBALS['related_assets_fixture'] = false;
+check_hook( strpos( $template_filter( '/woo/templates/content-product.php', 'content', 'product' ), 'inc/templates/related-product-card.php' ) !== false, 'Active owner swaps even when card CSS enqueue failed' );
+check_hook( strpos( $template_filter( '/wp-content/plugins/woocommerce/templates/content-product.php', 'content', 'product' ), 'inc/templates/related-product-card.php' ) !== false, 'Woo plugin-dir suffix still selects the related adapter' );
+$GLOBALS['skvn_marine_related_card_assets_ready'] = true;
+$GLOBALS['related_assets_fixture'] = true;
 $GLOBALS['loop_name'] = 'up-sells';
 skvn_marine_related_unmark_loop( 'single-product/related.php' );
 check_hook( $template_filter( '/woo/templates/content-product.php', 'content', 'product' ) === '/woo/templates/content-product.php', 'Upsells keep native content-product' );
@@ -112,4 +118,4 @@ catch ( RuntimeException $error ) { $thrown = true; }
 ob_end_clean();
 check_hook( $thrown, 'Related extension failure remains visible' );
 check_hook( has_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart' ) === 10, 'Native callbacks restored after related hook exception' );
-echo '13 related hook/template isolation checks passed (mocked only).' . PHP_EOL;
+echo '16 related hook/template isolation checks passed (mocked only).' . PHP_EOL;

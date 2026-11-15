@@ -47,12 +47,16 @@ Mọi key luôn có sau sanitize; key sai về default của key đó, không h�
 | `chipColorScheme` | palette slug (token theme) hoặc `''` | `''` | Không nhận raw hex; class `skvn-chips--{slug}` |
 | `productActionMode` | `view`, `quote`, `both`, `custom` | `quote` | Default presenter Collection; **default cần human review khi onsite** |
 | `customActionUrl` | string (esc_url_raw) | `''` | Chỉ dùng khi mode `custom`; không append quote context v1 |
+| `actionBackgroundColor` | Collection palette slug hoặc `''` | `''` | Human 2026-11-15: 4 token Collection cho CTA related; `''` = inherit CSS card. Không hex. |
+| `actionTextColor` | Collection palette slug hoặc `''` | `''` | Cùng allowlist `COLOR_PALETTE_OPTIONS` / cards.php `$color_allowed` |
+| `actionHoverBackgroundColor` | Collection palette slug hoặc `''` | `''` | Hover nền |
+| `actionHoverTextColor` | Collection palette slug hoặc `''` | `''` | Hover chữ |
 | `chipAllowTags` | bool | `true` | Lớp 2 — D4 allowlist `product_tag` |
 | `chipAllowCategories` | bool | `false` | Lớp 2 — D4 allowlist `product_cat` (capability render mới, opt-in) |
 | `displayTagLimit` | int `0–10` | `3` | `0` = không giới hạn; `1–10` = cap + `+N` informational span |
 | `relatedCount` | int `1–10` | `4` | `posts_per_page` khi active; `columns` = clamp(`relatedCount`, 1, 4) — §7 |
 
-Site option: **15 key** (không có `override`). Meta khi override: `override` + **15 key** (gồm `useCustomRelatedCard`).
+Site option: **19 key** (không có `override`). Meta khi override: `override` + **19 key** (gồm `useCustomRelatedCard`). Amend 2026-11-15: +4 action color keys.
 
 **Profile active (runtime):** `skvn_marine_blocks_pdp_related_is_active( $resolved )` → `useCustomRelatedCard === true` (bool sanitize). Không so diff với default. Plugin API vắng → luôn inactive (native).
 
@@ -61,13 +65,13 @@ Meta sản phẩm thêm đúng một key: `override` — semantics y hệt plan0
 - `override` true: dùng bản sanitize của meta; **key thiếu lấy default bảng trên, không lấy từng key từ site**.
 - Use default / Reset ghi `{ "override": false }`; không `delete_post_meta`.
 
-**Không có trong schema v1** (defer, xem §11): key specs mode (related cố định grouped), `badgeBehavior` (cố định display-only như 060 archive), token typography/color theo vai trò (`titleFont*`, `detailsFont*`, `action*`), `showPrice`/`showSku`/`showStock`, `appendQuoteContext`, `chipHighlightCurrent` (intersection).
+**Không có trong schema v1** (defer, xem §11): key specs mode (related cố định grouped), `badgeBehavior` (cố định display-only như 060 archive), token typography theo vai trò (`titleFont*`, `detailsFont*`, `actionFont*`), `showPrice`/`showSku`/`showStock`, `appendQuoteContext`, `chipHighlightCurrent` (intersection). Action **color** keys đã vào schema 2026-11-15.
 
 ## 4. Sanitize & resolve
 
 Plugin `modules/pdp-related-settings/pdp-related-settings.php`:
 - `skvn_marine_blocks_sanitize_pdp_related( $raw )` — luật plan067 §14: enum `isset && is_string && in_array(..., true)`; bool chỉ `true`/`1` (chuỗi `'false'`/`'true'`/`''` → false, không ép `(bool)`); int dùng bounded int (không `absint`, `0` hợp lệ — precedent Category action/DP-06); key lạ bỏ.
-- `skvn_marine_blocks_sanitize_pdp_related_meta( $raw )` — mirror plan067 meta sanitize: override sai → `array('override' => false)`; override đúng → override + 15 key.
+- `skvn_marine_blocks_sanitize_pdp_related_meta( $raw )` — mirror plan067 meta sanitize: override sai → `array('override' => false)`; override đúng → override + 19 key.
 - `skvn_marine_blocks_get_pdp_related( $product_id )` — resolve chỉ plugin đọc DB: sanitize option → nếu meta không array hoặc override không true/1 → trả site → ngược lại sanitize meta.
 - `skvn_marine_blocks_pdp_related_is_active( $resolved )` — bool owner; export cho theme enqueue/hooks.
 
@@ -117,9 +121,9 @@ File mới `inc/pdp-related.php` + template-part mới `inc/templates/related-pr
 Mirror plan067 §18 (nhánh `product`), thay owner bằng `related`:
 
 - `modules/typography-settings/typography-settings.php`:
-  - Owner map: `related` → option `skvn_pdp_related`; sanitize dedicated (không chạy vòng hex của palette); so khớp sau ghi dùng cùng hàm related; revision `skvn_marine_blocks_design_revision()` trên mảng **15 key** đã sanitize; capability `manage_options` (nhánh non-fonts).
+  - Owner map: `related` → option `skvn_pdp_related`; sanitize dedicated (không chạy vòng hex của palette); so khớp sau ghi dùng cùng hàm related; revision `skvn_marine_blocks_design_revision()` trên mảng **19 key** đã sanitize; capability `manage_options` (nhánh non-fonts).
   - `skvn_marine_blocks_design_snapshot()`: nếu contract có `related` → `groups.related` = value sanitize + revision + `canEdit`; thiếu capability → không có key.
-  - AJAX save allowlist thêm `related`; validate riêng: 15 key, enum string trong allowlist, bool JSON thật (không nhận chuỗi), `displayTagLimit`/`relatedCount` int trong bounds; sai → 400, draft giữ.
+  - AJAX save allowlist thêm `related`; validate riêng: 19 key, enum string trong allowlist, bool JSON thật (không nhận chuỗi), `displayTagLimit`/`relatedCount` int trong bounds; sai → 400, draft giữ.
 - `inc/customizer.php` `skvn_marine_design_sidebar_contract()`: thêm capability `related`; giữ `version => 1` (array_diff fail cho đến khi theme kèm capability — hai file cùng lượt, như plan067).
 - `src/design-sidebar/theme-design.tsx`:
   - `Group` thêm `'related'`; `Values` nhận boolean; `hasDraft` + mảng panel map thêm `related`; label group `Related products`.
@@ -132,7 +136,7 @@ Mirror plan067 §18 (nhánh `product`), thay owner bằng `related`:
 Mirror plan067 §19:
 
 - `skvn-marine-blocks.php`: một `require_once __DIR__ . '/modules/pdp-related-settings/pdp-related-settings.php';`
-- Module PHP: `register_post_meta( 'product', '_skvn_pdp_related', single, type object, auth_callback edit_post, show_in_rest schema = override + 15 key, additionalProperties false, enums trong schema, sanitize_callback = skvn_marine_blocks_sanitize_pdp_related_meta )` trên `init`.
+- Module PHP: `register_post_meta( 'product', '_skvn_pdp_related', single, type object, auth_callback edit_post, show_in_rest schema = override + 19 key, additionalProperties false, enums trong schema, sanitize_callback = skvn_marine_blocks_sanitize_pdp_related_meta )` trên `init`.
 - `src/pdp-related/panel.tsx` (mới), import từ `src/index.ts` (một dòng) — không thêm entry webpack:
   - `PluginDocumentSettingPanel` name `skvn-pdp-related`, title `Related products`; chỉ khi post type `product`.
   - `useEntityProp( 'postType', 'product', 'meta' )`; meta không phải object → coi `{ override: false }`.

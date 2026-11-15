@@ -43,7 +43,7 @@ function check( $condition, $message ) {
 }
 
 $d = skvn_marine_blocks_sanitize_pdp_related( null );
-check( 15 === count( $d ) && false === $d['useCustomRelatedCard'], 'null → 15 defaults' );
+check( 19 === count( $d ) && false === $d['useCustomRelatedCard'], 'null → 19 defaults' );
 
 check(
 	skvn_marine_blocks_sanitize_pdp_related( '{}' ) === skvn_marine_blocks_get_default_pdp_related(),
@@ -63,7 +63,7 @@ $m = skvn_marine_blocks_sanitize_pdp_related_meta( array( 'override' => false, '
 check( 1 === count( $m ) && false === $m['override'], 'override false strips meta keys' );
 
 $m2 = skvn_marine_blocks_sanitize_pdp_related_meta( array( 'override' => true ) );
-check( 16 === count( $m2 ) && true === $m2['override'] && 4 === $m2['relatedCount'], 'override true without keys → 15 defaults' );
+check( 20 === count( $m2 ) && true === $m2['override'] && 4 === $m2['relatedCount'], 'override true without keys → 19 defaults' );
 
 $m3 = skvn_marine_blocks_sanitize_pdp_related_meta(
 	array(
@@ -95,7 +95,18 @@ check( 0 === $d3b['displayTagLimit'], 'displayTagLimit 0 valid' );
 $d4 = skvn_marine_blocks_sanitize_pdp_related( array( 'chipColorScheme' => '#ff0000' ) );
 check( '' === $d4['chipColorScheme'], 'chipColorScheme rejects hex' );
 
+$d4b = skvn_marine_blocks_sanitize_pdp_related( array( 'actionBackgroundColor' => '#ff0000' ) );
+check( '' === $d4b['actionBackgroundColor'], 'actionBackgroundColor rejects hex' );
+$d4c = skvn_marine_blocks_sanitize_pdp_related( array( 'actionBackgroundColor' => 'skvn-teal-600', 'actionTextColor' => 'skvn-white' ) );
+check( 'skvn-teal-600' === $d4c['actionBackgroundColor'] && 'skvn-white' === $d4c['actionTextColor'], 'action colors keep Collection slugs' );
+
 $d5 = skvn_marine_blocks_sanitize_pdp_related( array( 'customActionUrl' => 'javascript:alert(1)' ) );
 check( '' === $d5['customActionUrl'], 'customActionUrl rejects javascript' );
+
+$cast_json = skvn_marine_blocks_pdp_related_cast_stored( '{"override":true,"useCustomRelatedCard":true}' );
+check( is_array( $cast_json ) && true === $cast_json['override'] && true === $cast_json['useCustomRelatedCard'], 'JSON string meta casts to array' );
+$cast_obj = skvn_marine_blocks_pdp_related_cast_stored( (object) array( 'override' => true ) );
+check( is_array( $cast_obj ) && true === $cast_obj['override'], 'stdClass meta casts to array' );
+check( null === skvn_marine_blocks_pdp_related_cast_stored( '' ), 'empty string meta is null' );
 
 echo $checks . ' checks passed (mocked sanitize only).' . PHP_EOL;

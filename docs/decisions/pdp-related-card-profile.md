@@ -28,7 +28,7 @@ Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` 
 
 ### D2 — Style attrs (whitelist, không query attrs)
 
-- Lưu **subset attrs card** presentation-only (15 keys site / 15 + `override` meta).
+- Lưu **subset attrs card** presentation-only (19 keys site / 19 + `override` meta). Action CTA colors reuse Collection `actionBackgroundColor` / `actionTextColor` / `actionHoverBackgroundColor` / `actionHoverTextColor` (token slug, default inherit).
 - **Không** lưu query attrs block (`categories`, `tags`, `itemsToShow`, …).
 - **Copy một lần:** “Copy card settings” từ page → sanitize vào option; set `useCustomRelatedCard` **true**; **first Product Collection block on page only**; not linked.
 

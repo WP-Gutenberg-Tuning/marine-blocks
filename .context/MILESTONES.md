@@ -795,6 +795,7 @@ Plan: `.context/planning/047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md` — 
 - [ ] MB-04/05: settings, theme consumers, idempotent data migration PASS.
 - [ ] MB-07/08: packaging/activation và rollback rehearsal PASS.
 - [ ] Start xác nhận trước implementation (SemVer 1.4.0 đã chốt); pilot onsite và human nghiệm thu trước completion.
+- PDP related Woo adapter còn nằm theme (`inc/pdp-related.php`); tension OPEN 2026-11-15 — lập plan chi tiết khi start (B/C), không làm trong 1.3.22. Ideation `docs/ideations/pdp-related-theme-plugin-independence.md`.
 
 Migration không đồng nghĩa public launch; gate sau 1.5.x giữ tới quyết định riêng, không tự reset version 0.0.1 hoặc hủy acceptance cũ.
 
@@ -1040,7 +1041,7 @@ Research/rationale: `docs/research/theme-template-editor-fse-transition-research
 
 ### Scope addition 2026-11-14 — PDP Related Card Profile & Chips (trong 1.3.22)
 
-Human duyệt scope addition vào current **1.3.22** qua Q&A 9 điểm (không bump, không chuyển current; kế thừa ngoại lệ đánh số 1.3.22). Decision `docs/decisions/pdp-related-card-profile.md` (ACTIVE); planning [076](planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md). Chốt: site default = **Theme Design group `related`** (option `skvn_pdp_related`, 15 key); owner **`useCustomRelatedCard`** default **off** — inactive = Woo native (kể cả option đã save); override per-product = panel + classic meta; presenter **`related`** — grouped specs 3/`+N` (P0 gate 060); chip hai lớp + allowlist UI disabled khi `show*` off; `imageRatio` 1:1; khi active: `posts_per_page = relatedCount`, **`columns = clamp(relatedCount, 1, 4)`**; **Copy card settings** v1 (first block only, bật owner, not linked).
+Human duyệt scope addition vào current **1.3.22** qua Q&A 9 điểm (không bump, không chuyển current; kế thừa ngoại lệ đánh số 1.3.22). Decision `docs/decisions/pdp-related-card-profile.md` (ACTIVE); planning [076](planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md). Chốt: site default = **Theme Design group `related`** (option `skvn_pdp_related`, 19 key — amend 2026-11-15: 4 Collection action color); owner **`useCustomRelatedCard`** default **off** — inactive = Woo native (kể cả option đã save); override per-product = panel + classic meta; presenter **`related`** — grouped specs 3/`+N` (P0 gate 060); chip hai lớp + allowlist UI disabled khi `show*` off; `imageRatio` 1:1; khi active: `posts_per_page = relatedCount`, **`columns = clamp(relatedCount, 1, 4)`**; **Copy card settings** v1 (first block only, bật owner, not linked).
 
 Defer v1: **upsells** (D5), **intersection bật** (D4 — chỉ ship off, không code nhánh bật), **token typography/color theo vai trò** (v1 theme-styled default; copy action không copy các key này).
 

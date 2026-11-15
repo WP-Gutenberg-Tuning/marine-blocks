@@ -1,6 +1,7 @@
 import { Button, Notice, PanelBody, SelectControl, Spinner, TextControl, ToggleControl } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { COLOR_PALETTE_OPTIONS } from '../collection/constants';
 
 type Group = 'palette' | 'heading' | 'fonts' | 'product' | 'related';
 type Values = Record< string, string | boolean | number | { size: string; weight: string } >;
@@ -257,6 +258,10 @@ const relatedLabels: Record< string, string > = {
 	chipColorScheme: __( 'Chip color', 'skvn-marine-blocks' ),
 	productActionMode: __( 'Card action', 'skvn-marine-blocks' ),
 	customActionUrl: __( 'Custom action URL', 'skvn-marine-blocks' ),
+	actionBackgroundColor: __( 'Button background', 'skvn-marine-blocks' ),
+	actionTextColor: __( 'Button text', 'skvn-marine-blocks' ),
+	actionHoverBackgroundColor: __( 'Button hover background', 'skvn-marine-blocks' ),
+	actionHoverTextColor: __( 'Button hover text', 'skvn-marine-blocks' ),
 	chipAllowTags: __( 'Allow product tags', 'skvn-marine-blocks' ),
 	chipAllowCategories: __( 'Allow product categories', 'skvn-marine-blocks' ),
 	displayTagLimit: __( 'Chip limit per product', 'skvn-marine-blocks' ),
@@ -395,6 +400,10 @@ export function ThemeDesign( { model }: { model: ReturnType< typeof useThemeDesi
 								{ label: __( 'Custom URL', 'skvn-marine-blocks' ), value: 'custom' },
 							] } onChange={ ( productActionMode ) => change( group, { ...value, productActionMode } ) } />
 							{ 'custom' === value.productActionMode && <TextControl label={ relatedLabels.customActionUrl } value={ String( value.customActionUrl ?? '' ) } disabled={ relatedLocked } onChange={ ( customActionUrl ) => change( group, { ...value, customActionUrl } ) } /> }
+							<SelectControl label={ relatedLabels.actionBackgroundColor } value={ String( value.actionBackgroundColor ?? '' ) } disabled={ relatedLocked } options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] } onChange={ ( actionBackgroundColor ) => change( group, { ...value, actionBackgroundColor } ) } />
+							<SelectControl label={ relatedLabels.actionTextColor } value={ String( value.actionTextColor ?? '' ) } disabled={ relatedLocked } options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] } onChange={ ( actionTextColor ) => change( group, { ...value, actionTextColor } ) } />
+							<SelectControl label={ relatedLabels.actionHoverBackgroundColor } value={ String( value.actionHoverBackgroundColor ?? '' ) } disabled={ relatedLocked } options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] } onChange={ ( actionHoverBackgroundColor ) => change( group, { ...value, actionHoverBackgroundColor } ) } />
+							<SelectControl label={ relatedLabels.actionHoverTextColor } value={ String( value.actionHoverTextColor ?? '' ) } disabled={ relatedLocked } options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] } onChange={ ( actionHoverTextColor ) => change( group, { ...value, actionHoverTextColor } ) } />
 							<TextControl label={ relatedLabels.displayTagLimit } help={ __( '0 shows all terms.', 'skvn-marine-blocks' ) } type="number" min={ 0 } max={ 10 } value={ String( value.displayTagLimit ?? '' ) } disabled={ relatedLocked } onChange={ ( next ) => { const limit = parseInt( next, 10 ); if ( Number.isNaN( limit ) ) return; change( group, { ...value, displayTagLimit: Math.min( 10, Math.max( 0, limit ) ) } ); } } />
 							<TextControl label={ relatedLabels.relatedCount } type="number" min={ 1 } max={ 10 } value={ String( value.relatedCount ?? '' ) } disabled={ relatedLocked } onChange={ ( next ) => { const count = parseInt( next, 10 ); if ( Number.isNaN( count ) ) return; change( group, { ...value, relatedCount: Math.min( 10, Math.max( 1, count ) ) } ); } } />
 							<h3 style={ { margin: '1em 0 0.25em' } }>{ __( 'Chip sources (allowlist)', 'skvn-marine-blocks' ) }</h3>
