@@ -188,7 +188,7 @@ function skvn_marine_blocks_render_collection_product_card( $product, $attribute
  *
  * @param WC_Product $product Current product supplied by the caller.
  * @param array $attributes Presentation options (not query arguments).
- * @param string $context archive|carousel|grid.
+ * @param string $context archive|carousel|grid|related.
  * @return string Escaped card markup; no list item or carousel container.
  */
 function skvn_marine_blocks_render_product_card( $product, $attributes = array(), $context = 'grid' ) {
@@ -196,10 +196,17 @@ function skvn_marine_blocks_render_product_card( $product, $attributes = array()
 		return '';
 	}
 	$is_archive = 'archive' === $context;
+	$is_related = 'related' === $context;
 	$archive_data = array();
 	if ( $is_archive ) {
 		$archive_data = skvn_marine_blocks_archive_card_data( $product );
 		$attributes = array( 'productActionMode' => 'quote', 'showImage' => true, 'showProductTags' => true, 'mediaLayout' => 'flush', 'cardContext' => 'archive' );
+	}
+	if ( $is_related ) {
+		$attributes = is_array( $attributes ) ? $attributes : array();
+		$attributes['cardContext'] = 'related';
+		$attributes['appendQuoteContext'] = false;
+		unset( $attributes['badgeBehavior'] );
 	}
 	$product_id  = $product->get_id();
 	$title       = $product->get_name();
@@ -312,6 +319,15 @@ function skvn_marine_blocks_render_product_card( $product, $attributes = array()
 	$card_classes = array( 'skvn-collection-card', 'skvn-collection-card--product' );
 	if ( $is_archive ) {
 		$card_classes[] = 'skvn-collection-card--archive';
+	}
+	if ( $is_related ) {
+		$card_classes[] = 'skvn-collection-card--related';
+		$ratio_allowed = array( '1:1', '4:3', '3:2', '16:9', 'auto' );
+		$ratio = isset( $attributes['imageRatio'] ) && is_string( $attributes['imageRatio'] ) ? $attributes['imageRatio'] : '1:1';
+		if ( ! in_array( $ratio, $ratio_allowed, true ) ) {
+			$ratio = '1:1';
+		}
+		$card_classes[] = 'skvn-collection--ratio-' . str_replace( ':', '-', $ratio );
 	}
 	// Missing/empty legacy attributes keep their saved ratio/cover behavior.
 	// Explicit presets opt in; do not migrate old content merely by rendering it.
@@ -448,7 +464,8 @@ function skvn_marine_blocks_render_product_card( $product, $attributes = array()
 				<?php echo skvn_marine_blocks_get_product_image_html( $product, $media_img_style ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php
 				// Badge overlay: product_tag (Wild Caught, Farmed) — always on image.
-					if ( ! $is_archive ) {
+				// Related uses body term chips (two-layer allowlist), not overlay.
+					if ( ! $is_archive && ! $is_related ) {
 						echo skvn_marine_blocks_render_collection_term_badges( $product_id, 'product_tag', $attributes, 'showProductTags' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 				?>
@@ -464,9 +481,9 @@ function skvn_marine_blocks_render_product_card( $product, $attributes = array()
 			</h3>
 			<?php if ( skvn_marine_blocks_collection_bool( $attributes, 'showSpecChips', true ) ) : ?>
 				<?php
-				// B1: grouped summary only on Product Carousel. Product Grid keeps
-				// the existing flat chip behavior so shared consumers do not change.
-				if ( $is_archive || 'carousel' === skvn_marine_blocks_collection_layout( $attributes ) ) {
+				// B1: grouped summary on Product Carousel and related cards.
+				// Product Grid keeps the existing flat chip behavior.
+				if ( $is_archive || $is_related || 'carousel' === skvn_marine_blocks_collection_layout( $attributes ) ) {
 					$spec_groups = $is_archive ? $archive_data['groups'] : skvn_marine_blocks_collection_spec_groups(
 						$product,
 						skvn_marine_blocks_collection_spec_values_limit( $attributes )
@@ -476,7 +493,7 @@ function skvn_marine_blocks_render_product_card( $product, $attributes = array()
 						echo skvn_marine_blocks_render_collection_spec_groups( $spec_groups ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						echo '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
-					if ( $is_archive && ! $spec_groups ) {
+					if ( ( $is_archive || $is_related ) && ! $spec_groups ) {
 						echo '<p class="skvn-collection-card__empty-specs">' . esc_html__( 'Specifications available on request', 'skvn-marine-blocks' ) . '</p>';
 					}
 				} else {
@@ -489,6 +506,11 @@ function skvn_marine_blocks_render_product_card( $product, $attributes = array()
 				}
 				?>
 			<?php endif; ?>
+			<?php
+			if ( $is_related ) {
+				echo skvn_marine_blocks_render_related_term_chips( $product_id, $attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+			?>
 			<?php // Catalog slot — owned by woo-catalog (1.5.0). Move this div + CSS to woo-catalog plugin when ready. See docs/decisions/woo-catalog-css-migration-1.5.0.md ?>
 			<div class="skvn-collection-card__catalog">
 				<?php if ( ! empty( $certs ) ) : ?>
@@ -648,6 +670,89 @@ function skvn_marine_blocks_render_collection_term_badges( $object_id, $taxonomy
 				<span class="skvn-collection-card__badge"><?php echo esc_html( $term->name ); ?></span>
 			<?php endif; ?>
 		<?php endforeach; ?>
+	</div>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Related-only term chips (product_tag / product_cat).
+ *
+ * Two-layer: taxonomy X renders iff showX && chipAllowX. Cap displayTagLimit
+ * (0 = all). Surplus is an informational +N span, not a control. product_cat
+ * chips exist only in this related branch.
+ *
+ * @param int   $product_id Product ID.
+ * @param array $attributes Resolved related profile attrs.
+ * @return string
+ */
+function skvn_marine_blocks_render_related_term_chips( $product_id, $attributes ) {
+	$taxonomies = array();
+	if ( skvn_marine_blocks_collection_bool( $attributes, 'showProductTags', true )
+		&& skvn_marine_blocks_collection_bool( $attributes, 'chipAllowTags', true ) ) {
+		$taxonomies[] = 'product_tag';
+	}
+	if ( skvn_marine_blocks_collection_bool( $attributes, 'showProductCategories', false )
+		&& skvn_marine_blocks_collection_bool( $attributes, 'chipAllowCategories', false ) ) {
+		$taxonomies[] = 'product_cat';
+	}
+	if ( ! $taxonomies ) {
+		return '';
+	}
+
+	$terms = array();
+	foreach ( $taxonomies as $taxonomy ) {
+		$found = get_the_terms( $product_id, $taxonomy );
+		if ( empty( $found ) || is_wp_error( $found ) ) {
+			continue;
+		}
+		foreach ( $found as $term ) {
+			if ( ! isset( $term->name ) ) {
+				continue;
+			}
+			$name = trim( wp_strip_all_tags( (string) $term->name ) );
+			if ( '' === $name ) {
+				continue;
+			}
+			$terms[] = $name;
+		}
+	}
+	if ( ! $terms ) {
+		return '';
+	}
+
+	$limit = isset( $attributes['displayTagLimit'] ) && is_int( $attributes['displayTagLimit'] )
+		? $attributes['displayTagLimit']
+		: 3;
+	if ( $limit < 0 ) {
+		$limit = 3;
+	}
+	$visible = 0 === $limit ? $terms : array_slice( $terms, 0, $limit );
+	$remaining = count( $terms ) - count( $visible );
+
+	ob_start();
+	?>
+	<div class="skvn-collection-card__term-chips">
+		<?php foreach ( $visible as $name ) : ?>
+			<span class="skvn-collection-card__spec-tag"><?php echo esc_html( $name ); ?></span>
+		<?php endforeach; ?>
+		<?php if ( $remaining > 0 ) : ?>
+			<span class="skvn-collection-card__spec-more">
+				<?php echo esc_html( sprintf( '+%d', $remaining ) ); ?>
+				<span class="skvn-collection-card__visually-hidden">
+					<?php
+					echo esc_html(
+						sprintf(
+							/* translators: %d: number of hidden term chips. */
+							__( '%d more terms', 'skvn-marine-blocks' ),
+							$remaining
+						)
+					);
+					?>
+				</span>
+			</span>
+		<?php endif; ?>
 	</div>
 	<?php
 

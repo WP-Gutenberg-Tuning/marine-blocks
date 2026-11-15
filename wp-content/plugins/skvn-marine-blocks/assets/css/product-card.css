@@ -692,3 +692,19 @@ a.skvn-collection-card__badge:hover {
 @container (max-width: 320px) {
 	.skvn-collection-card--archive .skvn-collection-card__media-wrap > .skvn-collection-card__badges { position: static; padding: 8px 12px 0; }
 }
+
+/* Related cards sit in Woo's related loop (no Collection section wrapper).
+ * Ratio class is on the card itself; existing .skvn-collection--ratio-*
+ * descendant rules still match .skvn-collection-card__image. Flush media
+ * keeps Collection cascade (flush still owns 1:1). Term chips wrap; no
+ * overflow-x, no viewport units, no fixed card width. */
+.skvn-collection-card--related .skvn-collection-card__term-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+	min-width: 0;
+}
+.skvn-collection-card--related .skvn-collection-card__empty-specs {
+	color: #4b6470;
+	margin: 0;
+}

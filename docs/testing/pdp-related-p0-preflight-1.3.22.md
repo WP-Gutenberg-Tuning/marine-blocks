@@ -15,8 +15,9 @@ Agent đã map từ installed source (`D:\Github\minhhaifish\wp-content\plugins\
 **Related loop** — `templates/single-product/related.php` @10.3.0:
 - Heading filter `woocommerce_product_related_products_heading`
 - `woocommerce_product_loop_start()` / `woocommerce_product_loop_end()`
-- Per item: `wc_get_template_part( 'content', 'product' )` → filter `wc_get_template_part` — **target template swap flag-scoped của P4** (không copy template vào theme, sẽ global-replace mọi loop)
+- Per item: `wc_get_template_part( 'content', 'product' )` → filter `wc_get_template_part`
 - `wp_reset_postdata()` cuối
+- **P4 source 2026-11-15:** Woo 10.7 **không** có `woocommerce_before_related_products` / `woocommerce_after_related_products`. Adapter dùng `wc_get_loop_prop( 'name' ) === 'related'` (set trong `woocommerce_related_products()`) + flag `woocommerce_before_template_part` / `woocommerce_after_template_part` cho `single-product/related.php`. Upsells name `up-sells` không swap.
 
 **Item hooks** — `templates/content-product.php` @9.4.0 (suppress/restore inventory P4):
 
@@ -46,6 +47,8 @@ add_action( 'wp', function () {
 	$hooks = array(
 		'woocommerce_output_related_products_args',
 		'wc_get_template_part',
+		'woocommerce_before_template_part',
+		'woocommerce_after_template_part',
 		'woocommerce_before_shop_loop_item',
 		'woocommerce_before_shop_loop_item_title',
 		'woocommerce_shop_loop_item_title',
@@ -126,4 +129,4 @@ source /home/shinkuro/.nvm/nvm.sh && nvm use 20 && cd /mnt/d/Github/skvn-marine/
 
 ## Thứ tự
 
-GATE C trước (nhanh, chỉ editor) → GATE A (snippet 5 phút) → GATE B (fixtures). Cả 3 PASS + human nói tiếp → mở P4 (related loop integration + template-part + presenter nhánh `related`).
+GATE C trước (nhanh, chỉ editor) → GATE A (snippet 5 phút) → GATE B (fixtures). P4 source đã có 2026-11-15; onsite pack đầy đủ: `docs/testing/pdp-related-card-1.3.22.md`. Gate B FAIL vẫn chặn REL-UI-01 (decision memo full-values), không tự đổi schema.

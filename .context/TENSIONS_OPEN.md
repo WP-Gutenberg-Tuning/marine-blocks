@@ -58,6 +58,20 @@ Status:     OPEN
 Resolved:
 Decision:   OPEN
 
+## [2026-11-15] | woocommerce, planning
+Tension:    Plan076 §7 đặt template-swap related vào `woocommerce_before_related_products` / `woocommerce_after_related_products`, nhưng Woo 10.7.0 installed không đăng ký hai hook đó.
+Context:    P4 related loop adapter; P0 GATE A đã map `woocommerce_output_related_products_args`, `single-product/related.php` @10.3.0, `wc_get_template_part`, và `wc_set_loop_prop( 'name', 'related' )`.
+Proposal:   Scope swap bằng `wc_get_loop_prop( 'name' ) === 'related'` cộng flag `woocommerce_before_template_part` / `woocommerce_after_template_part` cho `single-product/related.php`. Upsells (`up-sells`) giữ native.
+Constraint: Plan076 §7: "woocommerce_before_related_products bật flag → … → woocommerce_after_related_products gỡ flag (try/finally)".
+Severity:   low
+Tags:       woocommerce, planning, theme
+Milestone:  V1 / 1.3.22
+Evidence:   `woocommerce/includes/wc-template-functions.php` related/upsell (`wc_set_loop_prop` name related / up-sells); grep runtime Woo 10.7 không có `woocommerce_before_related_products`.
+Default:    Conservative: dùng loop name + template_part flag; không copy related.php vào theme.
+Status:     OPEN
+Resolved:
+Decision:   OPEN
+
 ## [2026-06-12 15:30] | editor-governance
 Tension:    Tiện ích copy/paste block là editor-governance dùng chung, trong khi milestone hiện tại tập trung vào Feature Showcase autoplay và panel links.
 Context:    Human yêu cầu hai nút copy block và paste block để giữ nguyên Gutenberg block markup khi chuyển nội dung giữa các trang.
