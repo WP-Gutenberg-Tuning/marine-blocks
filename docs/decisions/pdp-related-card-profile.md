@@ -3,7 +3,7 @@
 Status: ACTIVE
 Milestone: V1 / 1.3.22 (scope addition 2026-11-14)
 Lifecycle: active
-Notes: Human chốt 2026-11-14 sau phản biện kiến trúc; gộp **1.3.22** qua Q&A 9 điểm. **2026-11-14 (amend):** owner `useCustomRelatedCard` (default off) — inactive = Woo native kể cả option đã save; active khi bool true sau resolve. Args: `posts_per_page = relatedCount`, `columns = clamp(relatedCount, 1, 4)`. Còn lại: site default Theme Design `related`; per-product panel + classic meta; grouped specs gate 060; chip hai lớp + `displayTagLimit`; copy một lần (first block only notice). Defer: upsells, intersection, token typography. Planning: `.context/planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md`.
+Notes: Human chốt 2026-11-14 sau phản biện kiến trúc; gộp **1.3.22** qua Q&A 9 điểm. **2026-11-14 (amend):** owner `useCustomRelatedCard` (default off) — inactive = Woo native kể cả option đã save; active khi bool true sau resolve. Args: `posts_per_page = relatedCount`, `columns = clamp(relatedCount, 1, 4)`. Còn lại: site default Theme Design `related`; per-product panel + classic meta; grouped specs gate 060; chip hai lớp + `displayTagLimit`; copy một lần (first block only notice). Defer: upsells, intersection, token typography. Planning: `.context/planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md`. **2026-11-16 (amend, chưa implement):** D6 — Promote copy từ 1 PDP sang option; global editor đích admin `SKVN Marine`. Plan [077](../../.context/planning/077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md). Theme Design group `related` vẫn là UI đang chạy cho đến lệnh start 077.
 
 ## Problem
 
@@ -15,7 +15,7 @@ Single product **Related products** dùng Woo loop + theme `ul.products`, không
 
 | Layer | Storage | Capability pattern |
 |---|---|---|
-| Site default | Option `skvn_pdp_related` | `manage_options` (Theme Design group `related`) |
+| Site default | Option `skvn_pdp_related` | `manage_options`. UI hiện tại: Theme Design group `related`. Đích khi start 077: admin `SKVN Marine` → Related products |
 | Per-product override | Post meta `_skvn_pdp_related` | `edit_post` (panel product, giống 1.3.22) |
 
 Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` (context **`related`** tách khỏi `archive` / `grid` / `carousel`).
@@ -30,7 +30,8 @@ Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` 
 
 - Lưu **subset attrs card** presentation-only (19 keys site / 19 + `override` meta). Action CTA colors reuse Collection `actionBackgroundColor` / `actionTextColor` / `actionHoverBackgroundColor` / `actionHoverTextColor` (token slug, default inherit).
 - **Không** lưu query attrs block (`categories`, `tags`, `itemsToShow`, …).
-- **Copy một lần:** “Copy card settings” từ page → sanitize vào option; set `useCustomRelatedCard` **true**; **first Product Collection block on page only**; not linked.
+- **Copy một lần (076):** “Copy card settings” từ page → sanitize vào option; set `useCustomRelatedCard` **true**; **first Product Collection block on page only**; not linked.
+- **Promote (D6, 077, chưa code):** copy 19 key từ meta product đang override → cùng option; force owner true; **không** copy `override`; nguồn giữ override; không mass-reset product khác; cap `manage_options` + confirm. Không bind.
 
 ### D3 — Query (Woo only)
 
@@ -49,6 +50,17 @@ Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` 
 - Template swap scoped related loop only; plugin inactive → no swap.
 - Archive/grid/carousel contexts không đổi.
 
+### D6 — Promote + admin global (chốt hướng 2026-11-16, chưa implement)
+
+Human: Save 1 PDP chỉ đổi trang đó; nút áp dụng toàn trang = copy thông số sang global.
+
+- Product Save không ghi option.
+- Promote = sanitize meta → `update_option( skvn_pdp_related )`; copy không link.
+- Nguồn giữ `override: true`. Product override khác không đụng.
+- Global editor canonical khi start 077 = submenu `SKVN Marine` (1.4.0: label Marine Blocks trong source). Không option đổi tên menu trong plugin; ASE overlay onsite.
+- Khi start 077: không dual-edit Theme Design group `related`. Palette/heading/fonts ở lại sidebar.
+- Rejected cùng D6: mass-reset catalog; auto tắt override trên nguồn; bind live tới option hoặc Collection block.
+
 ## Rejected
 
 - Live runtime bind tới Product Collection block.
@@ -58,12 +70,14 @@ Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` 
 
 ## Implementation pointers
 
-- Plan: `.context/planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md` (P0 gate specs + Woo hooks trước P4).
-- Plugin: `modules/pdp-related-settings/`, presenter `related` in `cards.php`, Theme Design group.
+- Plan schema/loop: `.context/planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md` (P0 gate specs + Woo hooks trước P4).
+- Plan Promote/admin: `.context/planning/077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md` — PLANNED, chưa start.
+- Plugin: `modules/pdp-related-settings/`, presenter `related` in `cards.php`, Theme Design group (đến khi 077 start).
 - Theme: `inc/pdp-related.php`, related template-part; hooks gated by `is_active`.
 
 ## Related
 
 - `.context/planning/060_VER_1_3_20_ARCHIVE_PRODUCT_CARD_REUSE_PLAN.md`
+- `.context/planning/077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md`
 - `docs/decisions/skvn-dynamic-collections-1.3.3.md`
 - `.context/planning/067_VER_1_3_22_PRODUCT_PAGE_DESIGN_CONTROLS_EXECUTION_PLAN.md`

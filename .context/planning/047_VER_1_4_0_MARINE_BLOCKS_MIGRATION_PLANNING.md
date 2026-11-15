@@ -59,6 +59,8 @@ Plugin có defaults/runtime đủ dùng khi WindPress tắt và đổi theme. Th
 
 **Debt ghi 2026-11-15 — PDP related Woo adapter:** swap `wc_get_template_part` + `inc/templates/related-product-card.php` đang thuộc theme SKVN; panel/presenter thuộc plugin. Human: pitfall onsite = không cập nhật theme; làm chi tiết khi start 1.4.0 (tension OPEN, ideation `docs/ideations/pdp-related-theme-plugin-independence.md`). Chưa chọn B (hook vào plugin) vs C (hybrid). Không code trong 1.3.22. Archive card 060 cùng pattern — inventory, không tự gộp.
 
+**IA ghi 2026-11-16 — Related global Promote/admin:** plan [077](077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md) (1.3.22, chưa start). Top-level menu đổi label source sang Marine Blocks trong 1.4.0; không option rename trong plugin (ASE onsite). Không gộp 077 vào adapter B/C.
+
 ### P4 — Staging/pilot/rollout
 
 Audit ZIP/activation path. Rehearsal staging: backup → dry-run → chuyển code/data theo thứ tự đã kiểm chứng → cache → editor/frontend anonymous. Không giả định block cũ được hỗ trợ trong cửa sổ chuyển. Pilot ít nhất một site đại diện; rollout từng site có ledger, production cần human giao rõ site/scope. Rollback restore DB và code/theme cùng checkpoint, không chỉ cài lại ZIP cũ. Kiểm soát ghi trong cửa sổ chuyển để restore không mất edit mới.

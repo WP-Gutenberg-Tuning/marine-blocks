@@ -796,6 +796,7 @@ Plan: `.context/planning/047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md` — 
 - [ ] MB-07/08: packaging/activation và rollback rehearsal PASS.
 - [ ] Start xác nhận trước implementation (SemVer 1.4.0 đã chốt); pilot onsite và human nghiệm thu trước completion.
 - PDP related Woo adapter còn nằm theme (`inc/pdp-related.php`); tension OPEN 2026-11-15 — lập plan chi tiết khi start (B/C), không làm trong 1.3.22. Ideation `docs/ideations/pdp-related-theme-plugin-independence.md`.
+- Menu top-level `SKVN Marine` → label source Marine Blocks khi 1.4.0; không option đổi tên trong plugin (ASE onsite). Related global admin page là plan077 (1.3.22, chưa start) — không gộp vào adapter B/C.
 
 Migration không đồng nghĩa public launch; gate sau 1.5.x giữ tới quyết định riêng, không tự reset version 0.0.1 hoặc hủy acceptance cũ.
 
@@ -1068,6 +1069,8 @@ Source UX repair 2026-11-14 — Theme Design group "Product page" bớt khít (h
 Source P4 2026-11-15 (human lệnh "tiếp tục code phần kế"): related loop + presenter context `related` theo plan076 §5/§7. `cards.php` nhánh `related` (grouped 3/+N không cần layout=carousel, ratio class trên card, term chips hai lớp + `displayTagLimit`, `product_cat` chỉ related, không overlay badge trong image link, `appendQuoteContext` false); `inc/pdp-related.php` hooks (enqueue khi `is_product()` && active && plugin API; args `posts_per_page`/`columns` clamp; `wc_get_template_part` chỉ native `content-product` khi loop name `related` hoặc flag `single-product/related.php` — Woo 10.7 không có `woocommerce_before_related_products`); template-part `inc/templates/related-product-card.php`; CSS term-chips scoped `--related`. Inactive / plugin-off / thiếu CSS / override template → native. Mocked `tools/tests/pdp-related-card.test.php` + `pdp-related-hooks.test.php`. P0 onsite Gate B/C chưa PASS; REL-* giữ Chưa làm.
 
 Source P5 2026-11-15 (human lệnh "P5"): runbook `docs/testing/pdp-related-card-1.3.22.md` — fixtures R-A…R-H, thứ tự P0 A/B rồi REL-UX → REL-UI → REL-TECH → REL-TRACE, steps/expected/pass-fail/evidence per ID, WP-CLI, evidence log trống cho human. Gate B FAIL chặn REL-UI-01. URL/version human điền sau build. REL-* giữ Chưa làm.
+
+**Planning 2026-11-16 — Related Promote + admin global (chưa start):** human “lưu plan”. Model: Save 1 PDP = local only; nút áp dụng toàn trang = **copy** 19 key meta → option `skvn_pdp_related` (không bind, không mass-reset override khác, nguồn giữ override); global editor đích = submenu `SKVN Marine` (1.4.0 đổi label source Marine Blocks; ASE overlay tên menu, không option SKVN rename); khi start gỡ dual Theme Design group `related`. Storage/resolve/P1–P5 076 giữ. Plan [077](planning/077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md); decision D6. Acceptance mới REL-UX-03/04, REL-TECH-04 **Chưa làm**. REL-* 076 không đổi. Default: Theme Design `related` tiếp tục chạy đến lệnh implement. SemVer mặc định scope addition 1.3.22; start hoặc chuyển 1.4.0 cần lệnh riêng. Không bump/build/code trong lượt ghi.
 
 ### 1.3.23 — Post Page Basic Design Controls
 
