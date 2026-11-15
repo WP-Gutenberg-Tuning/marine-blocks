@@ -2,7 +2,7 @@
 /**
  * PDP related products card profile — schema, sanitize and resolve.
  *
- * Site default: option `skvn_pdp_related` (Theme Design group `related`).
+ * Site default: option `skvn_pdp_related` (admin SKVN Marine → Related products; plan077).
  * Per-product override: post meta `_skvn_pdp_related` with an `override` key.
  * The owner switch `useCustomRelatedCard` gates all custom related rendering;
  * everything else renders native WooCommerce output.
@@ -27,6 +27,11 @@ const SKVN_MARINE_BLOCKS_PDP_RELATED_COLLECTION_MARKER = '<!-- wp:skvn-marine/pr
 add_action( 'init', 'skvn_marine_blocks_register_pdp_related_meta' );
 add_action( 'add_meta_boxes', 'skvn_marine_blocks_pdp_related_meta_box' );
 add_action( 'save_post_product', 'skvn_marine_blocks_pdp_related_save_classic', 10, 2 );
+add_action( 'admin_menu', 'skvn_marine_blocks_pdp_related_admin_menu', 20 );
+add_action( 'admin_post_skvn_marine_pdp_related_save', 'skvn_marine_blocks_pdp_related_admin_save' );
+add_action( 'admin_post_skvn_marine_pdp_related_copy', 'skvn_marine_blocks_pdp_related_admin_copy' );
+add_action( 'wp_ajax_skvn_marine_pdp_related_promote', 'skvn_marine_blocks_pdp_related_promote_ajax' );
+add_action( 'wp_ajax_skvn_marine_pdp_related_copy_pages', 'skvn_marine_blocks_pdp_related_copy_pages_ajax' );
 
 /**
  * Collection CTA palette slugs (empty = inherit card CSS).
@@ -421,6 +426,255 @@ function skvn_marine_blocks_pdp_related_copy_from_page( $page_id ) {
 	update_option( SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION, $value );
 
 	return $value;
+}
+
+/**
+ * Copy a product override snapshot into the site default option (plan077).
+ *
+ * Reads saved post meta only; never accepts a client payload. Forces owner on.
+ * Does not change the source product meta or other products.
+ *
+ * @param int $product_id Product post ID.
+ * @return array<string,mixed>|WP_Error Sanitized option value or error.
+ */
+function skvn_marine_blocks_pdp_related_promote_from_product( $product_id ) {
+	$product_id = absint( $product_id );
+	$post       = $product_id ? get_post( $product_id ) : null;
+
+	if ( ! $post instanceof WP_Post || 'product' !== $post->post_type ) {
+		return new WP_Error( 'invalid_product', __( 'Choose a valid product.', 'skvn-marine-blocks' ) );
+	}
+
+	$meta = skvn_marine_blocks_pdp_related_cast_stored(
+		get_post_meta( $product_id, SKVN_MARINE_BLOCKS_PDP_RELATED_META, true )
+	);
+
+	if ( ! is_array( $meta ) || ! skvn_marine_blocks_sanitize_pdp_related_bool( $meta['override'] ?? false ) ) {
+		return new WP_Error( 'no_override', __( 'Turn on product override and save before promoting to the site default.', 'skvn-marine-blocks' ) );
+	}
+
+	$value = skvn_marine_blocks_sanitize_pdp_related( $meta );
+	if ( ! skvn_marine_blocks_pdp_related_is_active( $value ) ) {
+		return new WP_Error( 'inactive', __( 'Turn on SKVN related cards on this product before promoting.', 'skvn-marine-blocks' ) );
+	}
+
+	$value['useCustomRelatedCard'] = true;
+	update_option( SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION, $value );
+
+	return $value;
+}
+
+/**
+ * AJAX: promote product related settings to site default.
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_promote_ajax() {
+	nocache_headers();
+	if ( false === check_ajax_referer( 'skvn_marine_pdp_related_promote', 'nonce', false ) ) {
+		wp_send_json_error( array( 'message' => __( 'Your session expired. Reload the editor and try again.', 'skvn-marine-blocks' ) ), 403 );
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => __( 'You need administrator access to apply settings site-wide.', 'skvn-marine-blocks' ) ), 403 );
+	}
+
+	$product_id = isset( $_POST['productId'] ) && is_scalar( $_POST['productId'] ) ? absint( $_POST['productId'] ) : 0;
+	$result     = skvn_marine_blocks_pdp_related_promote_from_product( $product_id );
+
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error(
+			array(
+				'code'    => $result->get_error_code(),
+				'message' => $result->get_error_message(),
+			),
+			400
+		);
+	}
+
+	wp_send_json_success( array( 'value' => $result ) );
+}
+
+/**
+ * AJAX: list pages for copy-from-collection (admin + legacy consumers).
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_copy_pages_ajax() {
+	nocache_headers();
+	if ( false === check_ajax_referer( 'skvn_marine_pdp_related_admin', 'nonce', false ) ) {
+		wp_send_json_error( array( 'message' => __( 'Your session expired. Reload the page and try again.', 'skvn-marine-blocks' ) ), 403 );
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => __( 'You cannot copy card settings.', 'skvn-marine-blocks' ) ), 403 );
+	}
+	wp_send_json_success( array( 'pages' => skvn_marine_blocks_pdp_related_collection_pages() ) );
+}
+
+/**
+ * Admin submenu under SKVN Marine.
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_admin_menu() {
+	add_submenu_page(
+		'skvn-marine',
+		esc_html__( 'Related products', 'skvn-marine-blocks' ),
+		esc_html__( 'Related products', 'skvn-marine-blocks' ),
+		'manage_options',
+		'skvn-marine-pdp-related',
+		'skvn_marine_blocks_pdp_related_admin_render_page'
+	);
+}
+
+/**
+ * Collect related profile fields from an admin POST body.
+ *
+ * @return array<string,mixed>
+ */
+function skvn_marine_blocks_pdp_related_collect_admin_post() {
+	$prefix = 'skvn_pdp_related_';
+	$raw    = array();
+
+	foreach ( array( 'useCustomRelatedCard', 'showImage', 'showProductTags', 'showProductCategories', 'showSpecChips', 'chipAllowTags', 'chipAllowCategories' ) as $key ) {
+		$raw[ $key ] = isset( $_POST[ $prefix . $key ] );
+	}
+	foreach ( array( 'imageRatio', 'mediaLayout', 'chipStyle', 'chipColorScheme', 'productActionMode', 'customActionUrl', 'actionBackgroundColor', 'actionTextColor', 'actionHoverBackgroundColor', 'actionHoverTextColor', 'displayTagLimit', 'relatedCount' ) as $key ) {
+		$raw[ $key ] = isset( $_POST[ $prefix . $key ] ) && is_string( $_POST[ $prefix . $key ] )
+			? sanitize_text_field( wp_unslash( $_POST[ $prefix . $key ] ) )
+			: '';
+	}
+
+	return $raw;
+}
+
+/**
+ * Save site default from the admin form.
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_admin_save() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to save related product settings.', 'skvn-marine-blocks' ) );
+	}
+	check_admin_referer( 'skvn_marine_pdp_related_admin' );
+
+	update_option(
+		SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION,
+		skvn_marine_blocks_sanitize_pdp_related( skvn_marine_blocks_pdp_related_collect_admin_post() )
+	);
+
+	wp_safe_redirect(
+		add_query_arg(
+			array(
+				'page'    => 'skvn-marine-pdp-related',
+				'updated' => 'true',
+			),
+			admin_url( 'admin.php' )
+		)
+	);
+	exit;
+}
+
+/**
+ * Copy card settings from a page (admin form).
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_admin_copy() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to copy card settings.', 'skvn-marine-blocks' ) );
+	}
+	check_admin_referer( 'skvn_marine_pdp_related_copy' );
+
+	$page_id = isset( $_POST['copy_page_id'] ) && is_scalar( $_POST['copy_page_id'] ) ? absint( $_POST['copy_page_id'] ) : 0;
+	$copied  = skvn_marine_blocks_pdp_related_copy_from_page( $page_id );
+
+	$args = array( 'page' => 'skvn-marine-pdp-related' );
+	if ( is_wp_error( $copied ) ) {
+		$args['copy_error'] = rawurlencode( $copied->get_error_code() );
+	} else {
+		$args['copied'] = 'true';
+	}
+
+	wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php' ) ) );
+	exit;
+}
+
+/**
+ * Render the site default related products settings page.
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_admin_render_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$profile  = skvn_marine_blocks_sanitize_pdp_related(
+		get_option( SKVN_MARINE_BLOCKS_PDP_RELATED_OPTION, array() )
+	);
+	$owner_on = skvn_marine_blocks_pdp_related_is_active( $profile );
+	$disabled = $owner_on ? '' : ' disabled="disabled"';
+	$pages    = skvn_marine_blocks_pdp_related_collection_pages();
+	?>
+	<div class="wrap">
+		<h1><?php echo esc_html__( 'Related products', 'skvn-marine-blocks' ); ?></h1>
+		<p><?php echo esc_html__( 'Site default for PDP related cards. Products with Override stay on their own profile until you use site default or promote from another product.', 'skvn-marine-blocks' ); ?></p>
+		<?php if ( isset( $_GET['updated'] ) && 'true' === $_GET['updated'] ) : ?>
+			<div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Settings saved.', 'skvn-marine-blocks' ); ?></p></div>
+		<?php endif; ?>
+		<?php if ( isset( $_GET['copied'] ) && 'true' === $_GET['copied'] ) : ?>
+			<div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Copied from the page. Not linked to the source block.', 'skvn-marine-blocks' ); ?></p></div>
+		<?php endif; ?>
+		<?php if ( isset( $_GET['copy_error'] ) && is_string( $_GET['copy_error'] ) ) : ?>
+			<div class="notice notice-error is-dismissible"><p><?php echo esc_html__( 'Copy failed. Check the page and try again.', 'skvn-marine-blocks' ); ?></p></div>
+		<?php endif; ?>
+
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="skvn_marine_pdp_related_save" />
+			<?php wp_nonce_field( 'skvn_marine_pdp_related_admin' ); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php echo esc_html__( 'SKVN related cards', 'skvn-marine-blocks' ); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="skvn_pdp_related_useCustomRelatedCard" value="1" <?php checked( $owner_on ); ?> />
+							<?php echo esc_html__( 'Use SKVN related cards', 'skvn-marine-blocks' ); ?>
+						</label>
+						<p class="description"><?php echo esc_html__( 'When off, WooCommerce native related products render on the storefront.', 'skvn-marine-blocks' ); ?></p>
+					</td>
+				</tr>
+			</table>
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- classic HTML builder escapes internally.
+			echo skvn_marine_blocks_pdp_related_classic_controls_html( $profile, 'skvn_pdp_related_', $disabled );
+			?>
+			<?php submit_button( __( 'Save settings', 'skvn-marine-blocks' ) ); ?>
+		</form>
+
+		<hr />
+		<h2><?php echo esc_html__( 'Copy card settings', 'skvn-marine-blocks' ); ?></h2>
+		<p><?php echo esc_html__( 'Uses the first Product Collection block on the page only. Card styling is copied; query, layout and typography token keys are not.', 'skvn-marine-blocks' ); ?></p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="skvn_marine_pdp_related_copy" />
+			<?php wp_nonce_field( 'skvn_marine_pdp_related_copy' ); ?>
+			<p>
+				<label for="skvn-copy-page-id"><?php echo esc_html__( 'Source page', 'skvn-marine-blocks' ); ?></label><br />
+				<select id="skvn-copy-page-id" name="copy_page_id" required>
+					<option value=""><?php echo esc_html__( 'Select a page', 'skvn-marine-blocks' ); ?></option>
+					<?php foreach ( $pages as $page ) : ?>
+						<option value="<?php echo esc_attr( $page['value'] ); ?>"><?php echo esc_html( $page['label'] ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</p>
+			<?php if ( array() === $pages ) : ?>
+				<p><?php echo esc_html__( 'No published pages with a Product Collection block were found.', 'skvn-marine-blocks' ); ?></p>
+			<?php else : ?>
+				<?php submit_button( __( 'Copy card settings', 'skvn-marine-blocks' ), 'secondary', 'submit', false ); ?>
+			<?php endif; ?>
+		</form>
+	</div>
+	<?php
 }
 
 // ---------------------------------------------------------------------------

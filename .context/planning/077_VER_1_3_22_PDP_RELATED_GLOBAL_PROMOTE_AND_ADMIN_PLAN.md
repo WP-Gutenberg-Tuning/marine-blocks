@@ -1,6 +1,6 @@
 # V1 / 1.3.22 — PDP Related: Promote to site + admin global editor
 
-Created: **2026-11-16**. Status: **PLANNED — human “lưu plan”; chưa start, chưa code.**
+Created: **2026-11-16**. Status: **IN PROGRESS — source 2026-11-16; REL-UX-03/04/TECH-04 Chờ kiểm chứng.**
 Current: **V1 / 1.3.22**. SemVer mặc định: **scope addition 1.3.22** (cùng option/meta plan076). Start / gộp 1.4.0 cần lệnh human riêng. Không bump, không chuyển current, không build.
 
 Human model (2026-11-16): chỉnh trên **một** trang sản phẩm → Save chỉ đổi trang đó → nút **áp dụng toàn trang** = **copy/promote** thông số đã lưu sang setting global. Không bind, không loop catalog.

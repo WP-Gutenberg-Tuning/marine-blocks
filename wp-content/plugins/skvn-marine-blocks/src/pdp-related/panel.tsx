@@ -1,9 +1,20 @@
-import { Button, PluginDocumentSettingPanel, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
+import { Button, Notice, PluginDocumentSettingPanel, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { registerPlugin } from '@wordpress/plugins';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { COLOR_PALETTE_OPTIONS } from '../collection/constants';
+
+declare global {
+	interface Window {
+		skvnMarineDesign?: {
+			url?: string;
+			promoteNonce?: string;
+			canManageOptions?: boolean;
+		};
+	}
+}
 
 type RelatedMeta = Record< string, string | boolean | number > & { override?: boolean };
 
@@ -39,7 +50,12 @@ const chipColorSchemes: { label: string; value: string }[] = [
 
 function PdpRelatedPanel() {
 	const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
+	const postId = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
+	const isDirty = useSelect( ( select ) => select( 'core/editor' ).isEditedPostDirty(), [] );
 	const [ meta, setMeta ] = useEntityProp( 'postType', 'product', 'meta' ) as [ Record< string, unknown >, ( value: Record< string, unknown > ) => void ];
+	const [ promotePending, setPromotePending ] = useState( false );
+	const [ promoteMessage, setPromoteMessage ] = useState( '' );
+	const [ promoteFailed, setPromoteFailed ] = useState( false );
 
 	if ( postType !== 'product' ) {
 		return null;
@@ -65,6 +81,53 @@ function PdpRelatedPanel() {
 			setMeta( { ...meta, _skvn_pdp_related: { ...defaults, ...stored, override: true } } );
 		} else {
 			setMeta( { ...meta, _skvn_pdp_related: { override: false } } );
+		}
+	};
+
+	const canPromote = window.skvnMarineDesign?.canManageOptions === true;
+	const promoteToSite = async () => {
+		const config = window.skvnMarineDesign;
+		if ( promotePending || ! canPromote || ! config?.url || ! config.promoteNonce || ! postId ) {
+			return;
+		}
+		if ( isDirty ) {
+			setPromoteFailed( true );
+			setPromoteMessage( __( 'Update the product first so the site default matches your saved settings.', 'skvn-marine-blocks' ) );
+			return;
+		}
+		if ( ! overrideOn || ! values.useCustomRelatedCard ) {
+			setPromoteFailed( true );
+			setPromoteMessage( __( 'Turn on override and SKVN related cards, then update the product.', 'skvn-marine-blocks' ) );
+			return;
+		}
+		// eslint-disable-next-line no-alert
+		if ( ! window.confirm( __( 'Overwrite the site default related card settings with this product’s saved profile? Other products with override stay unchanged.', 'skvn-marine-blocks' ) ) ) {
+			return;
+		}
+		setPromotePending( true );
+		setPromoteMessage( '' );
+		try {
+			const response = await fetch( config.url, {
+				method: 'POST',
+				credentials: 'same-origin',
+				cache: 'no-store',
+				body: new URLSearchParams( {
+					action: 'skvn_marine_pdp_related_promote',
+					nonce: config.promoteNonce,
+					productId: String( postId ),
+				} ),
+			} );
+			const json = await response.json();
+			if ( ! response.ok || ! json?.success ) {
+				throw new Error( json?.data?.message || __( 'Could not apply settings site-wide.', 'skvn-marine-blocks' ) );
+			}
+			setPromoteFailed( false );
+			setPromoteMessage( __( 'Applied to the site default. This product keeps its override.', 'skvn-marine-blocks' ) );
+		} catch ( error ) {
+			setPromoteFailed( true );
+			setPromoteMessage( error instanceof Error ? error.message : __( 'Could not apply settings site-wide.', 'skvn-marine-blocks' ) );
+		} finally {
+			setPromotePending( false );
 		}
 	};
 
@@ -209,6 +272,21 @@ function PdpRelatedPanel() {
 			<p>{ __( 'Terms come from each related product. No fixed term picklist.', 'skvn-marine-blocks' ) }</p>
 			<ToggleControl label={ __( 'Allow product tags', 'skvn-marine-blocks' ) } checked={ !! values.chipAllowTags } disabled={ disabled || ! values.showProductTags } onChange={ ( chipAllowTags ) => setRelated( { chipAllowTags } ) } />
 			<ToggleControl label={ __( 'Allow product categories', 'skvn-marine-blocks' ) } checked={ !! values.chipAllowCategories } disabled={ disabled || ! values.showProductCategories } onChange={ ( chipAllowCategories ) => setRelated( { chipAllowCategories } ) } />
+			{ canPromote ? (
+				<>
+					<Button
+						variant="secondary"
+						disabled={ promotePending || ! overrideOn || ! values.useCustomRelatedCard || isDirty }
+						onClick={ promoteToSite }
+					>
+						{ promotePending ? __( 'Applying…', 'skvn-marine-blocks' ) : __( 'Apply to all products', 'skvn-marine-blocks' ) }
+					</Button>
+					<p className="description">{ __( 'Copies this product’s saved profile to the site default. Requires Update first.', 'skvn-marine-blocks' ) }</p>
+					{ promoteMessage && <Notice status={ promoteFailed ? 'error' : 'success' } isDismissible={ false }>{ promoteMessage }</Notice> }
+				</>
+			) : (
+				<p className="description">{ __( 'An administrator can apply this profile to the site default after you update the product.', 'skvn-marine-blocks' ) }</p>
+			) }
 		</PluginDocumentSettingPanel>
 	);
 }

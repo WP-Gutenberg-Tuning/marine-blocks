@@ -41,7 +41,7 @@ P0 F1–F6 = R-A…R-F. Thiếu R-A hoặc R-E → không PASS REL-UI-01.
 
 - Theme `skvn-marine`, plugin `skvn-marine-blocks` (build hiện hành), WooCommerce active.
 - Không có `wp-content/themes/skvn-marine/woocommerce/` (theme override `content-product`).
-- Admin `manage_options` cho Theme Design + copy. User `edit_post` (không `manage_options`) cho panel sản phẩm / negative save group.
+- Admin `manage_options` cho **SKVN Marine → Related products** + Promote. User `edit_post` (không `manage_options`) không Promote; Theme Design **không** còn group `related`.
 - Trước runtime follow-up khác: deferred baseline 1.3.20 (Category / Woo Archive / DS) — REL-TRACE-01.
 
 ---
@@ -71,6 +71,7 @@ php tools/tests/pdp-related-sanitize.test.php
 php tools/tests/pdp-related-copy-blocks.test.php
 php tools/tests/pdp-related-card.test.php
 php tools/tests/pdp-related-hooks.test.php
+php tools/tests/pdp-related-promote.test.php
 ```
 
 Zip/upload (module PHP ngoài `build/`):
@@ -86,7 +87,7 @@ unzip -l build/skvn-marine.zip | rg 'inc/templates/related-product-card.php'
 
 ## REL-UI-01 — Card related (owner on)
 
-**Setup:** Theme Design → Related products → **Use SKVN related cards** on → Save group. R-H không override.
+**Setup:** SKVN Marine → Related products → **Use SKVN related cards** on → Save settings. R-H không override.
 
 | Bước | Expected |
 |---|---|
@@ -126,23 +127,22 @@ unzip -l build/skvn-marine.zip | rg 'inc/templates/related-product-card.php'
 
 ---
 
-## REL-UX-01 — Theme Design group `related`
+## REL-UX-01 — Admin site default (plan077)
 
-Editor post (Marine Blocks → Theme Design → **Related products**).
+wp-admin → **SKVN Marine → Related products**.
 
 | Bước | Expected |
 |---|---|
-| 1. Owner off | Mọi control disabled trừ **Use SKVN related cards**. |
-| 2. Owner on, đổi `mediaLayout` + `relatedCount`, Save group | Reload editor: values còn. Option `skvn_pdp_related` 15 key. |
-| 3. Đổi rồi Discard | Values về bản saved; status không còn unsaved draft. |
-| 4. Copy từ R-G | Help “Uses the first Product Collection block on the page only.” Notice **Copied. Not linked to the source block.** Owner thành on. |
-| 5. Sửa card attrs block trên R-G, reload PDP | Related **không** đổi theo block (not linked). |
-| 6. Conflict (optional): tab 2 save group, tab 1 save | Conflict table; Use current / Keep draft không tự ghi. |
-| 7. User không `manage_options` | Save group / copy → lỗi quyền; draft giữ. |
+| 1. Owner off | Các control card disabled (giữ owner toggle). |
+| 2. Owner on, đổi `mediaLayout` + `relatedCount`, Save settings | Reload admin: values còn. Option `skvn_pdp_related` 19 key. |
+| 3. Copy từ R-G | Notice **Copied. Not linked to the source block.** Owner thành on. |
+| 4. Sửa card attrs block trên R-G, reload PDP R-H | Related **không** đổi theo block (not linked). |
+| 5. Theme Design sidebar | **Không** còn group Related products; có link “Edit related products (site default)”. |
+| 6. User không `manage_options` | Không vào admin page / không Promote. |
 
-**Pass:** save/discard/copy/not-linked đúng. **Fail:** copy linked; copy không bật owner; palette/fonts bị ghi nhầm.
+**Pass:** save/copy/not-linked; Theme Design không dual-edit. **Fail:** còn form related trong Theme Design; copy linked.
 
-**Evidence:** ảnh panel; video copy + sửa block; `wp option get skvn_pdp_related` trước/sau copy.
+**Evidence:** ảnh admin page; `wp option get skvn_pdp_related` trước/sau copy; ảnh Theme Design link only.
 
 ---
 
@@ -160,6 +160,36 @@ Editor post (Marine Blocks → Theme Design → **Related products**).
 **Pass:** override/reset/reopen đúng; owner tắt trên một SP không kéo site. **Fail:** Use default xóa meta; key site lẫn vào override.
 
 **Evidence:** `wp post meta get <id> _skvn_pdp_related` sau bước 3 và 5; ảnh panel.
+
+---
+
+## REL-UX-03 — Promote to site default
+
+Admin user on product R-A (hoặc SP test riêng).
+
+| Bước | Expected |
+|---|---|
+| 1. Override on, owner on, đổi `imageRatio` khác site, **Update** | Chỉ PDP đó đổi frontend. |
+| 2. **Apply to all products** + confirm | Option = snapshot; notice success. Meta nguồn vẫn `override: true`. |
+| 3. R-H (không override) reload | Theo option mới. |
+| 4. SP khác đã override riêng | Meta **không** đổi. |
+| 5. Editor chưa Update (dirty) | Nút Promote disabled / báo cần Update trước. |
+| 6. User chỉ `edit_post` | Không nút Promote; help text only. |
+
+**Pass:** copy site only; không mass-reset meta. **Fail:** ghi option khi dirty; xóa override nguồn; đụng SP override khác.
+
+**Evidence:** `wp option get skvn_pdp_related` + `wp post meta get` nguồn + SP override khác sau Promote.
+
+---
+
+## REL-UX-04 — Canonical admin (no Theme Design dual-edit)
+
+| Bước | Expected |
+|---|---|
+| 1. Theme Design | Không group Related; link tới admin page. |
+| 2. Sửa option trên admin, R-H reload | Frontend khớp. Update product **không** ghi option. |
+
+**Pass:** một editor global. **Fail:** còn Save group `related` trong sidebar.
 
 ---
 
