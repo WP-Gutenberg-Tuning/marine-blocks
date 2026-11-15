@@ -8,14 +8,12 @@
 
 ## Current Milestone
 
-Current: **V1 / 1.3.22 — Product Page Basic Design Controls**
-Status: **IN PROGRESS — human transition2026-11-13; implementation Chưa làm, chưa có runtime evidence**
-Started: **2026-11-13**
-Human instruction: “Đã xong toàn phần 1.3.21” + “Chuyển sang 1.3.22 ngay” (2026-11-13). 1.3.21 → **DONE**, carry **waived** cùng ngày; snapshot đầy đủ tại MILESTONES_HISTORY §1.3.21. Đây là milestone development build, không release/deploy; metadata working sync1.3.22 bằng bump-only, human rebuild assets.
+Current: **V1 / 1.3.23 — Post Page Basic Design Controls**
+Status: **IN PROGRESS — human transition2026-11-16; implementation Chưa làm, chưa có runtime evidence**
+Started: **2026-11-16**
+Human instruction: “note lại là cái tính năng ở milestone hiện tại tạm ổn, tạm Pass và sẽ làm lại trong tương lai 1.4.x. Đẩy milestone lên bản kế tiếp” (2026-11-16). 1.3.22 → **DONE_WITH_CARRY_OVER (tạm PASS theo human)**; snapshot đầy đủ tại MILESTONES_HISTORY §1.3.22. Carry1.3.22: rework PDP Related theme-plugin independence (B/C) sang **1.4.x** — tension OPEN 2026-11-15, lập plan chi tiết khi 1.4.x start, không mở trong 1.3.23. Đây là milestone development build, không release/deploy; metadata working sync1.3.23 bằng bump-only, human rebuild assets.
 
-Human PASS2026-11-13 cho1.3.21: Hero contrast + HERO-TECH-03 chớp đã hết + Slider Editor UI Redesign + addon fill/focal/parallax/text motion được nghiệm thu **toàn phần**. Plan071 overlay color: human “đã test rồi, xong rồi pass” nhưng repo **không có source `overlayColor`** — ghi nhận audit, không coi là code đã xong. Evidence kỹ thuật chưa thu thập **không còn là carry** (human waiver2026-11-13); chỉ giữ tên trong history để audit, không mở lại trạng thái và không hạ PASS của human.
-
-**1.3.20 → DONE_WITH_CARRY_OVER** (human PASS2026-11-12) — snapshot tại MILESTONES_HISTORY §1.3.20; carry của1.3.20 giữ trong register1.3.20→1.3.22 bên dưới. **1.3.21 → PASS, không carry** (human waiver2026-11-13, ghi ở mục Snapshot bên dưới).
+Lịch sử transitions: human PASS2026-11-13 cho1.3.21 — Hero contrast + HERO-TECH-03 chớp hết + Slider Editor UI Redesign + addon fill/focal/parallax/text motion nghiệm thu toàn phần, carry waived (Plan071 overlay color không có source — audit note). **1.3.20 → DONE_WITH_CARRY_OVER** (human PASS2026-11-12); carry1.3.20 giữ trong register bên dưới (đích hiện tại 1.3.23). Snapshots đầy đủ: MILESTONES_HISTORY §1.3.20/§1.3.21.
 
 ### Snapshot1.3.21 (đã đóng) — giữ để audit
 
@@ -39,7 +37,7 @@ Checklist đầy đủ HERO-*/SED-* đã move sang MILESTONES_HISTORY §1.3.21; 
 |---|---|
 | Blog archive, Woo Archive M2 inquiry/second language, ratio control060§12, Visual Sidebar054 Q1–Q3, Step Slider1.3.24 | Chưa start/deferred; không tự gán vào1.3.22 hoặc mở ratio setting trong patch1:1. Step Slider giữ018/1.3.24 và acceptance riêng. |
 
-### Carry register từ1.3.20 →1.3.22 — không mất acceptance
+### Carry register từ1.3.20 →1.3.23 (đã qua1.3.22) — không mất acceptance
 
 Đích theo dõi phần chưa nghiệm thu; không đổi owner/IDs hoặc tự mở coding scope. Snapshot 1.3.20 ở history giữ checklist gốc; bảng này là con trỏ vận hành, không thay hoặc rút gọn yêu cầu.
 
@@ -58,9 +56,9 @@ Checklist đầy đủ HERO-*/SED-* đã move sang MILESTONES_HISTORY §1.3.21; 
 
 **Loading/navigation046 vẫn thuộc1.3.18**, acceptance LDR-01–09/UXHF-01–10 theo runbook riêng; không nhập vào1.3.21. **Defer 2026-11-13:** sau fade, slider `viewport-below-header` nhích size (offset `5rem` → đo header+admin bar; scrollbar ~17px). Human xác nhận load đầu vẫn đổi nhẹ và tạm bỏ qua. Chẩn đoán + số đo: `docs/debug-casebook/PITFALLS.md` Pitfall 10, `.context/PITFALLS.md` DP-09. Không sửa trong 1.3.21.
 
-### Deferred test reminder khi bắt đầu1.3.22
+### Deferred test reminder khi bắt đầu1.3.23
 
-Trước follow-up runtime khác, human chạy deferred baseline còn treo từ1.3.20: Category CGD/CG/DS, Woo Archive AM1/AL/AR, cộng carry DS/TD/S19/SR2/CP/EF/RS/CCP và Carousel. 1.3.21 đã DONE với carry waived nên **không cần chạy lại HERO-*/SED/N01–03 như điều kiện mở1.3.22**; nếu human muốn evidence kỹ thuật cho audit thì tự do bổ sung, không phải nghĩa vụ. Source/model PASS không thay runtime PASS.
+Trước follow-up runtime khác, human chạy deferred baseline còn treo từ1.3.20: Category CGD/CG/DS, Woo Archive AM1/AL/AR, cộng carry DS/TD/S19/SR2/CP/EF/RS/CCP và Carousel. 1.3.21 DONE (carry waived) và 1.3.22 tạm PASS theo human nên **không cần chạy lại HERO-*/SED/N01–03 hay REL-* như điều kiện mở1.3.23**; evidence runtime REL-* của1.3.22 sẽ hoàn thiện trong rework1.4.x, và nếu human muốn evidence kỹ thuật cho audit thì tự do bổ sung, không phải nghĩa vụ. Source/model PASS không thay runtime PASS.
 
 ### Island foundation — ngoài scope1.3.21, defer1.4.x
 
@@ -1020,62 +1018,10 @@ Scope: chọn Product Category thủ công, grid responsive, archive/custom URL,
 
 Version rationale: feature thường tăng MINOR; **1.3.20 là ngoại lệ do human xác nhận**. Thứ tự mới 2026-11-04 là Sidebar 1.3.19 → Category 1.3.20 → Hero contrast 1.3.21. Post Category riêng, chưa gán số. Chưa start/current/bump metadata.
 
-### 1.3.22 — Product Page Basic Design Controls
-
-Status: **IN PROGRESS — CURRENT từ 2026-11-13** theo lệnh human “Chuyển sang 1.3.22 ngay”. Plan067 được mở khoá để triển khai; implementation **Chưa làm**, chưa có runtime evidence.
-Confirmed: **2026-11-03** — Product trước Post; sau hoán đổi 2026-11-04, nền sidebar là **1.3.19**, thứ tự các consumer Product **1.3.22 → 1.3.23** giữ nguyên.
-
-Version rationale: đây là feature mới, thông thường tăng MINOR; **1.3.22 và 1.3.23 là ngoại lệ đánh số do human xác nhận**, như 1.3.20–21. Không đổi Version Naming Rule, không chuyển current 1.3.18, không bump metadata hoặc archive.
-
-Scope: chỉnh thiết kế cơ bản Single Product khi vẫn là child theme GeneratePress: preset gallery/thông tin và tỷ lệ hai cột, độ rộng, bật/tắt thành phần phù hợp, typography/màu/khoảng cách và style thông số/CTA theo token; thiết kế mặc định chung + override giới hạn từng sản phẩm với Use default/Reset. Nội dung và gallery/attributes lấy dữ liệu native WooCommerce. Tận dụng shell/controls 1.3.19; đây là consumer riêng, không mở rộng ngược scope 1.3.19.
-
-Boundary: theme giữ template PHP/hooks và visual output; plugin giữ editor UI/logic phù hợp, không tạo store/font loader cạnh tranh. Chưa làm full template drag/drop, template condition engine, archive builder hoặc data model woo-catalog 1.5.0. Giữ quote flow hiện có, không viết form handler mới. **2.0 bắt đầu migrate từng bước khỏi GeneratePress**, không phải đã độc lập; không chốt mốc hoàn tất ở đây.
-
-Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
-- [ ] PDP-UI-01 — Block UI: preset/style/visibility áp dụng đúng trên desktop/mobile với title dài, có/không ảnh và thiếu/đủ thuộc tính; CTA đọc được, focus/contrast/touch phù hợp; kiểm screenshot, geometry và quote URL giữ product context.
-- [ ] PDP-UX-01 — Editor UX: phân biệt default chung với override sản phẩm; Use default/Reset, save/reopen và save failure không gây ghi nhầm phạm vi; keyboard/sidebar hẹp dùng được; evidence video và giá trị đã lưu.
-- [ ] PDP-TECH-01 — Technical: native Woo data, quyền/sanitize/escape, fallback khi dependency không khả dụng, không sửa GP parent; không tải runtime không cần thiết; kiểm source/network/console và regression quote/gallery trên build ghi rõ.
-- [ ] PDP-TRACE-01 — Trước implementation lập execution plan và đối chiếu từng acceptance liên quan của **1.3.5**: kế thừa phần đã có, chỉ triển khai delta; không xóa acceptance hoặc đánh dấu 1.3.5 completed. Archive scope vẫn ở nơi cũ.
-- [ ] Tạo runbook onsite với URL/fixtures/steps/expected/evidence, human duyệt trước completion. SemVer đã chốt; bắt đầu/chuyển current cần lệnh riêng.
-
-Research/rationale: `docs/research/theme-template-editor-fse-transition-research-2026-11-03.md`; roadmap 039, mục cập nhật 2026-11-03. Execution plan [067](planning/067_VER_1_3_22_PRODUCT_PAGE_DESIGN_CONTROLS_EXECUTION_PLAN.md) đã mở khoá; implementation **Chưa làm**. Agent cửa sổ ngắn làm một gói P1–P5 theo §12–20, không đọc lại toàn bộ quyết định. Liên hệ stack: consumer template thực tế liên quan M6 và nền visual/editor liên quan M3; không kích hoạt toàn bộ M3/M6 hoặc đổi thứ tự các scope khác.
-
-### Scope addition 2026-11-14 — PDP Related Card Profile & Chips (trong 1.3.22)
-
-Human duyệt scope addition vào current **1.3.22** qua Q&A 9 điểm (không bump, không chuyển current; kế thừa ngoại lệ đánh số 1.3.22). Decision `docs/decisions/pdp-related-card-profile.md` (ACTIVE); planning [076](planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md). Chốt: site default = **Theme Design group `related`** (option `skvn_pdp_related`, 19 key — amend 2026-11-15: 4 Collection action color); owner **`useCustomRelatedCard`** default **off** — inactive = Woo native (kể cả option đã save); override per-product = panel + classic meta; presenter **`related`** — grouped specs 3/`+N` (P0 gate 060); chip hai lớp + allowlist UI disabled khi `show*` off; `imageRatio` 1:1; khi active: `posts_per_page = relatedCount`, **`columns = clamp(relatedCount, 1, 4)`**; **Copy card settings** v1 (first block only, bật owner, not linked).
-
-Defer v1: **upsells** (D5), **intersection bật** (D4 — chỉ ship off, không code nhánh bật), **token typography/color theo vai trò** (v1 theme-styled default; copy action không copy các key này).
-
-Acceptance draft (scope addition) — tất cả **Chưa làm**:
-- [ ] REL-UI-01 — Card related khi `useCustomRelatedCard` on; design family Collection; CTA onsite review; columns/count layout; không nested link; screenshot desktop/mobile/zoom.
-- [ ] REL-UI-02 — Chips theo term từng SP; cap `displayTagLimit` + `+N` informational; allowlist off → không chip; category chip chỉ khi bật; không picklist term.
-- [ ] REL-UX-01 — Group `related`: owner toggle; save/discard/revision; Copy first-block notice, bật owner; source block không link sau copy.
-- [ ] REL-UX-02 — Per-product panel: override on/off, Use site default, reopen còn meta; classic editor cùng field.
-- [ ] REL-TECH-01 — `useCustomRelatedCard` off → Woo native, không enqueue; plugin off → không swap; Woo off → không fatal.
-- [ ] REL-TECH-02 — Active: args đổi count + columns clamp; inactive: args nguyên; archive/grid/carousel không regression (060).
-- [ ] REL-TECH-03 — Sanitize/escape/permissions đúng (`manage_options` option + copy, `edit_post` meta); key lạ bỏ; int bounds; không leak query attrs.
-- [ ] REL-TRACE-01 — Plan067 checklist không bị tick từ scope này; 1.3.5 checklist giữ nguyên; deferred baseline 1.3.20 chạy trước runtime follow-up.
-
-Plan067 §12–20 giữ nguyên hiệu lực. Phối hợp ba file chung (`modules/typography-settings/typography-settings.php`, `src/design-sidebar/theme-design.tsx`, `inc/customizer.php`) theo sequencing plan076 §2: mặc định P1–P4 plan067 chạy trước; nếu đảo thứ tự phải viết cơ chế group hỗ trợ cả hai, không ghi đè nhánh `product`. Runbook tạo khi implement: `docs/testing/pdp-related-card-1.3.22.md`. Bắt đầu implement cần lệnh human riêng.
-
-Source P1 2026-11-14 (human lệnh "Bám vào plan và làm 076"): plan067 đã implement + commit trước đó (`8d3aea9`) nên sequencing P1–P4 plan067 thỏa; P1 plan076 theo §10 — `modules/pdp-related-settings/pdp-related-settings.php` (mới: 15 default + bool + bounded-int + sanitize + meta sanitize + resolve `skvn_marine_blocks_get_pdp_related()` + `skvn_marine_blocks_pdp_related_is_active()`, constants `skvn_pdp_related`/`_skvn_pdp_related`), `inc/pdp-related.php` (mới, chỉ defaults/sanitize/getter, plugin vắng → defaults an toàn không đọc DB), `skvn-marine-blocks.php` 1 require, theme `functions.php` 1 include. Mocked fixture `tools/tests/pdp-related-sanitize.test.php` 12/12 PASS (REL-TECH-03 baseline). Human đã chạy build; P1 committed `3ca051c`.
-
-Source P2 2026-11-14 (human lệnh "đã chạy build rồi, làm tiếp"): Theme Design group `related` + copy action + contract theo plan076 §8/§6 — `inc/customizer.php` contract capabilities thêm `related`; `typography-settings.php` save_group 4 nhánh (owner/value/expected/physical, owner = option PDP), snapshot `groups.related` theo contract capability (canEdit `manage_options`), AJAX allowlist + validate riêng 15 key (bool JSON thật, enum strict, int bounds, chipColorScheme `''`|slug regex), copy operations `copyRelatedPages`/`copyRelated` (nonce + `manage_options`), guard generic `$valid` chỉ palette/heading/fonts; module thêm 2 helper copy (WP_Query ≤200 publish pages + PHP marker filter `str_contains`, không WP `s=`; parse_blocks DFS document-order first block kể cả lồng Group/Columns + marker preflight, map schema keys trừ owner, force owner true) + fixture `tools/tests/pdp-related-copy-blocks.test.php` 6/6 PASS; `theme-design.tsx` panel `related` đầy đủ (owner toggle luôn active, presentation controls `disabled` khi owner false, allowlist disabled thêm khi ẩn terms, chip color derive từ palette không raw hex, number clamp, copy UI notice "Copied. Not linked to the source block."), `ConflictComparison` hỗ trợ related. Chưa build/lint (human chạy); chưa runtime evidence; REL-* giữ Chưa làm.
-
-Source P3 2026-11-14 (human lệnh "commit và làm p3"; P2 committed `7e2051c`): per-product override theo plan076 §9 mirror plan067 §19 — module `pdp-related-settings.php` thêm `register_post_meta( 'product', '_skvn_pdp_related' )` trên init (object/single, REST schema `override` + 15 key, additionalProperties false, enum strict, int min/max, auth_callback `edit_post`, sanitize_callback meta), classic meta box `skvn-pdp-related` chỉ khi block editor off (nonce `skvn_pdp_related_nonce`, cùng field/label panel; mọi field active khi override on để classic save không rớt key), `save_post_product` guard nonce/autosave/`edit_post` + `update_post_meta` qua sanitize meta; panel `src/pdp-related/panel.tsx` (registerPlugin `skvn-marine-pdp-related`, PluginDocumentSettingPanel name `skvn-pdp-related` title `Related products`, guard post type `product`, `useEntityProp` meta, Override toggle + `Use site default` ghi `{override:false}`, controls mirror §8 với allowlist disabled rules + number clamp); `src/index.ts` 1 import. Test mocked được thêm stub `add_action` vì module giờ đăng ký hooks khi load. Chưa build/lint (human chạy); REL-* giữ Chưa làm.
-
-Source UX repair 2026-11-14 — Theme Design group "Product page" bớt khít (handoff `docs/workflows/prompts/pdp-theme-design-group-density-handoff.md`, CODE_NOW, trong 1.3.22): `theme-design.tsx` — fieldset class `skvn-theme-design` thay inline reset; group `product` bọc 3 section div (`__section` + h3 tiếng Anh Layout/Visibility/Type; div toggle thêm `__toggles`) không đổi key/thứ tự/label/help; Save/Discard bọc `__actions` vẫn trong fieldset (mọi group, vẫn bị disable cùng control); `<p role="status">` giữ ngoài fieldset. CSS mới `assets/css/design-sidebar.css` (16px control gap, 8px toggles, legend clip 1px không display:none, actions border-top #dcdcde, không !important/overflow-x/width cố định) enqueue handle `skvn-marine-blocks-design-sidebar` dep `wp-components` version filemtime trong `skvn_marine_blocks_design_bootstrap()`, chỉ khi file tồn tại; không frontend `style.css`, không `src/product-design/**`, không option/meta, không đụng REL-* hoặc group `related` copy UI. Behavior save/discard/dirty/conflict/disabled giữ nguyên. Human build (theme-design.tsx đổi) + onsite evidence chờ; gắn vào PDP-UX-01, acceptance giữ Chưa làm, không thêm acceptance ID.
-
-Source P4 2026-11-15 (human lệnh "tiếp tục code phần kế"): related loop + presenter context `related` theo plan076 §5/§7. `cards.php` nhánh `related` (grouped 3/+N không cần layout=carousel, ratio class trên card, term chips hai lớp + `displayTagLimit`, `product_cat` chỉ related, không overlay badge trong image link, `appendQuoteContext` false); `inc/pdp-related.php` hooks (enqueue khi `is_product()` && active && plugin API; args `posts_per_page`/`columns` clamp; `wc_get_template_part` chỉ native `content-product` khi loop name `related` hoặc flag `single-product/related.php` — Woo 10.7 không có `woocommerce_before_related_products`); template-part `inc/templates/related-product-card.php`; CSS term-chips scoped `--related`. Inactive / plugin-off / thiếu CSS / override template → native. Mocked `tools/tests/pdp-related-card.test.php` + `pdp-related-hooks.test.php`. P0 onsite Gate B/C chưa PASS; REL-* giữ Chưa làm.
-
-Source P5 2026-11-15 (human lệnh "P5"): runbook `docs/testing/pdp-related-card-1.3.22.md` — fixtures R-A…R-H, thứ tự P0 A/B rồi REL-UX → REL-UI → REL-TECH → REL-TRACE, steps/expected/pass-fail/evidence per ID, WP-CLI, evidence log trống cho human. Gate B FAIL chặn REL-UI-01. URL/version human điền sau build. REL-* giữ Chưa làm.
-
-**Planning 2026-11-16 — Related Promote + admin global (chưa start):** human “lưu plan”. Model: Save 1 PDP = local only; nút áp dụng toàn trang = **copy** 19 key meta → option `skvn_pdp_related` (không bind, không mass-reset override khác, nguồn giữ override); global editor đích = submenu `SKVN Marine` (1.4.0 đổi label source Marine Blocks; ASE overlay tên menu, không option SKVN rename); khi start gỡ dual Theme Design group `related`. Storage/resolve/P1–P5 076 giữ. Plan [077](planning/077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md); decision D6. Acceptance mới REL-UX-03/04, REL-TECH-04 **Chưa làm**. REL-* 076 không đổi. Default: Theme Design `related` tiếp tục chạy đến lệnh implement. SemVer mặc định scope addition 1.3.22; start hoặc chuyển 1.4.0 cần lệnh riêng. Không bump/build/code trong lượt ghi.
-
 ### 1.3.23 — Post Page Basic Design Controls
 
-Status: **PLANNED — implementation Chưa làm, chưa start**.
-Confirmed: **2026-11-03** — sau 1.3.22; cùng ngoại lệ version và boundary ghi ở trên.
+Status: **IN PROGRESS — CURRENT từ 2026-11-16** theo lệnh human “Đẩy milestone lên bản kế tiếp” sau khi 1.3.22 tạm PASS. Implementation **Chưa làm**, chưa có runtime evidence; execution plan cần lập khi human giao coding (POST-TRACE-01).
+Confirmed: **2026-11-03** — sau 1.3.22; cùng ngoại lệ version và boundary ghi ở trên. Transition: **2026-11-16**; metadata working bump sang1.3.23 (bump-only, milestone development build).
 
 Scope: Single Post presets, có/không sidebar, độ rộng nội dung, vị trí ảnh đại diện, bật/tắt metadata/related posts, typography và khoảng cách; default chung + override giới hạn từng bài, Use default/Reset. Dùng native WordPress content/Gutenberg, tái sử dụng nền controls của 1.3.19/1.3.22; theme vẫn render PHP/GeneratePress. Không gộp Post Category Grid (SemVer còn TBD), không tự xây TOC mới hoặc mở template builder đầy đủ.
 
@@ -1084,7 +1030,7 @@ Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
 - [ ] POST-UX-01 — Editor UX: phân biệt default/override, controls có tác dụng, reset/save/reopen đúng; lỗi lưu giữ draft; keyboard/sidebar hẹp dùng được; evidence video/saved state.
 - [ ] POST-TECH-01 — Technical: không mất/nhân đôi native content, quyền/sanitize/escape đúng, không sửa GP parent; asset loading phù hợp, regression Product và bài cũ được kiểm; evidence source/network/console/build.
 - [ ] POST-TRACE-01 — Map acceptance liên quan **1.3.5** trước implementation; giữ nguyên status/checklist cũ, không coi version mới là bằng chứng hoàn thành công việc cũ.
-- [ ] Tạo runbook onsite riêng và human duyệt kết quả trước completion; chưa bắt đầu hoặc bump metadata.
+- [ ] Tạo runbook onsite riêng và human duyệt kết quả trước completion; bump metadata transition đã chạy 2026-11-16 (milestone development build), release approval riêng.
 
 Rationale tách mốc: Product cần QA Woo gallery/specs/Request Quote; Post cần QA nội dung Gutenberg và reading UX. Mỗi surface có evidence nghiệm thu độc lập, giảm phạm vi regression của từng lượt.
 

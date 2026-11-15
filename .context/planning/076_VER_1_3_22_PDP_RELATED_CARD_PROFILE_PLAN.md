@@ -1,6 +1,6 @@
 # V1 / 1.3.22 — PDP Related Card Profile & Chips (scope addition)
 
-Created: **2026-11-14**. Status: **IN PROGRESS — P1–P5 source added; P0 onsite Gate B/C chưa PASS; REL-* Chưa làm**. P5 2026-11-15: runbook `docs/testing/pdp-related-card-1.3.22.md`. P4 source 2026-11-15: presenter `related` + related loop adapter. Woo 10.7 không có `woocommerce_before_related_products` — P4 dùng `wc_get_loop_prop('name')==='related'` + flag `woocommerce_before/after_template_part` cho `single-product/related.php`.
+Created: **2026-11-14**. Status: **CLOSED cùng 1.3.22 (2026-11-16) — DONE_WITH_CARRY_OVER, human tạm PASS; rework 1.4.x (tension OPEN 2026-11-15)**. P1–P5 source đủ; P0 onsite Gate B/C và REL-* chỉ tạm PASS theo human, evidence runtime chưa thu — hoàn thiện trong rework1.4.x. P5 2026-11-15: runbook `docs/testing/pdp-related-card-1.3.22.md`. P4 source 2026-11-15: presenter `related` + related loop adapter. Woo 10.7 không có `woocommerce_before_related_products` — P4 dùng `wc_get_loop_prop('name')==='related'` + flag `woocommerce_before/after_template_part` cho `single-product/related.php`.
 
 **Amend 2026-11-16 (planning only):** human lưu [077](077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md) — Save 1 PDP = local; nút áp dụng toàn trang = **copy** 19 key → option site; global editor đích = admin `SKVN Marine` (không dual Theme Design). Q2 dưới đây là lịch sử UI hiện tại. Storage/resolve/P1–P5 076 **giữ**. 077 **chưa start**, không gỡ group `related` cho đến lệnh implement.
 

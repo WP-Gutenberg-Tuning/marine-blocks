@@ -1,9 +1,16 @@
 # V1 / 1.3.22 — PDP Related: Promote to site + admin global editor
 
-Created: **2026-11-16**. Status: **IN PROGRESS — source 2026-11-16; REL-UX-03/04/TECH-04 Chờ kiểm chứng.**
+Created: **2026-11-16**. Status: **CLOSED cùng 1.3.22 (2026-11-16) — source 2026-11-16 (commit `2f11904`); human tạm PASS cùng ngày (REL-UX-03/04/TECH-04 mức tạm); rework 1.4.x (tension OPEN 2026-11-15).**
 Current: **V1 / 1.3.22**. SemVer mặc định: **scope addition 1.3.22** (cùng option/meta plan076). Start / gộp 1.4.0 cần lệnh human riêng. Không bump, không chuyển current, không build.
 
-Human model (2026-11-16): chỉnh trên **một** trang sản phẩm → Save chỉ đổi trang đó → nút **áp dụng toàn trang** = **copy/promote** thông số đã lưu sang setting global. Không bind, không loop catalog.
+Human model (2026-11-16): chỉnh style related trong **panel Related products trên product editor (PDP)** → **Update** sản phẩm → nút **áp dụng toàn trang (Promote)** = copy meta `_skvn_pdp_related` đã lưu sang option site. **Không** lấy từ Page / Product Collection; đó là kênh khác (076 copy-from-page, optional admin bootstrap).
+
+**Phân biệt bắt buộc**
+
+| Kênh | Nguồn | UI | Mục đích |
+|---|---|---|---|
+| **Promote (077)** | Meta product sau Update | Panel sản phẩm → Apply to all products | Workflow chính: test 1 PDP rồi đẩy lên global |
+| Copy-from-page (076) | Block đầu tiên trên **page** | Admin only (không Promote) | Bootstrap tùy chọn khi chưa có PDP test; not linked |
 
 Nối: decision `docs/decisions/pdp-related-card-profile.md` (D6); plan [076](076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md) giữ schema/resolve/presenter/loop. Menu label 1.4.0 theo [047](047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md). Adapter Woo-in-theme là tension 2026-11-15 — **ngoài** plan này.
 
@@ -13,8 +20,8 @@ Nối: decision `docs/decisions/pdp-related-card-profile.md` (D6); plan [076](07
 
 - Site default đã là option `skvn_pdp_related` (`manage_options`). Per-product là meta `_skvn_pdp_related` + `override` (`edit_post`). Resolve: override true → dùng nguyên meta, **không merge** từ site.
 - Editor global hiện tại = Theme Design group `related` (plan076 Q2). Draft không preview canvas; Page Save không ghi group. Sidebar còn palette/heading/fonts + group `product`.
-- Copy v1 (076 §6) copy từ **Product Collection block đầu tiên trên page** → option. Không copy từ PDP đang test.
-- Panel product đã có Override / Use site default. **Chưa** có Promote.
+- Copy-from-page (076 §6) = **không phải Promote** — chỉ page → option, tách workflow PDP.
+- Panel product: Override + related card controls; Promote = đọc **meta đã save**, không POST attrs từ client.
 - Admin plugin đã có top-level `SKVN Marine` (`add_menu_page` slug `skvn-marine`): Footer, Header, Typography, Core Control, Preloader, Blog sidebar. Module: không hardcode reorder/rename; onsite ASE.
 
 ## Goal

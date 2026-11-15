@@ -1,6 +1,6 @@
 # PDP Related — Card Profile & Chip Display
 
-Status: ACTIVE
+Status: ACTIVE — human tạm PASS 2026-11-16 cùng 1.3.22 (DONE_WITH_CARRY_OVER); rework PDP Related theme-plugin independence (B/C) sang 1.4.x — tension OPEN 2026-11-15. Khi 1.4.x start: review/supersede các chốt storage/admin theo hướng B hoặc C.
 Milestone: V1 / 1.3.22 (scope addition 2026-11-14)
 Lifecycle: active
 Notes: Human chốt 2026-11-14 sau phản biện kiến trúc; gộp **1.3.22** qua Q&A 9 điểm. **2026-11-14 (amend):** owner `useCustomRelatedCard` (default off) — inactive = Woo native kể cả option đã save; active khi bool true sau resolve. Args: `posts_per_page = relatedCount`, `columns = clamp(relatedCount, 1, 4)`. Còn lại: site default Theme Design `related`; per-product panel + classic meta; grouped specs gate 060; chip hai lớp + `displayTagLimit`; copy một lần (first block only notice). Defer: upsells, intersection, token typography. Planning: `.context/planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md`. **2026-11-16 (amend, chưa implement):** D6 — Promote copy từ 1 PDP sang option; global editor đích admin `SKVN Marine`. Plan [077](../../.context/planning/077_VER_1_3_22_PDP_RELATED_GLOBAL_PROMOTE_AND_ADMIN_PLAN.md). Theme Design group `related` vẫn là UI đang chạy cho đến lệnh start 077.
@@ -30,8 +30,8 @@ Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` 
 
 - Lưu **subset attrs card** presentation-only (19 keys site / 19 + `override` meta). Action CTA colors reuse Collection `actionBackgroundColor` / `actionTextColor` / `actionHoverBackgroundColor` / `actionHoverTextColor` (token slug, default inherit).
 - **Không** lưu query attrs block (`categories`, `tags`, `itemsToShow`, …).
-- **Copy một lần (076):** “Copy card settings” từ page → sanitize vào option; set `useCustomRelatedCard` **true**; **first Product Collection block on page only**; not linked.
-- **Promote (D6, 077, chưa code):** copy 19 key từ meta product đang override → cùng option; force owner true; **không** copy `override`; nguồn giữ override; không mass-reset product khác; cap `manage_options` + confirm. Không bind.
+- **Promote (D6, 077):** copy 19 key từ **panel Related products trên product editor** → meta `_skvn_pdp_related` sau **Update** → option; force owner true; **không** từ Page; **không** copy `override`; nguồn giữ override; cap `manage_options` + confirm.
+- **Copy một lần (076, tách kênh):** admin “Copy card settings” từ **page** (Product Collection) → option; bootstrap tùy chọn; **không** thay Promote; not linked.
 
 ### D3 — Query (Woo only)
 
@@ -50,9 +50,9 @@ Render: `skvn_marine_blocks_render_product_card( $product, $attrs, 'related' )` 
 - Template swap scoped related loop only; plugin inactive → no swap.
 - Archive/grid/carousel contexts không đổi.
 
-### D6 — Promote + admin global (chốt hướng 2026-11-16, chưa implement)
+### D6 — Promote + admin global (chốt hướng 2026-11-16; source 077)
 
-Human: Save 1 PDP chỉ đổi trang đó; nút áp dụng toàn trang = copy thông số sang global.
+Human: chỉnh related trên **panel sản phẩm**; Update 1 PDP chỉ đổi PDP đó; Promote = copy meta đó sang global — **không** lấy từ Page.
 
 - Product Save không ghi option.
 - Promote = sanitize meta → `update_option( skvn_pdp_related )`; copy không link.
