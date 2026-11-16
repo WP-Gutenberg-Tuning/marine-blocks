@@ -230,6 +230,19 @@ function skvn_marine_blocks_design_bootstrap() {
 		'woocommerceAvailable' => class_exists( 'WooCommerce' ),
 		'postEditor'           => (bool) ( $screen && 'post' === $screen->base && $screen->is_block_editor() ),
 	);
+
+	$sidebar_icon = dirname( __DIR__, 2 ) . '/assets/icons/marine-blocks.svg';
+	if ( file_exists( $sidebar_icon ) ) {
+		$payload['iconUrl'] = plugins_url( 'assets/icons/marine-blocks.svg', dirname( __DIR__, 2 ) . '/skvn-marine-blocks.php' );
+	}
+	$sidebar_icon_hover = dirname( __DIR__, 2 ) . '/assets/icons/marine-blocks-hover.svg';
+	if ( file_exists( $sidebar_icon_hover ) ) {
+		$payload['iconHoverUrl'] = plugins_url( 'assets/icons/marine-blocks-hover.svg', dirname( __DIR__, 2 ) . '/skvn-marine-blocks.php' );
+	}
+	$sidebar_icon_selected = dirname( __DIR__, 2 ) . '/assets/icons/marine-blocks-selected.svg';
+	if ( file_exists( $sidebar_icon_selected ) ) {
+		$payload['iconSelectedUrl'] = plugins_url( 'assets/icons/marine-blocks-selected.svg', dirname( __DIR__, 2 ) . '/skvn-marine-blocks.php' );
+	}
 	$json    = wp_json_encode( $payload, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
 	if ( ! is_string( $json ) ) {
 		return;

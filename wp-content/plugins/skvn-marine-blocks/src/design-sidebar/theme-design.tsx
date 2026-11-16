@@ -13,7 +13,7 @@ type Snapshot = {
 	presets?: { label: string; value: string }[];
 	scopes?: { label: string; value: string }[];
 };
-declare global { interface Window { skvnMarineDesign?: { url: string; nonce: string; promoteNonce: string; canManageOptions: boolean; woocommerceAvailable: boolean; postEditor: boolean } } }
+declare global { interface Window { skvnMarineDesign?: { url: string; nonce: string; promoteNonce: string; canManageOptions: boolean; woocommerceAvailable: boolean; postEditor: boolean; iconUrl?: string; iconHoverUrl?: string; iconSelectedUrl?: string } } }
 
 class DesignRequestError extends Error {
 	code: string;
