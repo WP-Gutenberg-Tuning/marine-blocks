@@ -4,19 +4,19 @@ Date: 2026-06-08
 Status: ACTIVE
 Milestone: V1 / 1.3.24 (origin1.3.10 DEFERRED)
 Lifecycle: active
-Notes: Human gán1.3.24 ngày2026-11-07, PLANNED/chưa start; current giữ1.3.20. Filename giữ để bảo toàn liên kết (trước đây đổi từ1.5.0); không phải current hoặc implementation approval. Status ACTIVE không là runtime PASS; architecture/research còn mở theo plan018 phải được chốt trước source.
+Notes: Human gán 1.3.24 ngày 2026-11-07. Pointer hiện tại là 1.3.24, PLANNED, chưa start. Handoff code là plan 079. Filename giữ để bảo toàn liên kết. Status ACTIVE không là runtime PASS và không phải lệnh implement.
 
 ## Product contract update — 2026-11-09
 
 Human chốt O01–O13 trong [plan018, Contract hiện hành](../../../../.context/planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md#contract-hiện-hành--human-chốt-2026-11-09). Phần kiến trúc bên dưới tiếp tục áp dụng khi không trái contract mới. Các khác biệt cần đặc biệt lưu ý:
 
-- Step Slider **manual mặc định**, no swipe/drag; arrows và direct-step tabs vẫn có. `loop` là setting mặc định **Off**, không còn mặc định `true` như research technical report §3.2.
+- Không swipe/drag. Tab và mũi tên vẫn có.
 - Fullscreen là chiều cao tối thiểu và có thể nở theo nội dung; không dùng vùng cuộn nội dung riêng như technical report §5.6/§9 đề xuất. Artifact `min-height`/`autoHeight` là mẫu, chưa có runtime acceptance cho nội dung dài.
-- Autoplay dùng **một dwell time chung** 5/8/10 giây (mặc định 8 khi bật), tách khỏi **transition time**. Dwell bắt đầu sau khi chuyển bước hoàn tất; progress chỉ đo dwell. Editor có nhắc nhở nhỏ, không chặn lưu, khi nội dung có nguy cơ không đọc kịp; gợi ý tăng dwell chung, rút gọn/tách nội dung hoặc dùng manual. Chưa chốt giá trị transition và ngưỡng nhắc nhở.
-- Lượt đầu dùng fade. Wipe/text cascade/Ken Burns trong §Rationale/§Adopted và plan018 §8 là **Deferred có truy vết**, không phải acceptance runtime đã PASS; không tự gỡ các ý tưởng đó khỏi backlog.
+- **Điều chỉnh 2026-11-16:** autoplay và loop **mặc định On** ở giai đoạn dev 2. Manual là tắt autoplay, làm ở giai đoạn dev 1 và giữ lại. Dwell chung 5/8/10 giây, mặc định 8, tách khỏi transition. Progress chỉ đo dwell sau khi transition xong. O08-E chưa có ngưỡng, chưa nằm trong hai giai đoạn dev.
+- **Điều chỉnh 2026-11-16:** lượt 1.3.24 gồm fade, wipe và text cascade ở giai đoạn dev 1. Ken Burns vẫn Deferred. O11-A (chỉ fade) không còn hiệu lực.
 - Template 3/4/5 mặc định 4, cho native add/remove/reorder, cap thêm mới 8; child content lượt đầu giới hạn heading/paragraph/list/buttons. Print đủ bước, deep-link từng bước deferred.
 
-Review còn mở: khi người xem đang cuộn đọc bước dài mà autoplay tới hạn, tooltip editor một mình không giải quyết được. Đề xuất dừng autoplay đến khi bấm Play chưa được human chốt. Cần mockup/QA geometry và timing Swiper trước implementation; quyết định O01–O13 không tự start milestone 1.3.24.
+Khi người xem cuộn bước dài, dwell vẫn chạy. Đề xuất dừng autoplay đến khi bấm Play chưa được chốt. Geometry và timing Swiper kiểm trong plan 079. Contract này không tự start milestone 1.3.24.
 
 ## Decision
 
@@ -83,6 +83,8 @@ flowchart TD
 ```
 
 ## Control Policy
+
+> Danh sách preset bên dưới là bản 2026-06-08. Height viewport/tall/medium và Motion cinematic/gentle/none không còn là schema để code. O02 và điều chỉnh 2026-11-16 thay chúng. Schema nằm ở plan 079.
 
 Controls must use governed presets:
 
