@@ -6,6 +6,18 @@
 
 ---
 
+## V1 / 1.3.23 — Post Page Basic Design Controls — DEFERRED (stockpile 1.4.x)
+
+Status: **DEFERRED** — human 2026-11-16: dời sang **1.4.x stockpile** sau khi planning boundary Theme/template surfaces vs Marine Blocks (plan 078).
+Started: **2026-11-16** (metadata bump-only, **implementation Chưa làm**).
+Transitioned: **2026-11-16** — không PASS/DONE; current pointer chuyển **1.3.24** (PLANNED, không auto-start).
+
+Lý do: quyết định tách rõ theme builder/template khỏi block canvas (research 2026-11-03); shortcut Theme Design như 067 P3 không chấp nhận cho Post mà chưa có plan 078. Acceptance POST-* giữ tại MILESTONES §1.3.23; GATE-078 trước execution.
+
+Snapshot: scope/acceptance như MILESTONES §1.3.23 tại thời điểm defer — tất cả POST-* **Chưa làm**.
+
+---
+
 ## V1 / 1.3.22 — Product Page Basic Design Controls — DONE_WITH_CARRY_OVER (tạm PASS theo human)
 
 Status: **DONE_WITH_CARRY_OVER** — human “tạm ổn, tạm Pass và sẽ làm lại trong tương lai 1.4.x” (2026-11-16)
