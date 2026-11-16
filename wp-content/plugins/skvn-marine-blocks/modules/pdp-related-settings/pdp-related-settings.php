@@ -32,6 +32,7 @@ add_action( 'admin_post_skvn_marine_pdp_related_save', 'skvn_marine_blocks_pdp_r
 add_action( 'admin_post_skvn_marine_pdp_related_copy', 'skvn_marine_blocks_pdp_related_admin_copy' );
 add_action( 'wp_ajax_skvn_marine_pdp_related_promote', 'skvn_marine_blocks_pdp_related_promote_ajax' );
 add_action( 'wp_ajax_skvn_marine_pdp_related_copy_pages', 'skvn_marine_blocks_pdp_related_copy_pages_ajax' );
+add_action( 'enqueue_block_editor_assets', 'skvn_marine_blocks_pdp_related_editor_bootstrap', 20 );
 
 /**
  * Collection CTA palette slugs (empty = inherit card CSS).
@@ -465,6 +466,38 @@ function skvn_marine_blocks_pdp_related_promote_from_product( $product_id ) {
 }
 
 /**
+ * Ensure Promote AJAX config on product editor (merges into skvnMarineDesign).
+ *
+ * @return void
+ */
+function skvn_marine_blocks_pdp_related_editor_bootstrap() {
+	if ( ! wp_script_is( 'skvn-marine-blocks-editor', 'registered' ) ) {
+		return;
+	}
+
+	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+	if ( ! $screen || 'product' !== $screen->post_type ) {
+		return;
+	}
+
+	$patch = array(
+		'url'              => admin_url( 'admin-ajax.php' ),
+		'promoteNonce'     => wp_create_nonce( 'skvn_marine_pdp_related_promote' ),
+		'canManageOptions' => current_user_can( 'manage_options' ),
+	);
+	$json  = wp_json_encode( $patch, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
+	if ( ! is_string( $json ) ) {
+		return;
+	}
+
+	wp_add_inline_script(
+		'skvn-marine-blocks-editor',
+		'(function(c){window.skvnMarineDesign=Object.assign({},window.skvnMarineDesign||{},c);})(' . $json . ');',
+		'before'
+	);
+}
+
+/**
  * AJAX: promote product related settings to site default.
  *
  * @return void
@@ -653,7 +686,8 @@ function skvn_marine_blocks_pdp_related_admin_render_page() {
 		</form>
 
 		<hr />
-		<h2><?php echo esc_html__( 'Copy card settings', 'skvn-marine-blocks' ); ?></h2>
+		<h2><?php echo esc_html__( 'Copy card settings (from a page)', 'skvn-marine-blocks' ); ?></h2>
+		<p><?php echo esc_html__( 'Optional bootstrap from a marketing page — not Promote. To apply settings tested on a product, use the product editor: Related products → Update → Apply to all products.', 'skvn-marine-blocks' ); ?></p>
 		<p><?php echo esc_html__( 'Uses the first Product Collection block on the page only. Card styling is copied; query, layout and typography token keys are not.', 'skvn-marine-blocks' ); ?></p>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="skvn_marine_pdp_related_copy" />

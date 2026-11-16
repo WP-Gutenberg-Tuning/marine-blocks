@@ -143,6 +143,26 @@ function PdpRelatedPanel() {
 				{ __( 'Use site default', 'skvn-marine-blocks' ) }
 			</Button>
 			<ToggleControl label={ __( 'Use SKVN related cards', 'skvn-marine-blocks' ) } checked={ !! values.useCustomRelatedCard } disabled={ disabled } onChange={ ( useCustomRelatedCard ) => setRelated( { useCustomRelatedCard } ) } />
+			{ canPromote ? (
+				<>
+					<h3 style={ { margin: '1em 0 0.25em' } }>{ __( 'Site default', 'skvn-marine-blocks' ) }</h3>
+					<Button
+						variant="primary"
+						disabled={ promotePending || ! overrideOn || ! values.useCustomRelatedCard || isDirty }
+						onClick={ promoteToSite }
+					>
+						{ promotePending ? __( 'Applying…', 'skvn-marine-blocks' ) : __( 'Apply to all products', 'skvn-marine-blocks' ) }
+					</Button>
+					<p className="description">
+						{ isDirty
+							? __( 'Update the product before applying these settings site-wide.', 'skvn-marine-blocks' )
+							: __( 'Promotes this panel’s saved related card profile to the site default (not from a Page).', 'skvn-marine-blocks' ) }
+					</p>
+					{ promoteMessage && <Notice status={ promoteFailed ? 'error' : 'success' } isDismissible={ false }>{ promoteMessage }</Notice> }
+				</>
+			) : (
+				<p className="description">{ __( 'An administrator can apply this profile to the site default after you update the product.', 'skvn-marine-blocks' ) }</p>
+			) }
 			<SelectControl
 				label={ __( 'Image ratio', 'skvn-marine-blocks' ) }
 				value={ String( values.imageRatio ?? '' ) }
@@ -272,21 +292,6 @@ function PdpRelatedPanel() {
 			<p>{ __( 'Terms come from each related product. No fixed term picklist.', 'skvn-marine-blocks' ) }</p>
 			<ToggleControl label={ __( 'Allow product tags', 'skvn-marine-blocks' ) } checked={ !! values.chipAllowTags } disabled={ disabled || ! values.showProductTags } onChange={ ( chipAllowTags ) => setRelated( { chipAllowTags } ) } />
 			<ToggleControl label={ __( 'Allow product categories', 'skvn-marine-blocks' ) } checked={ !! values.chipAllowCategories } disabled={ disabled || ! values.showProductCategories } onChange={ ( chipAllowCategories ) => setRelated( { chipAllowCategories } ) } />
-			{ canPromote ? (
-				<>
-					<Button
-						variant="secondary"
-						disabled={ promotePending || ! overrideOn || ! values.useCustomRelatedCard || isDirty }
-						onClick={ promoteToSite }
-					>
-						{ promotePending ? __( 'Applying…', 'skvn-marine-blocks' ) : __( 'Apply to all products', 'skvn-marine-blocks' ) }
-					</Button>
-					<p className="description">{ __( 'Copies this product’s saved profile to the site default. Requires Update first.', 'skvn-marine-blocks' ) }</p>
-					{ promoteMessage && <Notice status={ promoteFailed ? 'error' : 'success' } isDismissible={ false }>{ promoteMessage }</Notice> }
-				</>
-			) : (
-				<p className="description">{ __( 'An administrator can apply this profile to the site default after you update the product.', 'skvn-marine-blocks' ) }</p>
-			) }
 		</PluginDocumentSettingPanel>
 	);
 }
