@@ -18,6 +18,7 @@ require_once __DIR__ . '/modules/header-settings/header-settings.php';
 require_once __DIR__ . '/modules/collection-render/collection-render.php';
 require_once __DIR__ . '/modules/category-grid/category-grid.php';
 require_once __DIR__ . '/modules/slider-render/slider-render.php';
+require_once __DIR__ . '/modules/step-slider-render/step-slider-render.php';
 require_once __DIR__ . '/modules/feature-showcase-render/feature-showcase-render.php';
 require_once __DIR__ . '/modules/typography-settings/typography-settings.php';
 require_once __DIR__ . '/modules/product-design/product-design.php';
@@ -155,6 +156,66 @@ function skvn_marine_blocks_register_blocks() {
 		);
 	}
 
+	$step_slider_view_script = __DIR__ . '/build/frontend.ts.js';
+	$step_slider_view_asset  = __DIR__ . '/build/frontend.ts.asset.php';
+	$step_slider_view_deps   = array();
+	$step_slider_view_ver    = file_exists( $step_slider_view_script ) ? filemtime( $step_slider_view_script ) : '1.3.23';
+
+	if ( file_exists( $step_slider_view_asset ) ) {
+		$asset                = require $step_slider_view_asset;
+		$step_slider_view_deps = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+		$step_slider_view_ver  = isset( $asset['version'] ) ? $asset['version'] : $step_slider_view_ver;
+	}
+
+	if ( file_exists( $step_slider_view_script ) ) {
+		wp_register_script(
+			'skvn-marine-step-slider-view',
+			plugins_url( 'build/frontend.ts.js', __FILE__ ),
+			$step_slider_view_deps,
+			$step_slider_view_ver,
+			true
+		);
+	}
+
+	$step_slider_core_style = __DIR__ . '/build/frontend.ts.css';
+
+	if ( file_exists( $step_slider_core_style ) ) {
+		wp_register_style(
+			'skvn-marine-step-slider-core',
+			plugins_url( 'build/frontend.ts.css', __FILE__ ),
+			array(),
+			filemtime( $step_slider_core_style )
+		);
+	}
+
+	$step_slider_style = __DIR__ . '/build/style-frontend.ts.css';
+
+	if ( file_exists( $step_slider_style ) ) {
+		wp_register_style(
+			'skvn-marine-step-slider-view',
+			plugins_url( 'build/style-frontend.ts.css', __FILE__ ),
+			wp_style_is( 'skvn-marine-step-slider-core', 'registered' )
+				? array( 'skvn-marine-step-slider-core' )
+				: array(),
+			filemtime( $step_slider_style )
+		);
+	}
+
+	// editor.css is not named style.css, so wp-scripts emits it as index.ts.css.
+	// The shared editor handle only loads style-index.ts.css.
+	$step_slider_editor_style = __DIR__ . '/build/index.ts.css';
+
+	if ( file_exists( $step_slider_editor_style ) ) {
+		wp_register_style(
+			'skvn-marine-step-slider-editor',
+			plugins_url( 'build/index.ts.css', __FILE__ ),
+			wp_style_is( 'skvn-marine-blocks-editor', 'registered' )
+				? array( 'skvn-marine-blocks-editor' )
+				: array(),
+			filemtime( $step_slider_editor_style )
+		);
+	}
+
 	$motion_script = __DIR__ . '/build/motion-view.ts.js';
 	$motion_asset  = __DIR__ . '/build/motion-view.ts.asset.php';
 	$motion_deps   = array();
@@ -234,6 +295,8 @@ function skvn_marine_blocks_register_blocks() {
 		'responsive-spacer',
 		'slider',
 		'slide',
+		'step-slider',
+		'step-slide',
 		'accordion',
 		'card-grid',
 		'card',
@@ -293,6 +356,46 @@ function skvn_marine_blocks_register_blocks() {
 				wp_style_is( 'skvn-marine-slider-view', 'registered' )
 			) {
 				$args['style_handles'] = array( 'skvn-marine-slider-view' );
+			}
+
+			if (
+				in_array( $block, array( 'step-slider', 'step-slide' ), true ) &&
+				wp_style_is( 'skvn-marine-blocks-editor', 'registered' ) &&
+				! isset( $args['editor_style_handles'] )
+			) {
+				$args['editor_style_handles'] = array( 'skvn-marine-blocks-editor' );
+			}
+
+			if (
+				in_array( $block, array( 'step-slider', 'step-slide' ), true ) &&
+				wp_style_is( 'skvn-marine-step-slider-editor', 'registered' )
+			) {
+				if ( ! isset( $args['editor_style_handles'] ) ) {
+					$args['editor_style_handles'] = array();
+				}
+
+				$args['editor_style_handles'][] = 'skvn-marine-step-slider-editor';
+			}
+
+			if (
+				in_array( $block, array( 'step-slider', 'step-slide' ), true ) &&
+				wp_style_is( 'skvn-marine-step-slider-view', 'registered' )
+			) {
+				$args['style_handles'] = array( 'skvn-marine-step-slider-view' );
+			}
+
+			if ( 'step-slider' === $block && wp_script_is( 'skvn-marine-step-slider-view', 'registered' ) ) {
+				$args['view_script'] = 'skvn-marine-step-slider-view';
+			}
+
+			if ( 'step-slider' === $block ) {
+				$args['render_callback']   = 'skvn_marine_blocks_render_step_slider';
+				$args['skip_inner_blocks'] = true;
+			}
+
+			if ( 'step-slide' === $block ) {
+				$args['render_callback']   = 'skvn_marine_blocks_render_step_slide';
+				$args['skip_inner_blocks'] = true;
 			}
 
 			if ( 'feature-showcase' === $block ) {

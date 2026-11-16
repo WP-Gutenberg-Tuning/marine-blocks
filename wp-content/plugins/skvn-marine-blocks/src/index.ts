@@ -22,6 +22,14 @@ import { Edit as SliderEdit } from './slider/edit';
 import { save as sliderSave } from './slider/save';
 import { registerSliderVariations } from './slider/variations';
 
+import stepSlideMetadata from './step-slide/block.json';
+import { Edit as StepSlideEdit } from './step-slide/edit';
+import { save as stepSlideSave } from './step-slide/save';
+
+import stepSliderMetadata from './step-slider/block.json';
+import { Edit as StepSliderEdit } from './step-slider/edit';
+import { save as stepSliderSave } from './step-slider/save';
+
 import cardGridMetadata from './card-grid/block.json';
 import { Edit as CardGridEdit } from './card-grid/edit';
 import { save as cardGridSave } from './card-grid/save';
@@ -76,6 +84,18 @@ registerBlockType( sliderMetadata.name, {
 	save: sliderSave,
 } );
 registerSliderVariations();
+
+registerBlockType( stepSlideMetadata.name, {
+	...stepSlideMetadata,
+	edit: StepSlideEdit,
+	save: stepSlideSave,
+} );
+
+registerBlockType( stepSliderMetadata.name, {
+	...stepSliderMetadata,
+	edit: StepSliderEdit,
+	save: stepSliderSave,
+} );
 
 registerBlockType( cardGridMetadata.name, {
 	...cardGridMetadata,
