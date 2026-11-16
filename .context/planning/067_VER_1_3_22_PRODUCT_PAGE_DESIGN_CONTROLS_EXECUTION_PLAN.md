@@ -1,6 +1,8 @@
 # V1 / 1.3.22 — Product Page Basic Design Controls
 
-2026-11-12. **Current từ 2026-11-13** — human “Đã xong toàn phần 1.3.21” + “Chuyển sang 1.3.22 ngay” đã mở khoá plan này. Đây là execution plan PDP-TRACE-01; implementation **Chưa làm**, chưa có runtime evidence.
+2026-11-12. **1.3.22** — execution plan PDP-TRACE-01; source đã ship (tạm PASS human 2026-11-16).
+
+**Amend 2026-11-16:** P3 global UI (Theme Design group `product`) tension với boundary Theme vs Block — optional rework **1.4.x stockpile**; không áp pattern này cho Post (1.3.23 defer). Xem [078](078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md).
 
 **2026-11-13:** §12–20 là hợp đồng implement cho agent cửa sổ ngắn. §1–11 giữ quyết định. Khi hai chỗ lệch, làm theo §12–20.
 
