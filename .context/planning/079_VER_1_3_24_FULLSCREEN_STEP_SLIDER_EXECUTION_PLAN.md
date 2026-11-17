@@ -68,7 +68,7 @@ Content & States dùng cho SS-UI-01–04: 4 bước mặc định, 1 bước, 8 
 
 Ken Burns, video nền, Content Actions riêng, deep-link từng bước, ngưỡng O08-E, và luật “cuộn thì dừng đến khi bấm Play”.
 
-Palette/mockup editor vẫn cần human xem khi làm SS-ED-01. Chưa có mockup không chặn schema đã chốt.
+Palette/mockup editor vẫn cần human xem khi làm SS-ED-01. Chưa có mockup không chặn schema đã chốt. Hai plan độc lập, chưa phải lệnh code: [081](081_VER_1_3_24_STEP_SLIDER_FRONTEND_VISUAL_PLAN.md) cho mặt frontend, [082](082_VER_1_3_24_STEP_SLIDER_EDITOR_UI_PLAN.md) cho editor.
 
 ## 7. Đọc trước khi sửa, rồi dừng
 
@@ -99,7 +99,7 @@ Không đọc `src/slider/view.ts`. Danh sách import CSS đã khóa ở §9 bư
 | Wipe | Trên `.skvn-step-slide__media` của slide active: `clip-path` từ `inset(0 100% 0 0)` tới `inset(0 0 0 0)` trong 800 ms. Fade do Swiper. Cả hai luôn chạy. |
 | Text cascade | Heading 0 ms, paragraph 100 ms, list 200 ms, buttons 300 ms. Duration 400 ms. `translateY(0.75rem)` và opacity 0 → 1. |
 | Reduced motion | `speed: 0`, không animation wipe, không cascade, chữ opacity 1. |
-| Cao | `min-height: 100svh` trên viewport và từng bước. `width: 100%`. Không `100vw`, không `margin` âm, không `overflow-x` trên shell. Thanh tab được `overflow-x: auto`. |
+| Cao | `min-height: 100svh` trên viewport và từng bước. `width: 100%`. Không `100vw`, không `margin` âm, không `overflow-x` trên shell. Thanh tab được `overflow-x: auto`. Human 2026-11-17 (O02-H): không đổi sang Viewport below header. Trừ header chờ theme tách khỏi GeneratePress. |
 | Module Swiper giai đoạn 1 | `A11y`, `EffectFade`, `Keyboard`, `Navigation`. Không import `Autoplay`. |
 | Tên file frontend | `src/step-slider/frontend.ts`. Cấm tên `view.ts` vì `package.json` đang xuất `src/slider/view.ts` thành `build/view.ts.js`. |
 | Hai lớp opacity | Opacity chữ = opacity `.swiper-slide` × opacity cascade. Giữ cả hai. Không bỏ opacity của cascade. Không tắt fade của content. Không đổi số 800 / 400 / 0 / 100 / 200 / 300. |

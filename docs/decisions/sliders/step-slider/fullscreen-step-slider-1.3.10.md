@@ -12,6 +12,7 @@ Human chốt O01–O13 trong [plan018, Contract hiện hành](../../../../.conte
 
 - Không swipe/drag. Tab và mũi tên vẫn có.
 - Fullscreen là chiều cao tối thiểu và có thể nở theo nội dung; không dùng vùng cuộn nội dung riêng như technical report §5.6/§9 đề xuất. Artifact `min-height`/`autoHeight` là mẫu, chưa có runtime acceptance cho nội dung dài.
+- **O02-H, 2026-11-17:** chiều cao giữ `min-height: 100svh` (cả khung nhìn). Không thêm preset Slider height, không dùng Viewport below header. Đồng bộ header với bước làm sau khi theme tách khỏi GeneratePress. Không sửa `themes/generatepress/`. Lần thứ hai một block cần đo header để trừ viewport: agent DỪNG và báo human trước khi copy hoặc tách hàm dùng chung. Tension OPEN `.context/TENSIONS_OPEN.md` 2026-11-17 15:43.
 - **Điều chỉnh 2026-11-16:** autoplay và loop **mặc định On** ở giai đoạn dev 2. Manual là tắt autoplay, làm ở giai đoạn dev 1 và giữ lại. Dwell chung 5/8/10 giây, mặc định 8, tách khỏi transition. Progress chỉ đo dwell sau khi transition xong. O08-E chưa có ngưỡng, chưa nằm trong hai giai đoạn dev.
 - **Điều chỉnh 2026-11-16:** lượt 1.3.24 gồm fade, wipe và text cascade ở giai đoạn dev 1. Ken Burns vẫn Deferred. O11-A (chỉ fade) không còn hiệu lực.
 - Template 3/4/5 mặc định 4, cho native add/remove/reorder, cap thêm mới 8; child content lượt đầu giới hạn heading/paragraph/list/buttons. Print đủ bước, deep-link từng bước deferred.

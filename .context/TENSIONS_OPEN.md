@@ -97,3 +97,17 @@ Milestone:  V1 / 1.3.2
 Status:     OPEN
 Resolved:
 Decision:   Conservative implementation: one isolated editor entry with removable public-API SlotFill actions; no settings, persistence, core patch, or custom clipboard format.
+
+## [2026-11-17 15:43] | slider, theme
+Tension:    Đo chiều cao header để trừ viewport hiện chỉ Slider thường có (`syncViewportHeight`, preset Viewport below header). Lần thứ hai cần tính năng tương tự phải báo human trước khi code.
+Context:    Human 2026-11-17 chốt Step Slider giữ `100svh` (O02-H). Đánh giá tách hàm dùng chung: chưa có lần lặp, selector `#masthead` buộc GeneratePress, tách shared lúc này là sớm. Human yêu cầu lưu tín hiệu.
+Proposal:   Chưa tách `src/shared/`. Chưa copy logic sang Step Slider. Khi một task sắp đo header/admin bar để đặt chiều cao block thứ hai, dừng và báo human. Human chọn giữ bản copy, tách hàm đo pixel, hay để theme ghi biến sau khi tách khỏi GeneratePress.
+Constraint: O02-H: đồng bộ header với Step làm sau khi theme tách khỏi GeneratePress. Không sửa `themes/generatepress/`.
+Severity:   high
+Tags:       slider, theme, agent
+Milestone:  V1 / 1.3.24
+Evidence:   `src/slider/view.ts` `syncViewportHeight` (đo `#masthead`/`.site-header` + `#wpadminbar`, ghi `--skvn-slider-viewport-offset`, gọi `swiper.updateSize`). CSS `.skvn-slider--height-viewport-below-header`. Step Slider chỉ `min-height: 100svh`.
+Default:    DỪNG chờ human
+Status:     OPEN
+Resolved:
+Decision:   OPEN
