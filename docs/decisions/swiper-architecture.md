@@ -70,6 +70,7 @@ CSS:
 ### Invariant
 
 > **`--skvn-parallax-inset` is server-owned (PHP inline style) for first paint.**  
+> **Superseded for the inset value by plan 070 (2026-11-13):** PHP and JS leave the inset at 0. Do not paint a negative inset to cover travel. Cover travel with `data-swiper-parallax-scale` (`S >= 1 + 2 * translate / 100`). The still image must match the editor crop.  
 > **`data-swiper-parallax-*` are injected in JS before `new Swiper()` on Swiper 11.**  
 > **Do not reintroduce post-init inject + `swiper.update()` solely for “loop clones” — that premise is invalid on this major.**  
 > **Set `data-swiper-parallax-duration` to match `speed` / `transitionDuration`.**

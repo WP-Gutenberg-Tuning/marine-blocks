@@ -1,0 +1,302 @@
+import { Button, Notice, PluginDocumentSettingPanel, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
+import { registerPlugin } from '@wordpress/plugins';
+import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { COLOR_PALETTE_OPTIONS } from '../collection/constants';
+
+declare global {
+	interface Window {
+		skvnMarineDesign?: {
+			url?: string;
+			promoteNonce?: string;
+			canManageOptions?: boolean;
+		};
+	}
+}
+
+type RelatedMeta = Record< string, string | boolean | number > & { override?: boolean };
+
+const defaults: RelatedMeta = {
+	useCustomRelatedCard: false,
+	showImage: true,
+	imageRatio: '1:1',
+	mediaLayout: 'flush',
+	showProductTags: true,
+	showProductCategories: false,
+	showSpecChips: true,
+	chipStyle: 'tag',
+	chipColorScheme: '',
+	productActionMode: 'quote',
+	customActionUrl: '',
+	actionBackgroundColor: '',
+	actionTextColor: '',
+	actionHoverBackgroundColor: '',
+	actionHoverTextColor: '',
+	chipAllowTags: true,
+	chipAllowCategories: false,
+	displayTagLimit: 3,
+	relatedCount: 4,
+};
+
+// Theme palette slugs only, never raw hex. Keep in sync with the Theme Design palette group.
+const chipColorSchemes: { label: string; value: string }[] = [
+	{ label: __( 'Primary', 'skvn-marine-blocks' ), value: 'primary' },
+	{ label: __( 'Accent', 'skvn-marine-blocks' ), value: 'accent' },
+	{ label: __( 'Surface', 'skvn-marine-blocks' ), value: 'surface' },
+	{ label: __( 'Text', 'skvn-marine-blocks' ), value: 'text' },
+];
+
+function PdpRelatedPanel() {
+	const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
+	const postId = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
+	const isDirty = useSelect( ( select ) => select( 'core/editor' ).isEditedPostDirty(), [] );
+	const [ meta, setMeta ] = useEntityProp( 'postType', 'product', 'meta' ) as [ Record< string, unknown >, ( value: Record< string, unknown > ) => void ];
+	const [ promotePending, setPromotePending ] = useState( false );
+	const [ promoteMessage, setPromoteMessage ] = useState( '' );
+	const [ promoteFailed, setPromoteFailed ] = useState( false );
+
+	if ( postType !== 'product' ) {
+		return null;
+	}
+
+	const stored = ( meta?._skvn_pdp_related && typeof meta._skvn_pdp_related === 'object'
+		? meta._skvn_pdp_related
+		: { override: false } ) as RelatedMeta;
+
+	const overrideOn = stored.override === true || stored.override === 1;
+	const values = overrideOn ? { ...defaults, ...stored } : defaults;
+	const disabled = ! overrideOn;
+
+	const setRelated = ( patch: Partial< RelatedMeta > ) => {
+		const next = overrideOn
+			? { ...stored, ...patch, override: true }
+			: { ...defaults, ...patch, override: true };
+		setMeta( { ...meta, _skvn_pdp_related: next } );
+	};
+
+	const setOverride = ( enabled: boolean ) => {
+		if ( enabled ) {
+			setMeta( { ...meta, _skvn_pdp_related: { ...defaults, ...stored, override: true } } );
+		} else {
+			setMeta( { ...meta, _skvn_pdp_related: { override: false } } );
+		}
+	};
+
+	const canPromote = window.skvnMarineDesign?.canManageOptions === true;
+	const promoteToSite = async () => {
+		const config = window.skvnMarineDesign;
+		if ( promotePending || ! canPromote || ! config?.url || ! config.promoteNonce || ! postId ) {
+			return;
+		}
+		if ( isDirty ) {
+			setPromoteFailed( true );
+			setPromoteMessage( __( 'Update the product first so the site default matches your saved settings.', 'skvn-marine-blocks' ) );
+			return;
+		}
+		if ( ! overrideOn || ! values.useCustomRelatedCard ) {
+			setPromoteFailed( true );
+			setPromoteMessage( __( 'Turn on override and SKVN related cards, then update the product.', 'skvn-marine-blocks' ) );
+			return;
+		}
+		// eslint-disable-next-line no-alert
+		if ( ! window.confirm( __( 'Overwrite the site default related card settings with this product’s saved profile? Other products with override stay unchanged.', 'skvn-marine-blocks' ) ) ) {
+			return;
+		}
+		setPromotePending( true );
+		setPromoteMessage( '' );
+		try {
+			const response = await fetch( config.url, {
+				method: 'POST',
+				credentials: 'same-origin',
+				cache: 'no-store',
+				body: new URLSearchParams( {
+					action: 'skvn_marine_pdp_related_promote',
+					nonce: config.promoteNonce,
+					productId: String( postId ),
+				} ),
+			} );
+			const json = await response.json();
+			if ( ! response.ok || ! json?.success ) {
+				throw new Error( json?.data?.message || __( 'Could not apply settings site-wide.', 'skvn-marine-blocks' ) );
+			}
+			setPromoteFailed( false );
+			setPromoteMessage( __( 'Applied to the site default. This product keeps its override.', 'skvn-marine-blocks' ) );
+		} catch ( error ) {
+			setPromoteFailed( true );
+			setPromoteMessage( error instanceof Error ? error.message : __( 'Could not apply settings site-wide.', 'skvn-marine-blocks' ) );
+		} finally {
+			setPromotePending( false );
+		}
+	};
+
+	return (
+		<PluginDocumentSettingPanel name="skvn-pdp-related" title={ __( 'Related products', 'skvn-marine-blocks' ) }>
+			<ToggleControl
+				label={ __( 'Override related products', 'skvn-marine-blocks' ) }
+				checked={ overrideOn }
+				onChange={ setOverride }
+			/>
+			{ ! overrideOn && <p>{ __( 'Using the site default.', 'skvn-marine-blocks' ) }</p> }
+			<Button variant="secondary" disabled={ ! overrideOn } onClick={ () => setMeta( { ...meta, _skvn_pdp_related: { override: false } } ) }>
+				{ __( 'Use site default', 'skvn-marine-blocks' ) }
+			</Button>
+			<ToggleControl label={ __( 'Use SKVN related cards', 'skvn-marine-blocks' ) } checked={ !! values.useCustomRelatedCard } disabled={ disabled } onChange={ ( useCustomRelatedCard ) => setRelated( { useCustomRelatedCard } ) } />
+			{ canPromote ? (
+				<>
+					<h3 style={ { margin: '1em 0 0.25em' } }>{ __( 'Site default', 'skvn-marine-blocks' ) }</h3>
+					<Button
+						variant="primary"
+						disabled={ promotePending || ! overrideOn || ! values.useCustomRelatedCard || isDirty }
+						onClick={ promoteToSite }
+					>
+						{ promotePending ? __( 'Applying…', 'skvn-marine-blocks' ) : __( 'Apply to all products', 'skvn-marine-blocks' ) }
+					</Button>
+					<p className="description">
+						{ isDirty
+							? __( 'Update the product before applying these settings site-wide.', 'skvn-marine-blocks' )
+							: __( 'Promotes this panel’s saved related card profile to the site default (not from a Page).', 'skvn-marine-blocks' ) }
+					</p>
+					{ promoteMessage && <Notice status={ promoteFailed ? 'error' : 'success' } isDismissible={ false }>{ promoteMessage }</Notice> }
+				</>
+			) : (
+				<p className="description">{ __( 'An administrator can apply this profile to the site default after you update the product.', 'skvn-marine-blocks' ) }</p>
+			) }
+			<SelectControl
+				label={ __( 'Image ratio', 'skvn-marine-blocks' ) }
+				value={ String( values.imageRatio ?? '' ) }
+				disabled={ disabled }
+				options={ [
+					{ label: '1:1', value: '1:1' },
+					{ label: '4:3', value: '4:3' },
+					{ label: '3:2', value: '3:2' },
+					{ label: '16:9', value: '16:9' },
+					{ label: __( 'Auto', 'skvn-marine-blocks' ), value: 'auto' },
+				] }
+				onChange={ ( imageRatio ) => setRelated( { imageRatio } ) }
+			/>
+			<SelectControl
+				label={ __( 'Media layout', 'skvn-marine-blocks' ) }
+				value={ String( values.mediaLayout ?? '' ) }
+				disabled={ disabled }
+				options={ [
+					{ label: __( 'Flush', 'skvn-marine-blocks' ), value: 'flush' },
+					{ label: __( 'Padded', 'skvn-marine-blocks' ), value: 'padded' },
+					{ label: __( 'Floating', 'skvn-marine-blocks' ), value: 'floating' },
+				] }
+				onChange={ ( mediaLayout ) => setRelated( { mediaLayout } ) }
+			/>
+			<ToggleControl label={ __( 'Show image', 'skvn-marine-blocks' ) } checked={ !! values.showImage } disabled={ disabled } onChange={ ( showImage ) => setRelated( { showImage } ) } />
+			<ToggleControl label={ __( 'Show product tags', 'skvn-marine-blocks' ) } checked={ !! values.showProductTags } disabled={ disabled } onChange={ ( showProductTags ) => setRelated( { showProductTags } ) } />
+			<ToggleControl label={ __( 'Show product categories', 'skvn-marine-blocks' ) } checked={ !! values.showProductCategories } disabled={ disabled } onChange={ ( showProductCategories ) => setRelated( { showProductCategories } ) } />
+			<ToggleControl label={ __( 'Show specification chips', 'skvn-marine-blocks' ) } checked={ !! values.showSpecChips } disabled={ disabled } onChange={ ( showSpecChips ) => setRelated( { showSpecChips } ) } />
+			<SelectControl
+				label={ __( 'Chip style', 'skvn-marine-blocks' ) }
+				value={ String( values.chipStyle ?? '' ) }
+				disabled={ disabled }
+				options={ [
+					{ label: __( 'Tag', 'skvn-marine-blocks' ), value: 'tag' },
+					{ label: __( 'Hashtag', 'skvn-marine-blocks' ), value: 'hashtag' },
+					{ label: __( 'Dot', 'skvn-marine-blocks' ), value: 'dot' },
+					{ label: __( 'Plain', 'skvn-marine-blocks' ), value: 'plain' },
+				] }
+				onChange={ ( chipStyle ) => setRelated( { chipStyle } ) }
+			/>
+			<SelectControl
+				label={ __( 'Chip color', 'skvn-marine-blocks' ) }
+				value={ String( values.chipColorScheme ?? '' ) }
+				disabled={ disabled }
+				options={ [
+					{ label: __( 'None', 'skvn-marine-blocks' ), value: '' },
+					...chipColorSchemes,
+				] }
+				onChange={ ( chipColorScheme ) => setRelated( { chipColorScheme } ) }
+			/>
+			<SelectControl
+				label={ __( 'Card action', 'skvn-marine-blocks' ) }
+				value={ String( values.productActionMode ?? '' ) }
+				disabled={ disabled }
+				options={ [
+					{ label: __( 'View product', 'skvn-marine-blocks' ), value: 'view' },
+					{ label: __( 'Request quote', 'skvn-marine-blocks' ), value: 'quote' },
+					{ label: __( 'Both', 'skvn-marine-blocks' ), value: 'both' },
+					{ label: __( 'Custom URL', 'skvn-marine-blocks' ), value: 'custom' },
+				] }
+				onChange={ ( productActionMode ) => setRelated( { productActionMode } ) }
+			/>
+			{ 'custom' === values.productActionMode && (
+				<TextControl
+					label={ __( 'Custom action URL', 'skvn-marine-blocks' ) }
+					value={ String( values.customActionUrl ?? '' ) }
+					disabled={ disabled }
+					onChange={ ( customActionUrl ) => setRelated( { customActionUrl } ) }
+				/>
+			) }
+			<SelectControl
+				label={ __( 'Button background', 'skvn-marine-blocks' ) }
+				value={ String( values.actionBackgroundColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionBackgroundColor ) => setRelated( { actionBackgroundColor } ) }
+			/>
+			<SelectControl
+				label={ __( 'Button text', 'skvn-marine-blocks' ) }
+				value={ String( values.actionTextColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionTextColor ) => setRelated( { actionTextColor } ) }
+			/>
+			<SelectControl
+				label={ __( 'Button hover background', 'skvn-marine-blocks' ) }
+				value={ String( values.actionHoverBackgroundColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionHoverBackgroundColor ) => setRelated( { actionHoverBackgroundColor } ) }
+			/>
+			<SelectControl
+				label={ __( 'Button hover text', 'skvn-marine-blocks' ) }
+				value={ String( values.actionHoverTextColor ?? '' ) }
+				disabled={ disabled }
+				options={ COLOR_PALETTE_OPTIONS as { label: string; value: string }[] }
+				onChange={ ( actionHoverTextColor ) => setRelated( { actionHoverTextColor } ) }
+			/>
+			<TextControl
+				label={ __( 'Chip limit per product', 'skvn-marine-blocks' ) }
+				help={ __( '0 shows all terms.', 'skvn-marine-blocks' ) }
+				type="number"
+				min={ 0 }
+				max={ 10 }
+				value={ String( values.displayTagLimit ?? '' ) }
+				disabled={ disabled }
+				onChange={ ( next ) => {
+					const limit = parseInt( next, 10 );
+					if ( Number.isNaN( limit ) ) return;
+					setRelated( { displayTagLimit: Math.min( 10, Math.max( 0, limit ) ) } );
+				} }
+			/>
+			<TextControl
+				label={ __( 'Related products count', 'skvn-marine-blocks' ) }
+				type="number"
+				min={ 1 }
+				max={ 10 }
+				value={ String( values.relatedCount ?? '' ) }
+				disabled={ disabled }
+				onChange={ ( next ) => {
+					const count = parseInt( next, 10 );
+					if ( Number.isNaN( count ) ) return;
+					setRelated( { relatedCount: Math.min( 10, Math.max( 1, count ) ) } );
+				} }
+			/>
+			<h3 style={ { margin: '1em 0 0.25em' } }>{ __( 'Chip sources (allowlist)', 'skvn-marine-blocks' ) }</h3>
+			<p>{ __( 'Terms come from each related product. No fixed term picklist.', 'skvn-marine-blocks' ) }</p>
+			<ToggleControl label={ __( 'Allow product tags', 'skvn-marine-blocks' ) } checked={ !! values.chipAllowTags } disabled={ disabled || ! values.showProductTags } onChange={ ( chipAllowTags ) => setRelated( { chipAllowTags } ) } />
+			<ToggleControl label={ __( 'Allow product categories', 'skvn-marine-blocks' ) } checked={ !! values.chipAllowCategories } disabled={ disabled || ! values.showProductCategories } onChange={ ( chipAllowCategories ) => setRelated( { chipAllowCategories } ) } />
+		</PluginDocumentSettingPanel>
+	);
+}
+
+registerPlugin( 'skvn-marine-pdp-related', {
+	render: PdpRelatedPanel,
+	icon: null,
+} );

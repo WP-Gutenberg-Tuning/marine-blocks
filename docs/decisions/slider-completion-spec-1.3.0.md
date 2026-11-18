@@ -335,5 +335,5 @@ Active related documents:
 
 - `docs/testing/onsite-slider-motion-1.3.2.md`
 - `.context/planning/archives/020_VERSION_1_3_2_FEATURE_SHOWCASE_AUTOPLAY_AND_LINKS_PLANNING.md`
-- `docs/decisions/fullscreen-step-slider-1.3.10.md`
+- `docs/decisions/sliders/step-slider/fullscreen-step-slider-1.3.10.md`
 - `.context/planning/018_VERSION_1_5_0_FULLSCREEN_STEP_SLIDER_PLANNING.md`

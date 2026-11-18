@@ -1,8 +1,15 @@
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import {
+	getSlideFillClassSuffix,
+	getSlideFillInlineStyle,
+	type SlideFillAttributes,
+} from './fill';
+import { focalPointToWrapperStyle, type FocalPoint } from './focal';
 
-type SlideAttributes = {
+type SlideAttributes = SlideFillAttributes & {
 	backgroundImageUrl: string;
 	backgroundImageAlt: string;
+	backgroundImageFocalPoint?: FocalPoint;
 	overlayOpacity: number;
 };
 
@@ -12,10 +19,19 @@ type SlideSaveProps = {
 
 export function save( { attributes }: SlideSaveProps ) {
 	const hasImage = Boolean( attributes.backgroundImageUrl );
+	const fillClassSuffix = getSlideFillClassSuffix( attributes, 'hero' );
+	const fillInlineStyle = getSlideFillInlineStyle( attributes, 'hero' );
+	const focalStyle = hasImage
+		? focalPointToWrapperStyle( attributes.backgroundImageFocalPoint )
+		: undefined;
 	const blockProps = useBlockProps.save( {
 		className: `skvn-slide swiper-slide${
 			hasImage ? ' skvn-slide--has-background' : ''
-		}`,
+		}${ fillClassSuffix }`,
+		style: {
+			...( fillInlineStyle || {} ),
+			...( focalStyle || {} ),
+		},
 	} );
 
 	return (

@@ -1,7 +1,9 @@
 # 05 — Step Slider 1.3.10: MVP cut cho demo
 
-> Full contract trong `.context/planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md`
-> quá lớn cho demo timeline. File này định nghĩa đường cắt. **Chờ human approve trước khi code.**
+> **Lịch sử demo, không phải handoff code.** Human 2026-11-16: nguồn implement là `.context/planning/079_VER_1_3_24_FULLSCREEN_STEP_SLIDER_EXECUTION_PLAN.md`. Delay 5/7/9/12 giây và lựa chọn slide hoặc fade trong file này không còn hiệu lực.
+
+> Full contract trong `.context/planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md`.
+> File này là đường cắt demo cũ.
 
 ---
 

@@ -9,6 +9,8 @@
 
 ## Bảng nhanh
 
+Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05): xem [Agent pitfalls AP-08–10](../../.context/PITFALLS.md#ap-08--guard-chỉ-tồn-tại-ở-copyroot-paste-và-descendants-đi-vòng) và [repair plan057 §19–25](../../.context/planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md#19-review-repair-plan--2026-11-05-baseline-0a53a2d). Clipboard ingress/descendant guards bị bỏ sót, pure tests thiếu actual call path, styled-span policy bị đổi bằng test sai. Repair có source và11 mocked controller tests PASS; runtime/onsite chưa PASS.
+
 | Pitfall | Triệu chứng | Layer sở hữu | Case |
 |---|---|---|---|
 | Swiper JS không kèm core CSS | Slider trắng / slide xếp dọc sau init | WordPress enqueue | [CASE-001](slider/001_SWIPER_JS_WITHOUT_CORE_CSS.md) |
@@ -20,6 +22,10 @@
 | Editor preview arrow reuse Swiper hook + CSS yếu | Circle “rỗng”, chevron xanh to/lệch; `aria-controls` trên preview button | Plugin editor CSS + `view.ts` selector | [CASE-006](slider/006_SLIDER_EDITOR_ARROW_PREVIEW_CSS_CASCADE.md) |
 | CSS vars build nhưng không emit define rule | Có `<style>` + `var(--x, inherit)`; hover không đổi; `--x` rỗng trên wrapper | PHP render_block adapter | [CASE-007](core-control/007_BUTTON_HOVER_CSS_VARS_BUILT_NOT_EMITTED.md) |
 | CSS frame extract sang file chưa enqueue | Root class/label hiện nhưng mất khung và màu nền | Editor asset graph + agent verification | [CASE-008](gutenberg/008_EDITOR_FRAME_CSS_EXTRACTED_NOT_ENQUEUED.md) |
+| Hero editor sửa một rule chiều cao | Stage Hero vẫn thấp sau khi đổi 356px hoặc 480px | `assets/css/slider-editor.css` thắng `style.css` | Pitfall 9, [AP-14](../../.context/PITFALLS.md#ap-14--sửa-chiều-cao-hero-editor-ở-rule-thua-cascade) |
+| Slider đổi size sau fade load/chuyển trang | Khung và tỉ lệ nhích khi fade xong | Offset CSS `5rem` rồi JS ghi header + admin bar; scrollbar | Pitfall 10 |
+| Marine Blocks không có trong sidebar editor | Page / SKVN Page Display / GeneratePress còn; Preferences → Panels chỉ WindPress | `wp_localize_script` ép boolean thành `"1"` | Pitfall 11, [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14) |
+| PDP related panel bật, frontend không đổi | Native Woo related (placeholder + nút outline); không có `.skvn-related-shared-card` | Theme chưa cập nhật (swap ở theme); option/meta owner off; gate `assets_ready`; path Woo; spread `override` | Pitfall 12, [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15) |
 
 ---
 
@@ -303,6 +309,7 @@ không giữ appender Gutenberg.
 [ ] useSelect không return object literal; preset qua context nếu có
 [ ] IME typing: Highlight updates không flash cả slide stack
 [ ] CASE-004 / CASE-005 verification steps nếu chạm add-slide hoặc slide/edit.tsx
+[ ] Hero stage: đừng sửa riêng 356px hoặc riêng max-height 480px. Pitfall 9. Rail list giữ 356px
 ```
 
 ---
@@ -329,6 +336,99 @@ Sau `npm run build`, human onsite verify để promote case sang `ONSITE_VERIFIE
 **Tránh:** kiểm đầy đủ DOM class → selector → import → build output thực tế → registered/enqueued handle → editor document/iframe → matched/computed style. Search đúng file CSS được đăng ký, không chỉ thấy selector ở một nơi bất kỳ trong build. Chuyển owner phải atomic, không xóa cơ chế cũ khi replacement chưa nối đủ; runtime evidence chưa có thì ghi đúng giới hạn. Không đoán cache hoặc thêm `!important` khi chưa biết CSS có được tải không. Existing parse/VM tests không phải asset-loading regression guard.
 
 ---
+
+## Pitfall 9 — Agent không nâng stage Hero editor
+
+**Xảy ra 2026-11-13.** Human gửi ảnh Slider Editor: heading Hero, paragraph và nút nằm sát trong stage. Yêu cầu tăng chiều cao, thảo luận trước. Không thấy log một lượt sửa mỗi một rule rồi thất bại.
+
+Agent trước không làm được vì nhiệm vụ đang mở là bám Concept01. Plan 062/063 khóa sàn `356px` và đòi human duyệt trước khi đổi tỷ lệ. “Content được cao hơn, không cắt” đọc như ô thấp đã đúng. DP-05 thì ghi lần đặt `max-height: 480px` lên wrapper đã làm vỡ cả editor, và cách sửa là giữ trần trên slide. Lần này làm được sau khi human chọn phương án A, tức delta mà plan đang đòi. CSS chỉ là bước sau quyết định đó.
+
+**Cơ chế nếu đã quyết nâng mà sửa nhầm file:**
+
+- `assets/css/slider-editor.css`: `.skvn-slider.skvn-slider--editor-focus .skvn-slide--editor` có `min-height: 356px`. Đây là sàn stage ngắn của Concept01, specificity 0,3,0. File này enqueue handle `skvn-marine-slider-editor`, phụ thuộc `style-view`, version `filemtime`.
+- `src/slider/style.css`: `.skvn-slide--hero-max-height` có `max-height: 480px` và `min-height: 0`. Class chỉ thêm trong `slide/edit.tsx` khi preset là Hero. Specificity 0,1,0.
+
+Sửa `480px` trong `style.css` không nâng stage: rule 356px vẫn thắng `min-height`. Nâng 356px lên 36rem mà không gỡ trần trên selector mạnh hơn thì `max-height: 480px` vẫn kẹp hộp. Frontend `.skvn-slider--hero .skvn-slide` dùng `clamp(30rem, 68vh, 48rem)` nhưng thua rule editor.
+
+**Human chọn A.** Chỉ Hero trong editor: `min-height: 36rem`, `max-height: none`, selector `.skvn-slider.skvn-slider--editor-focus .skvn-slide--editor.skvn-slide--hero-max-height`. Danh sách slide giữ `max-height: 356px`. Slide không phải Hero giữ sàn 356px. Không đổi frontend.
+
+**Tránh:** Khi stage editor thấp, đo computed `min-height` và `max-height` trên `.skvn-slide--editor`, rồi tìm cả hai file. Rule mới phải thắng cả sàn 356px và trần 480px. Đừng kéo rail lên theo stage. Đừng dùng `68vh` trong post editor.
+
+**Chưa đo lại.** Source có. Human reload editor và đo chiều cao ô xanh khoảng 576px.
+
+## Pitfall 10 — Slider đổi size nhẹ sau fade load đầu
+
+**Xảy ra 2026-11-13.** Human: chuyển loading sang trang còn gượng; fade xong slider đổi size và tỉ lệ nhẹ. Đo sau khi trang đã đứng yên, đang đăng nhập:
+
+```text
+w 1903, h 407, ratio 4.676, initialized true, offset 120px, inlineH rỗng, scrollbar 17
+```
+
+**Human 2026-11-13:** phần nhảy lớn khi đăng nhập là admin bar; lần load đầu vẫn nhích nhẹ; tạm bỏ qua, không sửa trong mốc này.
+
+**State delta:**
+
+```text
+State A: trong fade — ảnh chụp View Transition, offset CSS fallback 5rem (80px)
+State B: fade xong — trang thật, offset JS 120px, scrollbar 17px
+Delta:   cao hơn khoảng 40px trong ảnh chụp; rộng hơn 17px
+```
+
+Chiều cao settled là `100dvh − 120px = 407`, nên viewport lúc đo khoảng 527px (cửa sổ thấp hoặc DevTools mở). `inlineH` rỗng: Swiper không ghi pixel height. Class preset là `viewport-below-header`. `view.ts` `syncViewportHeight()` chỉ chạy với preset này: đo `#masthead, .site-header` + `#wpadminbar`, ghi `--skvn-slider-viewport-offset`, rồi `updateSize()`.
+
+Ba chẩn đoán, chỉ số 2 được số đo chốt:
+
+1. Fade chuyển trang trong `inc/preloader.php` chỉ đổi `::view-transition-old(root)` và `::view-transition-new(root)`. `::view-transition-group(root)` vẫn nội suy width/height. Ảnh chụp được lấy trước khi script slider chạy. Plan 046 yêu cầu chỉ fade, không morph. Đây là cảm giác gượng.
+2. Fallback trong `src/slider/style.css` là `var(--skvn-slider-viewport-offset, 5rem)`. Sau script thành `120px`. 120px = admin bar 32px (chỉ khi đăng nhập) + header khoảng 88px. Khách không có 32px đó. Phần header so với 80px còn khoảng 8px.
+3. Scrollbar 17px xuất hiện khi ảnh chụp bị gỡ. Cao theo `dvh` gần như giữ, rộng giảm, `object-fit: cover` crop lại. Có với mọi người. Cùng kiểu trên overlay cũ: `html.skvn-preloading { overflow: hidden }` trong `inc/preloader.php`, class bị gỡ lúc fade overlay kết thúc.
+
+**Nếu sửa sau:** giữ hộp settled (offset thật, kể cả admin bar khi có). Đưa offset cuối vào trước ảnh chụp: cao header đã biết cộng `html.admin-bar` 32px, thay cho đoán `5rem`. Ổn scrollbar (`scrollbar-gutter: stable`) để rộng không đổi lúc fade xong. Tắt morph của `::view-transition-group(root)` nếu muốn fade không kéo size. Đừng gỡ admin bar khỏi phép đo — 120px là chiều cao đúng khi đang đăng nhập.
+
+**Đừng làm:** coi Swiper inline height là thủ phạm khi `style.height` trống. Đừng sửa preset Hero `clamp(30rem, 68vh, 48rem)` cho case này; rule viewport (0,3,0) thắng rule Hero (0,2,0).
+
+## Pitfall 11 — Sidebar Marine Blocks không mount vì boolean thành `"1"`
+
+**Xảy ra 2026-11-14.** Human mở page editor, không thấy Marine Blocks. Preferences → Panels chỉ có WindPress. Plugin đã build và upload.
+
+**State delta:**
+
+```text
+State A (kỳ vọng): postEditor === true (boolean) → PluginSidebar mount
+State B (lỗi):     postEditor === "1" (string) → DesignSidebar trả null
+Delta:             wp_localize_script ép (string) true thành "1"
+```
+
+Chi tiết, consumer `woocommerceAvailable === false`, và fix: [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14).
+
+**Đừng làm:** đổ cho bundle cũ khi `skvnMarineDesign` đã có trên trang và lệch file chỉ khoảng trăm byte. Đừng tìm Marine Blocks trong Preferences → Panels. Đừng nới `=== true` thành truthy rồi giữ `wp_localize_script`.
+
+## Pitfall 12 — PDP related: editor bật SKVN cards, frontend vẫn Woo native
+
+**Xảy ra 2026-11-15.** Panel sản phẩm Override + Use SKVN related cards (Floating, Both, chips) bật. Frontend related không đổi.
+
+**State delta:**
+
+```text
+State A (kỳ vọng): related.php → related-product-card.php → .skvn-related-shared-card
+State B (lỗi):     related.php → Woo content-product.php
+                   placeholder “HÌNH SẮP CẬP NHẬT” + nút outline Request a Quote
+Delta:             template không swap. Không phải card SKVN thiếu CSS.
+```
+
+**Case này do gì (thứ tự):**
+
+1. **Theme chưa cập nhật — human chốt onsite 2026-11-15.** Panel thuộc plugin nên editor bật. Swap Woo (`add_filter('wc_get_template_part')`) chỉ register khi theme load `inc/pdp-related.php`. Theme cũ = DOM native, không fatal. 1.3.22 vẫn cần zip theme+plugin cùng gói. Độc lập plugin/theme = tension 1.4.0, ideation `docs/ideations/pdp-related-theme-plugin-independence.md`.
+2. **Owner chưa persist — runtime local.** `wp option get skvn_pdp_related` → option không tồn tại. Default `useCustomRelatedCard: false` → P4 **cố ý** giữ Woo native. Panel document ≠ Theme Design; cần **Update** sản phẩm mới ghi `_skvn_pdp_related`. Toggle inspector không phải bằng chứng DB.
+3. **Spread `override`.** `{ override: true, ...defaults, ...stored }` để `stored.override: false` thắng. Toggle Override không ghi. Đổi control khác (`setRelated`) mới gắn `override: true` trong memory → editor trông bật, meta có thể vẫn off.
+4. **Swap gắn `assets_ready` lúc enqueue.** Header `is_active()` false (đúng khi option/meta chưa có) → không swap cả khi render. CSS enqueue fail cũng ra native HTML.
+5. **Path Woo so tuyệt đối** `plugin_path()/templates/content-product.php` — tokenize/realpath/`WP_PLUGIN_DIR` lệch thì không swap.
+6. **Meta không phải array** (JSON string / `stdClass`) → bỏ override, rơi về option site.
+
+Local runtime đã có adapter + `product-card.css` khi theme đủ file. Không phải upsells, không phải DP-10.
+
+Chi tiết và source fix: [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15).
+
+**Đừng làm:** sửa CSS related/placeholder khi DOM vẫn `li.product` native. Đừng deploy mỗi plugin khi swap còn nằm theme. Đừng coi panel checked là owner on. Đừng gắn swap vào enqueue-time CSS. Đừng spread `...stored` sau `override: true`.
 
 ## Related
 

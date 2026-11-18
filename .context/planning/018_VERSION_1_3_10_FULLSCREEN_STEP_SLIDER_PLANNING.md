@@ -1,12 +1,45 @@
 # V1 / 1.3.10 — Fullscreen Step Slider Planning
 
-Status: PENDING — DEFERRED sang stack item **M5** (roadmap 039), chưa cấp SemVer mới.
+Status: **PLANNED — chưa start**. Human gán **V1 / 1.3.24 — Fullscreen Step Slider** ngày **2026-11-07**: 1.3.10 DEFERRED → M5 (phần Step Slider) → 1.3.24. Current pointer là **1.3.24** từ 2026-11-16; implementation chưa start. Working metadata có thể vẫn `1.3.23`. Filename giữ để bảo toàn liên kết.
+
+Handoff để code: [079](079_VER_1_3_24_FULLSCREEN_STEP_SLIDER_EXECUTION_PLAN.md). Contract bên dưới là nguồn sản phẩm. §5–§8 và §14.3–§14.4 chỉ để truy vết.
+
+## Contract hiện hành — human chốt 2026-11-09, điều chỉnh 2026-11-16
+
+Phần này là contract sản phẩm hiện hành cho Step Slider 1.3.24. Các đề xuất trong §1–§14, [decision gốc](../../docs/decisions/sliders/step-slider/fullscreen-step-slider-1.3.10.md) và tài liệu nghiên cứu chỉ còn hiệu lực khi không trái phần này. Quyết định thiết kế không phải bằng chứng source/runtime PASS hoặc lệnh bắt đầu milestone.
+
+| ID | Quyết định hiện hành | Kế hoạch ban đầu bị thay thế / điều chỉnh |
+|---|---|---|
+| O01 | Gộp contract hiện hành vào plan018; giữ các phần cũ để truy vết. | §14.4 còn liệt kê nhiều câu hỏi trước handoff; các câu đã chốt dưới đây không được hỏi lại. |
+| O02 | Fullscreen là **chiều cao tối thiểu**; bước dài làm section nở và cuộn cùng trang, không tạo vùng cuộn nội dung riêng. Không tự cuộn dọc trang khi đổi bước. | Nghiên cứu [technical report](../../docs/ideations/sliders/from-soil-to-harvest/skvn-step-slider-technical-report-m5%20.md) §5.6/§9 đề xuất scroll nội bộ; áp dụng O02-A thay cho hướng đó. Artifact `step-slider-prototype[-manual].html` dùng `min-height` và `autoHeight`, chỉ là mẫu source, chưa có QA dài→ngắn/zoom. |
+| O03 | Ảnh cover có điểm lấy nét từng bước, overlay theo vùng chữ và surface đỡ chữ tùy chọn; thiếu/lỗi ảnh vẫn đọc được chữ và controls. | §5/§7 chỉ nêu ảnh/overlay/text position, chưa có focal point và fallback đầy đủ. |
+| O04 | Editor preview tĩnh, các child xếp dọc; nhãn sửa inline tại child, một owner attribute; content ở canvas, controls theo Inspector/Design Sidebar có fallback. | §14.4 hỏi lại inline hay sidebar; câu hỏi đó đã đóng. Palette/mockup vẫn cần kiểm. |
+| O05 | Template khởi tạo 3/4/5, mặc định 4; sau đó native add/remove/reorder, tối đa 8 bước mới. Không tự cắt child vượt 8 do import/legacy. | Nghiên cứu [Gutenberg planning report](../../docs/ideations/sliders/from-soil-to-harvest/skvn-step-slider-gutenberg-planning-report.md) §3 đề xuất số bước cố định và giảm preset; §12 của plan cho add/remove/reorder. Không có thao tác đổi preset phá nội dung. |
+| O06 | Child dùng heading/paragraph/list/buttons; CTA có thể bỏ; không mở columns/forms/embeds/slider lồng trong lượt đầu. | §4/§5/§7 nhắc columns và nội dung rộng hơn; lượt đầu theo allowlist này. Nội dung legacy/import ngoài allowlist không bị xóa âm thầm. |
+| O07 | Setting Loop, **mặc định On** khi giai đoạn dev 2 xong. On: mũi tên và autoplay quay vòng. Off: mũi tên dừng ở hai đầu, autoplay dừng sau bước cuối. Giai đoạn dev 1 chưa chạy loop. | O07-C ngày 2026-11-09 để mặc định Off. Human 2026-11-16 đổi mặc định thành On và dời runtime loop sang giai đoạn dev 2. |
+| O08 | **Autoplay mặc định On** khi giai đoạn dev 2 xong. Manual là tắt autoplay: có ở giai đoạn dev 1 và giữ lại sau đó. Dwell chung 5/8/10 giây, mặc định 8; transition là khoảng riêng. Progress chỉ đo dwell, bắt đầu khi transition xong; đổi bước thì reset; bấm bước đang mở không reset; pause giữ phần còn lại. | O08 ngày 2026-11-09 để manual làm mặc định. Human 2026-11-16 đổi mặc định thành autoplay On, tách manual / autoplay+loop theo giai đoạn dev. Không thêm per-step duration, timer thứ hai hoặc CSS clock độc lập. Không lấy `speed ~600–800` của report hay `speed: 700` của prototype làm giá trị đã chốt. |
+| O08-E | Editor hiển thị **nhắc nhở nhỏ, không chặn lưu** khi nội dung một bước có nguy cơ không đọc kịp trong thời gian đứng đã chọn; gợi ý tăng thời gian đứng chung. Nếu đã ở mức cao nhất, gợi ý rút gọn/tách nội dung hoặc dùng manual. Tooltip/nhắc nhở phải đọc được bằng keyboard/screen reader và không dựa riêng vào hover. | §7/§12 và technical report chưa có cảnh báo độ dài; quyết định mới bổ sung Editor UX. Chưa chốt ngưỡng ước tính, cách đếm nội dung core blocks, hoặc wording; cần mockup và fixture trước implementation. Không tự đổi thời gian hoặc tạo duration riêng từng child. |
+| O09 | Focus vào slider dừng autoplay, chỉ chạy lại khi người dùng chọn Play; hover/hidden/offscreen tạm pause theo state policy, reduced motion chặn autoplay/motion. | §6 và technical report F7 mô tả pause/resume tổng quát; không được tự resume sau khi focus rời slider. |
+| O10 | Mobile giữ arrows và nhãn chữ trên thanh step cuộn ngang; cuộn thanh không đổi bước. | Artifact mobile ép 4 tab vừa hàng, ellipsis nhãn; không lấy hành vi đó làm production contract. |
+| O11 | Lượt 1.3.24 gồm **fade, wipe và text cascade**, làm trong giai đoạn dev 1 cùng manual. **Ken Burns Deferred**, chưa gán version. Không có control chọn effect. Reduced motion đổi bước tức thì và hiện chữ ngay. | O11-A ngày 2026-11-09 chỉ giữ fade và deferred cả wipe, text cascade, Ken Burns. Human 2026-11-16 đưa fade, wipe và text cascade vào 1.3.24; chỉ Ken Burns còn deferred. |
+| O12 | Chưa làm Content Actions adapter riêng cho Step; dùng thao tác Gutenberg native. | §14.4 còn mở metadata/Content Actions; adapter Step deferred đến khi schema ổn định. |
+| O13 | Bản in hiển thị đủ bước theo thứ tự, bỏ controls/motion; chỉ hứa anchor toàn block, chưa có deep-link từng bước. | §10 có no-JS fallback nhưng chưa quy định print/hash. Native child anchors vẫn cần kiểm để không tạo link tới nội dung không thể mở. |
+
+**Điểm cần kiểm/định nghĩa tiếp, không đảo quyết định trên:** hằng số thời lượng fade/wipe và nhịp text cascade, chốt ở spike giai đoạn 1; ngưỡng và câu chữ nhắc nội dung dài (O08-E, chưa đưa vào hai giai đoạn dev); geometry bước dài→ngắn, thanh tabs, zoom/mobile; Swiper 11.2.10 có bắt đầu dwell sau transition hay không, kiểm ở spike giai đoạn 2. Khi người xem cuộn bước dài, dwell vẫn chạy. Đề xuất “cuộn thì dừng đến khi bấm Play” chưa được chốt. Không suy PASS từ artifact hoặc tài liệu Slider Revolution.
+
+**Giai đoạn dev, trong cùng 1.3.24:**
+
+1. Manual: tab, mũi tên, fade, wipe, text cascade. Mũi tên dừng ở hai đầu. Chưa có runtime autoplay/loop.
+2. Autoplay mặc định On, loop mặc định On, dwell/progress/pause. Manual vẫn là tắt autoplay.
+
+Ken Burns nằm ngoài hai giai đoạn.
+
 Created: 2026-06-08
 Current milestone: **V1 / 1.3.17** (xem `.context/MILESTONES.md`). Bản ghi này dùng 1.3.10 vì milestone `V1 / 1.3.10 — Fullscreen Step Slider` đã được đăng ký trong `AGENTS.md` §9; stack mapping `1.3.10 → M5` nằm ở `.context/planning/039_ROADMAP_C_B2B_TOOLKIT_CAROUSEL_FIRST_PLANNING.md`.
 
 > Header cũ của file ghi `V1 / 1.5.0` và `Current milestone remains: V1 / 1.2.1`; cả hai dòng đã lỗi thời và được sửa ở đợt nghiên cứu 2026-10-14 (xem §14). Scope và acceptance của các mục 1–13 được giữ nguyên.
 >
-> **Không có SemVer nào được cấp cho M5.** Khi human đưa M5 vào triển khai, agent phải đề xuất SemVer theo `AGENTS.md` §0 và `MILESTONES.md` (`Milestone stack → SemVer`) rồi chờ human xác nhận.
+> **Step Slider đã chốt version 1.3.24** (human2026-11-07, ngoại lệ PATCH cho feature theo precedent1.3.22–23). Không hỏi lại version; start cần lệnh riêng. Không kích hoạt toàn bộ M5.
 
 ## 1. Decision
 
@@ -109,6 +142,8 @@ metadata:
   </button>
 </div>
 ```
+
+> **Không dùng §5–§8 làm schema hay runtime để code.** Handoff là [plan 079](079_VER_1_3_24_FULLSCREEN_STEP_SLIDER_EXECUTION_PLAN.md), theo contract phía trên sau điều chỉnh 2026-11-16. Phần dưới giữ để truy vết.
 
 ## 5. Attribute Ownership
 
@@ -305,6 +340,8 @@ Prototype là **HTML nghiên cứu**, không phải Gutenberg block. Số liệu
 | Gutenberg plan | Block candidate `skvn-marine/seafood-slider` / `seafood-slide` — **chưa phê duyệt đăng ký, ngoài scope Step** | `docs/ideations/sliders/seafood-store/skvn-seafood-slider-gutenberg-plan.md` |
 
 Seafood chỉ được dùng để **so sánh interaction/composition** (info-panel mở thay nửa slide, split-screen 50/50, wrap bất đối xứng, không autoplay). Technical report của Step đã map những khác biệt này sang **scope B (deferred)** ở F13–F18. Đưa Seafood vào scope M5 là quyết định của human, không phải kết luận của nghiên cứu.
+
+> **Không dùng §14.3–§14.4 làm danh sách câu hỏi để code.** O04, O05, O07, O08, O11 và O12 đã chốt. Bản 2026-11-16 điều chỉnh O07, O08 và O11. Handoff: [plan 079](079_VER_1_3_24_FULLSCREEN_STEP_SLIDER_EXECUTION_PLAN.md).
 
 ### 14.3 Bảng truy vết feature/decision → nguồn → trạng thái → conflict → điều kiện triển khai
 

@@ -58,6 +58,34 @@ Status:     OPEN
 Resolved:
 Decision:   OPEN
 
+## [2026-11-15 15:34] | theme, woocommerce
+Tension:    PDP related: panel/option/presenter thuộc plugin, nhưng swap Woo related loop (`wc_get_template_part` + adapter template) thuộc theme — cập nhật plugin không hiện SKVN card; conflict identity Marine Blocks (plugin độc lập theme).
+Context:    Human onsite related không đổi sau khi bật Override + Use SKVN related cards. Human chốt pitfall = không cập nhật theme. Yêu cầu lưu phân tích và tension; làm chi tiết sau đổi tên 1.4.0. Không implement lúc ghi.
+Proposal:   1.3.22 giữ theme adapter. Khi start 1.4.0: đọc ideation rồi lập execution plan chuyển hook Woo + adapter vào plugin (B) hoặc hybrid plugin-default + theme override (C). Inventory archive card 060 cùng pattern; không tự gộp nếu human chưa chọn.
+Constraint: Plan 047: "Plugin có styling/runtime riêng, không phụ thuộc WindPress/theme SKVN". MB-06: plugin độc lập theme. A2: Visual/layout → theme. Logic/data → plugin. Plan076 P4 đặt swap trong theme.
+Severity:   low
+Tags:       theme, woocommerce, blocks, planning
+Milestone:  V1 / 1.4.0
+Evidence:   Theme `functions.php` require `inc/pdp-related.php`; `add_filter('wc_get_template_part', 'skvn_marine_related_template_part')` chỉ theme. Plugin `pdp-related-settings.php` + `cards.php` không hook Woo related. Human 2026-11-15: không cập nhật theme. Ideation `docs/ideations/pdp-related-theme-plugin-independence.md`. DP-11 / Pitfall 12.
+Default:    Conservative 1.3.22: không chuyển hook; deploy theme+plugin cùng gói. 1.4.0 start: lập plan chi tiết trước code; chưa chọn B vs C thì DỪNG.
+Status:     OPEN
+Resolved:
+Decision:   OPEN
+
+## [2026-11-15] | woocommerce, planning
+Tension:    Plan076 §7 đặt template-swap related vào `woocommerce_before_related_products` / `woocommerce_after_related_products`, nhưng Woo 10.7.0 installed không đăng ký hai hook đó.
+Context:    P4 related loop adapter; P0 GATE A đã map `woocommerce_output_related_products_args`, `single-product/related.php` @10.3.0, `wc_get_template_part`, và `wc_set_loop_prop( 'name', 'related' )`.
+Proposal:   Scope swap bằng `wc_get_loop_prop( 'name' ) === 'related'` cộng flag `woocommerce_before_template_part` / `woocommerce_after_template_part` cho `single-product/related.php`. Upsells (`up-sells`) giữ native.
+Constraint: Plan076 §7: "woocommerce_before_related_products bật flag → … → woocommerce_after_related_products gỡ flag (try/finally)".
+Severity:   low
+Tags:       woocommerce, planning, theme
+Milestone:  V1 / 1.3.22
+Evidence:   `woocommerce/includes/wc-template-functions.php` related/upsell (`wc_set_loop_prop` name related / up-sells); grep runtime Woo 10.7 không có `woocommerce_before_related_products`.
+Default:    Conservative: dùng loop name + template_part flag; không copy related.php vào theme.
+Status:     OPEN
+Resolved:
+Decision:   OPEN
+
 ## [2026-06-12 15:30] | editor-governance
 Tension:    Tiện ích copy/paste block là editor-governance dùng chung, trong khi milestone hiện tại tập trung vào Feature Showcase autoplay và panel links.
 Context:    Human yêu cầu hai nút copy block và paste block để giữ nguyên Gutenberg block markup khi chuyển nội dung giữa các trang.

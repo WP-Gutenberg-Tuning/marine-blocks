@@ -52,6 +52,7 @@ type SliderConfig = {
 	effect?: string;
 	transitionStyle?: string;
 	transitionDuration?: number;
+	contentMotion?: string;
 	heightPreset?: string;
 	slidesPerView?: number;
 	responsiveSlides?: string;
@@ -64,6 +65,7 @@ type SliderConfig = {
 	parallaxTranslate?: number;
 	parallaxScale?: number;
 	parallaxInset?: number;
+	parallaxBlur?: number;
 };
 
 type NormalizedSliderConfig = {
@@ -78,6 +80,7 @@ type NormalizedSliderConfig = {
 	paginationPosition: BottomPosition;
 	transitionStyle: TransitionStyle;
 	transitionDuration: number;
+	contentMotion: 'off' | 'stagger' | 'fade';
 	heightPreset:
 		| 'default'
 		| 'content'
@@ -95,6 +98,7 @@ type NormalizedSliderConfig = {
 	parallaxTranslate: number;
 	parallaxScale: number;
 	parallaxInset: number;
+	parallaxBlur: number;
 };
 
 type SliderElement = HTMLElement & {
@@ -222,6 +226,11 @@ function parseSliderConfig(
 			parsed.transitionDuration,
 			SLIDER_TRANSITION_TIME
 		),
+		contentMotion: normalizeChoice(
+			parsed.contentMotion,
+			[ 'off', 'stagger', 'fade' ] as const,
+			'off'
+		),
 		heightPreset: normalizeChoice(
 			parsed.heightPreset,
 			[
@@ -258,8 +267,9 @@ function parseSliderConfig(
 			'horizontal'
 		),
 		parallaxTranslate: clampInteger( parsed.parallaxTranslate, 30, 0, 80 ),
-		parallaxScale: clampNumber( parsed.parallaxScale, 1.12, 1, 1.5 ),
+		parallaxScale: clampNumber( parsed.parallaxScale, 1.12, 1, 2 ),
 		parallaxInset: clampInteger( parsed.parallaxInset, 35, 0, 80 ),
+		parallaxBlur: clampInteger( parsed.parallaxBlur, 0, 0, 48 ),
 	};
 }
 
@@ -471,6 +481,20 @@ function initSlider( slider: SliderElement ): void {
 		slider.classList.add(
 			`skvn-slider--transition-${ transitionStyle }`
 		);
+		const singleSlideView =
+			config.slidesPerView === 1 && config.responsiveSlides !== '3-2-1';
+		slider.classList.toggle(
+			'skvn-slider--content-stagger',
+			config.contentMotion === 'stagger' &&
+				! reducedMotion &&
+				singleSlideView
+		);
+		slider.classList.toggle(
+			'skvn-slider--content-fade',
+			config.contentMotion === 'fade' &&
+				! reducedMotion &&
+				singleSlideView
+		);
 		slider.style.setProperty(
 			'--skvn-slider-transition-duration',
 			`${ config.transitionDuration }ms`
@@ -480,10 +504,11 @@ function initSlider( slider: SliderElement ): void {
 
 		// Swiper 11 loop mode does not create DOM clones (rearrangement /
 		// loopFix only). Inject data attrs BEFORE new Swiper() so the Parallax
-		// module reads them on init. Inset CSS var is owned by PHP first paint
-		// (see slider-render.php) — do not set it here (avoids load-time jump).
+		// module reads them on init. Resting inset stays 0 (plan 070): a
+		// negative inset zooms the still image. Scale during the move covers
+		// the translate instead.
+		slider.style.removeProperty( '--skvn-parallax-inset' );
 		if ( reducedMotion ) {
-			slider.style.removeProperty( '--skvn-parallax-inset' );
 			slider.classList.remove( 'skvn-slider--parallax' );
 		} else if ( shouldParallax ) {
 			const presetTranslate = {
@@ -492,9 +517,9 @@ function initSlider( slider: SliderElement ): void {
 				strong: 50,
 			} as const;
 			const presetScale = {
-				subtle: 1.06,
-				medium: 1.12,
-				strong: 1.2,
+				subtle: 1.3,
+				medium: 1.6,
+				strong: 2,
 			} as const;
 			const intensity = config.parallaxIntensity;
 			const advanced = config.parallaxAdvanced;
@@ -505,13 +530,55 @@ function initSlider( slider: SliderElement ): void {
 			const translateMag = advanced
 				? config.parallaxTranslate
 				: presetTranslate[ intensity ];
-			const scaleVal = advanced
+			const chosenScale = advanced
 				? config.parallaxScale
 				: presetScale[ intensity ];
 			const includeTranslate = depth !== 'scale';
+			// Plan 072: Translate only must not zoom. The cover-scale floor
+			// stays on Both (and on intensity presets, which use Both).
 			const includeScale = depth !== 'translate';
+			const coverScale =
+				Math.round( ( 1 + 2 * ( translateMag / 100 ) ) * 100 ) / 100;
+			const scaleVal =
+				depth === 'both'
+					? Math.max( chosenScale, coverScale )
+					: chosenScale;
 			const axis = direction === 'vertical' ? 'y' : 'x';
 			const durationMs = String( config.transitionDuration );
+
+			if ( includeTranslate && config.parallaxBlur > 0 ) {
+				const plateScale =
+					Math.round( ( coverScale + 0.12 ) * 100 ) / 100;
+				slider.style.setProperty(
+					'--skvn-parallax-blur',
+					`${ config.parallaxBlur }px`
+				);
+				slider.style.setProperty(
+					'--skvn-parallax-plate-scale',
+					String( plateScale )
+				);
+				slider
+					.querySelectorAll< HTMLElement >( '.skvn-slide__media' )
+					.forEach( ( media ) => {
+						if ( media.querySelector( '.skvn-slide__plate' ) ) {
+							return;
+						}
+						const source = media.querySelector< HTMLImageElement >(
+							'.skvn-slide__bg img'
+						);
+						if ( ! source?.src ) {
+							return;
+						}
+						const plate = document.createElement( 'div' );
+						const image = document.createElement( 'img' );
+						plate.className = 'skvn-slide__plate';
+						plate.setAttribute( 'aria-hidden', 'true' );
+						image.alt = '';
+						image.src = source.src;
+						plate.appendChild( image );
+						media.insertBefore( plate, media.firstChild );
+					} );
+			}
 
 			slider
 				.querySelectorAll< HTMLElement >( '.skvn-slide__bg' )
@@ -532,7 +599,7 @@ function initSlider( slider: SliderElement ): void {
 					if ( includeScale ) {
 						bg.setAttribute(
 							'data-swiper-parallax-scale',
-							String( scaleVal )
+							scaleVal.toFixed( 2 )
 						);
 					}
 
@@ -543,26 +610,6 @@ function initSlider( slider: SliderElement ): void {
 						durationMs
 					);
 				} );
-
-			// Legacy markup fallback: if PHP did not paint inset, set once
-			// before Swiper so the first transition still has edge-guard.
-			if ( ! slider.style.getPropertyValue( '--skvn-parallax-inset' ) ) {
-				const presetInset = {
-					subtle: 20,
-					medium: 35,
-					strong: 50,
-				} as const;
-				const insetMag = advanced
-					? config.parallaxInset
-					: presetInset[ intensity ];
-				const effectiveInset = includeTranslate ? insetMag : 0;
-				if ( effectiveInset > 0 ) {
-					slider.style.setProperty(
-						'--skvn-parallax-inset',
-						`-${ effectiveInset }%`
-					);
-				}
-			}
 
 			slider.classList.add( 'skvn-slider--parallax' );
 		}

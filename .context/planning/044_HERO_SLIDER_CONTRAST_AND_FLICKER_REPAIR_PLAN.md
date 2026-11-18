@@ -1,5 +1,15 @@
 # 044 — Hero Slider: plan sửa tương phản và kiểm chứng hiện tượng chớp
 
+**Concept01 source update:** human P1 “Đã test, đúng UX”; P2/P3 frame/rail/native stage/footer/Inspector states có source, default UI sau human build, P1 gate/harness đã retire. Current source map/gates **063§13/runbook§0** supersede planning-only/chờ P1 entries bên dưới.19selection/Add tests + syntax10files PASS; presentation suite human10/10 PASS (64.42s, SSR/WP mocks), actual AF/native/HERO/fidelity/geometry vẫn pending riêng. Không chuyển current1.3.20/bump/build/lint/deploy/commit.
+
+**Source start2026-11-09:** human “Tiến hành” theo063; P1 QA harness default-off có source,14 mocked selection/action tests và syntax5files PASS. N01–03/onsite version+iframe/assets pending; P2/P3 giữ gate, chưa final Concept01.063§12 và native runbook§2.1 là checkpoint mới, supersede planning-only/start wording bên dưới. Current1.3.20/metadata giữ; không build/lint/commit/deploy.
+
+**Execution plan063 — 2026-11-09:** [063](063_VER_1_3_21_SLIDER_EDITOR_UI_EXECUTION_PLAN.md) cụ thể hóa§10/062 thành P0 versioned API evidence, P1 native editing proof trước rollout, source map/layout/Inspector/states/assets và P2–P5 nghiệm thu. [Native runbook](../../docs/testing/slider-editor-ui-1.3.21.md) giữ exact cases; contrast/flicker vẫn theo các section repair bên dưới. Chưa coding/start/current transition; native visibility/context là hypothesis cần proof, không suy Handbook latest hoặc HTML demo đã PASS.
+
+**Artifact reference lock2026-11-09:** human đã xem Concept01, nói “Good” và yêu cầu bám artifact khi thực hiện. [062](062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) bổ sung canonical HTML/hash, AF01–10 source mapping, deviation register và paired artifact/actual editor screenshot gate bắt buộc. Các câu§10 “chưa chốt layout” là checkpoint trước reference; Concept01 là baseline để triển khai, không được tự redesign/đổi frame/labels. Inspector/native feasibility/variation mapping chưa thể suy PASS từ demo. Chưa coding/start; current1.3.20 giữ.
+
+**Amendment2026-11-09 — scope hiện hành:** **1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**, human bổ sung redesign Editor UI, xem§10. Current thực tế1.3.20; các current1.3.18/“file sửa duy nhất”/planning-only dưới đây là checkpoint của repair slice. Contrast source có/runtime pending; redesign PLANNED/Chưa làm, chưa start. Không bump/current transition; SOURCE IMPLEMENTED không áp toàn milestone mở rộng.
+
 Ngày: 2026-10-19. Status: **SOURCE IMPLEMENTED — chờ human build + kiểm chứng runtime**. Không có runtime PASS.
 
 Current là **V1 / 1.3.18 — Product/Post Carousel Editor UX & Technical**. Slider thuộc stack M5; **2026-11-04 human dời Hero contrast 1.3.19 → 1.3.21**, Sidebar từ 1.3.21 → 1.3.19. Giữ source/acceptance/hotfix ngoài current; không bump/archive.
@@ -307,3 +317,33 @@ source /home/shinkuro/.nvm/nvm.sh && nvm use 20 && cd /mnt/d/Github/skvn-marine/
 ```
 
 Planning-only hiện tại không chạy command này. Không cần packaging/PHP runtime artifact changes nếu repair thực tế chỉ đổi CSS.
+
+## 10. Slider Editor UI Redesign — scope bổ sung2026-11-09
+
+Human: “Thế thêm 1 cái vào phần này là làm redesign phần slider editor UI”. Approval scope trong1.3.21, chưa chốt layout/palette hoặc giao coding. Không hỏi lại có đưa vào1.3.21. Bước tiếp theo: audit và đề xuất thiết kế cho human xem.
+
+### 10.1. Phạm vi và boundary
+
+- Canvas/preview/chrome: bố cục làm việc, khung ngoài/label/palette/spacing, phân biệt Slider với từng Slide, editable content, thông tin/trạng thái/preview controls. Tận dụng chiều rộng canvas và editor hẹp.
+- Inspector/settings: inventory và nhóm/nhãn/help/conditional visibility, Slider-level vs Slide-level; chưa tự thêm feature hoặc di chuyển controls trước proposal.
+- Audit Hero, Product Showcase, Card Carousel và default Slider. Slider không phải Product Collection Carousel; không áp nguyên sample-card/query overview052 lên InnerBlocks thật.
+- Nối053 P3/EF-SLIDER và phần Slider của EF-06. Palette cần đề xuất/chốt; giữ contract khung/spacing, không tự bỏ frame/background. Step Slider giữ1.3.24, EF-STEP và Step acceptance không chuyển sang1.3.21. Visual Sidebar054 chưa tự start.
+
+### 10.2. Invariants
+
+Native InnerBlocks/List View/core rich content vẫn là source of truth; không custom slide array/store song song, không serialize editor frame/session state, không chạy Swiper/autoplay frontend trên canvas. Nếu đề xuất thay stacked editing hiện hành, phải chứng minh nội dung vẫn editable/keyboard reachable trước khi human chốt; chưa tự chọn tabs/single-slide preview.
+
+Giữ Add/select/reorder/remove/duplicate, focus, RichText/IME, Undo/Redo, Save/reopen và giới hạn5slide Hero/Showcase hiện hành. Controls phải đúng target clientId, không sửa parent khi chọn child. Không tự đổi limits hoặc motion/Advanced semantics.
+
+Redesign đổi editor presentation/organization; frontend render/schema/save/runtime/motion giữ baseline. Contrast repair CSS dùng chung kiểm riêng. Nếu cần thay schema/feature frontend, nêu evidence/scope delta trước coding, không mở rộng ngầm.
+
+### 10.3. Trình tự và acceptance
+
+1. Audit src/slider/edit.tsx, src/slide/edit.tsx, variations, editor styles/registration và controls. Ghi URL/build/ảnh baseline, states/limits/hidden/disabled, control owners.
+2. Vẽ text/mockup canvas rộng/hẹp, Inspector/Sidebar, palette/frame, parent/child selection, empty/one/many/limit/missing image/long text; thể hiện effect của từng control và giới hạn static preview. Human chốt trước coding.
+3. Implementation khi được giao: editor/controls/styles/enqueue tương ứng, preserve native data và frontend. Files cụ thể chốt sau audit; giới hạn một CSS file của repair gốc không áp editor redesign.
+4. Bổ sung runbook exact labels/steps theo approved design; human build/lint/onsite. Source/mock tests không thay browser/WordPress geometry/typing evidence.
+
+SED-ED01 (audit/mockup approved), SED-ED02 (canvas/controls rộng-hẹp và parent-child), SED-ED03 (native lifecycle/limits), SED-ED04 (frame/states/static preview), SED-TECH01 (loaded assets/no leak/schema/store/invalid-block) và SED-UI01 (frontend regression/contrast) đều **Chưa làm**. Full checklist trong MILESTONES.md §1.3.21; format ID→nhóm→hành vi→hiện trạng→việc sửa→cách kiểm/evidence theo review contract. Evidence cần mockup/decision trace, paired shots/rect, video keyboard/IME/save-reopen, saved content/DOM/network/console trên đúng build.
+
+HERO-* và SED-* nghiệm thu riêng; chớp có outcome riêng. Completion mở rộng cần đủ evidence/approval hoặc human defer có truy vết; không đóng chỉ vì contrast có source. Current vẫn1.3.20.

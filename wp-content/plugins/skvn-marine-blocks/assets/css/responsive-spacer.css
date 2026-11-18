@@ -1,0 +1,23 @@
+/* Runtime asset: intentionally separate from editor chrome and JS bundles. */
+.wp-block-skvn-marine-responsive-spacer.skvn-responsive-spacer {
+	box-sizing: border-box;
+	height: var(--skvn-spacer-mobile, 30px);
+	min-height: 0;
+	padding: 0;
+	border: 0;
+	margin: 0;
+	background: transparent;
+	flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+	.wp-block-skvn-marine-responsive-spacer.skvn-responsive-spacer {
+		height: var(--skvn-spacer-tablet, 30px);
+	}
+}
+
+@media (min-width: 1024px) {
+	.wp-block-skvn-marine-responsive-spacer.skvn-responsive-spacer {
+		height: var(--skvn-spacer-desktop, 30px);
+	}
+}

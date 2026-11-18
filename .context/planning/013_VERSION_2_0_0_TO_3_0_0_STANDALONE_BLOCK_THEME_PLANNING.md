@@ -90,6 +90,10 @@ Acceptance:
 
 ### Phase 2 — 2.0.0 Migration Start
 
+**Nhắc human khi bắt đầu — quyết định 2026-11-09:** trước khi chốt kế hoạch header/footer trong đợt tách GeneratePress, agent phải trình [digest Header/Footer và Mega Menu](../../docs/ideations/megamenu/README.md) để thảo luận sâu và xin human chốt scope, thứ tự, SemVer/milestone cụ thể. Đọc cả digest, câu hỏi §6 và acceptance HF-*; làm rõ host theme, plugin component/assets vs theme placement, storage/menu source, CTA mobile, templates/conditions/wave và migration/fallback. Theo dõi checklist tại MILESTONES.md §“Nhắc thảo luận khi bắt đầu tách GeneratePress”.
+
+Trigger này là **thảo luận khi bắt đầu migration**, còn module vẫn chỉ triển khai **sau khi theme độc lập khỏi GeneratePress** theo định hướng đã lưu. Không tự gán module vào 2.0.0/3.0.0 hoặc bắt đầu coding; nếu human chưa quyết milestone, giữ trạng thái chờ và ghi các câu hỏi chưa chốt.
+
 Goal:
 
 - Start replacing GeneratePress-dependent behavior with SKVN-owned adapters and contracts.

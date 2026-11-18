@@ -9,7 +9,6 @@ import {
 	CheckboxControl,
 	Button,
 	FormTokenField,
-	NumberControl,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -1131,7 +1130,7 @@ return <>
 									/>
 									{ attributes.mediaShadowToggle === true && (
 										<>
-											<NumberControl
+											<TextControl type="number"
 												label={ __(
 													'Shadow offset X',
 													'skvn-marine-blocks'
@@ -1149,7 +1148,7 @@ return <>
 													MEDIA_SHADOW_OFFSET_DEFAULT
 												}
 											/>
-											<NumberControl
+											<TextControl type="number"
 												label={ __(
 													'Shadow offset Y',
 													'skvn-marine-blocks'
@@ -1221,7 +1220,7 @@ return <>
 							) }
 							{ attributes.mediaLayout === 'padded' && (
 								<>
-									<NumberControl
+									<TextControl type="number"
 										label={ __(
 											'Frame padding',
 											'skvn-marine-blocks'
@@ -1328,7 +1327,7 @@ return <>
 						<ProductChipDesign attributes={ attributes } setAttributes={ setAttributes } contentType={ contentType } /></> }
 { group === 'action' && <>{/* Action role */}
 						<SelectControl
-							label={ __( 'Action font', 'skvn-marine-blocks' ) }
+							label={ __( 'Button font', 'skvn-marine-blocks' ) }
 							onChange={ ( actionFontFamily ) =>
 								setAttributes( {
 									actionFontFamily: actionFontFamily as FontFamily,
@@ -1338,7 +1337,7 @@ return <>
 							value={ attributes.actionFontFamily || '' }
 						/>
 						<SelectControl
-							label={ __( 'Action size', 'skvn-marine-blocks' ) }
+							label={ __( 'Button size', 'skvn-marine-blocks' ) }
 							onChange={ ( actionFontSize ) =>
 								setAttributes( {
 									actionFontSize: resolveFontSize(
@@ -1352,7 +1351,7 @@ return <>
 						/>
 						{ contentType === 'product' && (
 <SelectControl
-							label={ __( 'Action background', 'skvn-marine-blocks' ) }
+							label={ __( 'Button background', 'skvn-marine-blocks' ) }
 							onChange={ ( actionBackgroundColor ) =>
 								setAttributes( {
 									actionBackgroundColor:
@@ -1364,7 +1363,7 @@ return <>
 						/>
 ) }
 						<SelectControl
-							label={ __( 'Action text', 'skvn-marine-blocks' ) }
+							label={ __( 'Button text', 'skvn-marine-blocks' ) }
 							onChange={ ( actionTextColor ) =>
 								setAttributes( {
 									actionTextColor: actionTextColor as ColorSlug,
@@ -1375,7 +1374,7 @@ return <>
 						/>
 						{ contentType === 'product' && (
 <SelectControl
-							label={ __( 'Action hover background', 'skvn-marine-blocks' ) }
+							label={ __( 'Button hover background', 'skvn-marine-blocks' ) }
 							onChange={ ( actionHoverBackgroundColor ) =>
 								setAttributes( {
 									actionHoverBackgroundColor:
@@ -1387,7 +1386,7 @@ return <>
 						/>
 ) }
 						<SelectControl
-							label={ __( 'Action hover text', 'skvn-marine-blocks' ) }
+							label={ __( 'Button hover text', 'skvn-marine-blocks' ) }
 							onChange={ ( actionHoverTextColor ) =>
 								setAttributes( {
 									actionHoverTextColor: actionHoverTextColor as ColorSlug,

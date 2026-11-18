@@ -1,3 +1,6 @@
+/* Card rules are supplied by the shared skvn-marine-product-card style dependency.
+ * Keep them out of the compiled bundles so mixed archive/Collection pages load once. */
+
 .skvn-collection {
 	box-sizing: border-box;
 	width: 100%;
@@ -141,60 +144,6 @@
 	.skvn-collection--preset-5-3-1 .skvn-collection__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
-.skvn-collection-card {
-	background: #fff;
-	border: 1px solid #d9e2e8;
-	border-radius: 8px;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	min-width: 0;
-	overflow: hidden;
-	transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1),
-	            box-shadow 0.28s ease,
-	            border-color 0.28s ease;
-}
-
-.skvn-collection-card:hover {
-	border-color: #99bfcc;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-	transform: translateY(-6px);
-}
-
-.skvn-collection-card__media {
-	background: #edf4f7;
-	display: block;
-	overflow: hidden;
-	position: relative;
-}
-
-.skvn-collection-card__image {
-	aspect-ratio: 4 / 3;
-	display: block;
-	height: auto;
-	object-fit: cover;
-	transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.3, 1);
-	width: 100%;
-}
-
-.skvn-collection-card:hover .skvn-collection-card__image {
-	transform: scale(1.045);
-}
-
-.skvn-collection-card__body {
-	display: flex;
-	flex: 1;
-	flex-direction: column;
-	gap: 0.65rem;
-	padding: 1rem;
-}
-
-.skvn-collection-card__title {
-	font-size: 1.05rem;
-	line-height: 1.3;
-	margin: 0;
-}
-
 /* Product carousel titles remain complete, including unbroken product codes.
  * Keep this scoped so Post title policy and saved media ratios stay independent.
  */
@@ -213,17 +162,6 @@
 	-webkit-line-clamp: unset;
 }
 
-.skvn-collection-card__meta,
-.skvn-collection-card__excerpt {
-	color: #4b6470;
-	font-size: 0.9rem;
-}
-
-.skvn-collection-card__action {
-	align-self: flex-start;
-	margin-top: auto;
-}
-
 .skvn-collection__empty,
 .skvn-collection__notice {
 	background: #f4f8fa;
@@ -235,11 +173,6 @@
 }
 
 /* Image ratio variants */
-.skvn-collection--ratio-1-1  .skvn-collection-card__image { aspect-ratio: 1 / 1; }
-.skvn-collection--ratio-4-3  .skvn-collection-card__image { aspect-ratio: 4 / 3; }
-.skvn-collection--ratio-3-2  .skvn-collection-card__image { aspect-ratio: 3 / 2; }
-.skvn-collection--ratio-16-9 .skvn-collection-card__image { aspect-ratio: 16 / 9; }
-.skvn-collection--ratio-auto .skvn-collection-card__image { aspect-ratio: auto; }
 
 /* The skeleton media must reserve the same box as the real media, so it reuses
  * the exact same ratio declarations instead of a second set of values. */
@@ -255,40 +188,10 @@
 }
 
 /* Badges */
-.skvn-collection-card__badges {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.35rem;
-}
-
-.skvn-collection-card__badge {
-	background: #edf4f7;
-	border: 1px solid #c6d9e2;
-	border-radius: 4px;
-	color: #25404d;
-	font-size: 0.78rem;
-	padding: 0.15rem 0.45rem;
-	text-decoration: none;
-}
-
-a.skvn-collection-card__badge:hover {
-	background: #d0e8f0;
-}
 
 /* Badge overlay — universal (top-left on image) */
-.skvn-collection-card__media .skvn-collection-card__badges {
-	left: 0.75rem;
-	position: absolute;
-	top: 0.75rem;
-}
 
 /* Actions */
-.skvn-collection-card__actions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-	margin-top: auto;
-}
 
 /* Carousel */
 .skvn-collection__carousel-outer {
@@ -576,75 +479,11 @@ a.skvn-collection-card__badge:hover {
 
 /* ── Product card — new classes ────────────────────────────────────────── */
 
-.skvn-collection-card__specs {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.3rem;
-}
-
-.skvn-collection-card__spec-tag {
-	background: #f0f6fa;
-	border: 1px solid #c6d9e2;
-	border-radius: 3px;
-	color: #25404d;
-	font-size: 0.78rem;
-	overflow-wrap: anywhere;
-	padding: 0.1rem 0.4rem;
-}
-
 /* Grouped attribute summary (Product Carousel only).
  * Rows grow with content: no fixed height, no clipping, no line-clamp and no
  * font shrinking, so long values wrap instead of being cut. */
-.skvn-collection-card__specs--grouped {
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-.skvn-collection-card__spec-group {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-	min-width: 0;
-}
-
-.skvn-collection-card__spec-group-label {
-	color: #4b6470;
-	font-size: 0.72rem;
-	font-weight: 600;
-	letter-spacing: 0.04em;
-	line-height: 1.2;
-	overflow-wrap: anywhere;
-	text-transform: uppercase;
-}
-
-.skvn-collection-card__spec-values {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.3rem;
-	min-width: 0;
-}
 
 /* "+N" is informational only — same chip geometry, muted tone, not a button. */
-.skvn-collection-card__spec-more {
-	background: none;
-	border: 1px dashed #c6d9e2;
-	border-radius: 3px;
-	color: #4b6470;
-	font-size: 0.78rem;
-	padding: 0.1rem 0.4rem;
-	white-space: nowrap;
-}
-
-.skvn-collection-card__visually-hidden {
-	clip: rect(1px, 1px, 1px, 1px);
-	clip-path: inset(50%);
-	height: 1px;
-	overflow: hidden;
-	position: absolute;
-	white-space: nowrap;
-	width: 1px;
-	word-wrap: normal;
-}
 
 .skvn-collection__editor-note {
 	color: #4b6470;
@@ -653,39 +492,10 @@ a.skvn-collection-card__badge:hover {
 }
 
 /* chipStyle: hashtag */
-.skvn-collection-card--chip-hashtag .skvn-collection-card__spec-tag {
-	background: none;
-	border: none;
-	color: #0D9488;
-	padding: 0;
-}
-
-.skvn-collection-card--chip-hashtag .skvn-collection-card__spec-tag::before {
-	content: '#';
-}
 
 /* chipStyle: dot */
-.skvn-collection-card--chip-dot .skvn-collection-card__spec-tag {
-	background: none;
-	border: none;
-	padding: 0;
-}
-
-.skvn-collection-card--chip-dot .skvn-collection-card__spec-tag::before {
-	content: '• ';
-}
 
 /* chipStyle: plain */
-.skvn-collection-card--chip-plain .skvn-collection-card__spec-tag {
-	background: none;
-	border: none;
-	padding: 0;
-}
-
-.skvn-collection-card--chip-plain .skvn-collection-card__spec-tag + .skvn-collection-card__spec-tag::before {
-	color: #c6d9e2;
-	content: ' / ';
-}
 
 /* chipColorScheme — áp màu palette cho mọi slug có trong COLOR_PALETTE_OPTIONS.
  * Thêm rule này thay vì chỉ hardcode teal/navy, để editor chọn màu chip thực sự
@@ -732,149 +542,18 @@ a.skvn-collection-card__badge:hover {
 }
 
 /* Catalog slot — woo-catalog (1.5.0) sẽ own nội dung này. See woo-catalog-css-migration-1.5.0.md */
-.skvn-collection-card__catalog {
-	display: contents;
-}
 
 /* Cert dots */
-.skvn-collection-card__certs {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.4rem;
-}
-
-.skvn-collection-card__cert-dot {
-	color: #0D9488;
-	font-size: 0.78rem;
-	font-weight: 600;
-}
-
-.skvn-collection-card__cert-dot::before {
-	content: '• ';
-}
 
 /* MOQ / Lead Time stats */
-.skvn-collection-card__stats {
-	border-top: 1px solid #e8f0f4;
-	display: grid;
-	gap: 0.5rem;
-	grid-template-columns: 1fr 1fr;
-	padding-top: 0.6rem;
-}
-
-.skvn-collection-card__stat-label {
-	color: #7b9aaa;
-	display: block;
-	font-size: 0.7rem;
-	font-weight: 600;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-}
-
-.skvn-collection-card__stat-value {
-	color: #25404d;
-	display: block;
-	font-size: 0.95rem;
-	font-weight: 700;
-}
 
 /* Quote / action CTA — full width */
-.skvn-collection-card__cta {
-	background: #0A2540;
-	border-radius: 4px;
-	color: #fff;
-	display: block;
-	font-weight: 600;
-	margin-top: auto;
-	padding: 0.55rem 1rem;
-	text-align: center;
-	text-decoration: none;
-	transition: background 0.15s;
-}
-
-.skvn-collection-card__cta:hover {
-	background: #0D9488;
-}
 
 /* CTA hover màu theo palette (gap E07 / UX-12.a). Chỉ áp khi editor chọn
  * actionHoverBackgroundColor / actionHoverTextColor; block cũ thiếu key giữ
  * hardcode hover trên. */
-.skvn-collection-card__cta--hover-bg-skvn-blue-950:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-blue-950, #082f49);
-}
-.skvn-collection-card__cta--hover-text-skvn-blue-950:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-blue-950, #082f49);
-}
-.skvn-collection-card__cta--hover-bg-skvn-blue-900:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-blue-900, #0c4a6e);
-}
-.skvn-collection-card__cta--hover-text-skvn-blue-900:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-blue-900, #0c4a6e);
-}
-.skvn-collection-card__cta--hover-bg-skvn-blue-700:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-blue-700, #0369a1);
-}
-.skvn-collection-card__cta--hover-text-skvn-blue-700:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-blue-700, #0369a1);
-}
-.skvn-collection-card__cta--hover-bg-skvn-mint-100:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-mint-100, #ddfaf4);
-}
-.skvn-collection-card__cta--hover-text-skvn-mint-100:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-mint-100, #ddfaf4);
-}
-.skvn-collection-card__cta--hover-bg-skvn-gold-300:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-gold-300, #e9c766);
-}
-.skvn-collection-card__cta--hover-text-skvn-gold-300:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-gold-300, #e9c766);
-}
-.skvn-collection-card__cta--hover-bg-skvn-teal-600:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-teal-600, #0d9488);
-}
-.skvn-collection-card__cta--hover-text-skvn-teal-600:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-teal-600, #0d9488);
-}
-.skvn-collection-card__cta--hover-bg-skvn-sky-50:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-sky-50, #eaf7ff);
-}
-.skvn-collection-card__cta--hover-text-skvn-sky-50:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-sky-50, #eaf7ff);
-}
-.skvn-collection-card__cta--hover-bg-skvn-slate-700:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-slate-700, #334155);
-}
-.skvn-collection-card__cta--hover-text-skvn-slate-700:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-slate-700, #334155);
-}
-.skvn-collection-card__cta--hover-bg-skvn-slate-900:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-slate-900, #0f172a);
-}
-.skvn-collection-card__cta--hover-text-skvn-slate-900:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-slate-900, #0f172a);
-}
-.skvn-collection-card__cta--hover-bg-skvn-white:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	background-color: var(--wp--preset--color--skvn-white, #ffffff);
-}
-.skvn-collection-card__cta--hover-text-skvn-white:is(.skvn-collection-card__cta, .skvn-collection-card__read-more):is(:hover, :focus-visible) {
-	color: var(--wp--preset--color--skvn-white, #ffffff);
-}
-
-.skvn-collection-card__cta:active {
-	transform: translateY(1px);
-}
 
 /* Spec sheet PDF link */
-.skvn-collection-card__pdf {
-	color: #0D9488;
-	font-size: 0.85rem;
-	text-align: center;
-	text-decoration: none;
-}
-
-.skvn-collection-card__pdf:hover {
-	text-decoration: underline;
-}
 
 /* ── Editor preview layout ───────────────────────────────────────────────── */
 
@@ -1003,30 +682,6 @@ a.skvn-collection-card__badge:hover {
 	}
 }
 
-.skvn-collection-card__image--placeholder {
-	aspect-ratio: 1 / 1;
-	background-color: #edf4f7;
-	background-image: repeating-linear-gradient(
-		45deg,
-		#d0e0ea 0,
-		#d0e0ea 1px,
-		transparent 0,
-		transparent 50%
-	);
-	background-size: 10px 10px;
-	display: block;
-	width: 100%;
-}
-
-.skvn-collection-card__catalog--placeholder {
-	border: 1px dashed #c6d9e2;
-	border-radius: 4px;
-	color: #99bfcc;
-	font-size: 0.85rem;
-	padding: 0.4rem 0.6rem;
-	text-align: center;
-}
-
 .skvn-collection__editor-info {
 	font-size: 0.95rem;
 }
@@ -1118,24 +773,6 @@ a.skvn-collection-card__badge:hover {
 
 /* ── Post card — new classes ─────────────────────────────────────────────── */
 
-.skvn-collection-card__date,
-.skvn-collection-card__author {
-	color: #7b9aaa;
-	font-size: 0.78rem;
-}
-
-.skvn-collection-card__read-more {
-	color: #0D9488;
-	font-size: 0.9rem;
-	font-weight: 600;
-	margin-top: auto;
-	text-decoration: none;
-}
-
-.skvn-collection-card__read-more:hover {
-	text-decoration: underline;
-}
-
 /* ── Style panel: typography & color per role (S4/S5) ──
  * Tokens lưu slug, CSS resolve qua biến theme. Không raw hex/computed CSS.
  * Fallback: khi slug rỗng hoặc token bị gỡ, kế thừa theme (không rule áp dụng).
@@ -1167,9 +804,6 @@ a.skvn-collection-card__badge:hover {
 .skvn-collection [class*="skvn-font-size-"] :is(.skvn-collection-card__spec-tag, .skvn-collection-card__spec-more) {
 	font-size: inherit;
 }
-.skvn-collection-card:not([class*="skvn-chips--"]) [class*="skvn-collection-card__details--color-"] :is(.skvn-collection-card__spec-tag, .skvn-collection-card__spec-more) {
-	color: inherit;
-}
 
 /* Font-size roles (giá trị khớp theme.json presets) */
 .skvn-collection .skvn-font-size-sm {
@@ -1189,148 +823,14 @@ a.skvn-collection-card__badge:hover {
 }
 
 /* Title color — áp trên .skvn-collection-card__title và liên kết bên trong */
-.skvn-collection-card__title--color-skvn-blue-950,
-.skvn-collection-card__title--color-skvn-blue-950 a {
-	color: var(--wp--preset--color--skvn-blue-950, #082f49);
-}
-.skvn-collection-card__title--color-skvn-blue-900,
-.skvn-collection-card__title--color-skvn-blue-900 a {
-	color: var(--wp--preset--color--skvn-blue-900, #0c4a6e);
-}
-.skvn-collection-card__title--color-skvn-blue-700,
-.skvn-collection-card__title--color-skvn-blue-700 a {
-	color: var(--wp--preset--color--skvn-blue-700, #0369a1);
-}
-.skvn-collection-card__title--color-skvn-mint-100,
-.skvn-collection-card__title--color-skvn-mint-100 a {
-	color: var(--wp--preset--color--skvn-mint-100, #ddfaf4);
-}
-.skvn-collection-card__title--color-skvn-gold-300,
-.skvn-collection-card__title--color-skvn-gold-300 a {
-	color: var(--wp--preset--color--skvn-gold-300, #e9c766);
-}
-.skvn-collection-card__title--color-skvn-teal-600,
-.skvn-collection-card__title--color-skvn-teal-600 a {
-	color: var(--wp--preset--color--skvn-teal-600, #0d9488);
-}
-.skvn-collection-card__title--color-skvn-sky-50,
-.skvn-collection-card__title--color-skvn-sky-50 a {
-	color: var(--wp--preset--color--skvn-sky-50, #eaf7ff);
-}
-.skvn-collection-card__title--color-skvn-slate-700,
-.skvn-collection-card__title--color-skvn-slate-700 a {
-	color: var(--wp--preset--color--skvn-slate-700, #334155);
-}
-.skvn-collection-card__title--color-skvn-slate-900,
-.skvn-collection-card__title--color-skvn-slate-900 a {
-	color: var(--wp--preset--color--skvn-slate-900, #0f172a);
-}
-.skvn-collection-card__title--color-skvn-white,
-.skvn-collection-card__title--color-skvn-white a {
-	color: var(--wp--preset--color--skvn-white, #ffffff);
-}
 
 /* Details color — áp trên date/author/excerpt/spec-meta */
-.skvn-collection-card__details--color-skvn-blue-950 {
-	color: var(--wp--preset--color--skvn-blue-950, #082f49);
-}
-.skvn-collection-card__details--color-skvn-blue-900 {
-	color: var(--wp--preset--color--skvn-blue-900, #0c4a6e);
-}
-.skvn-collection-card__details--color-skvn-blue-700 {
-	color: var(--wp--preset--color--skvn-blue-700, #0369a1);
-}
-.skvn-collection-card__details--color-skvn-mint-100 {
-	color: var(--wp--preset--color--skvn-mint-100, #ddfaf4);
-}
-.skvn-collection-card__details--color-skvn-gold-300 {
-	color: var(--wp--preset--color--skvn-gold-300, #e9c766);
-}
-.skvn-collection-card__details--color-skvn-teal-600 {
-	color: var(--wp--preset--color--skvn-teal-600, #0d9488);
-}
-.skvn-collection-card__details--color-skvn-sky-50 {
-	color: var(--wp--preset--color--skvn-sky-50, #eaf7ff);
-}
-.skvn-collection-card__details--color-skvn-slate-700 {
-	color: var(--wp--preset--color--skvn-slate-700, #334155);
-}
-.skvn-collection-card__details--color-skvn-slate-900 {
-	color: var(--wp--preset--color--skvn-slate-900, #0f172a);
-}
-.skvn-collection-card__details--color-skvn-white {
-	color: var(--wp--preset--color--skvn-white, #ffffff);
-}
 
 /* Action CTA background */
-.skvn-collection-card__cta--bg-skvn-blue-950 {
-	background-color: var(--wp--preset--color--skvn-blue-950, #082f49);
-}
-.skvn-collection-card__cta--bg-skvn-blue-900 {
-	background-color: var(--wp--preset--color--skvn-blue-900, #0c4a6e);
-}
-.skvn-collection-card__cta--bg-skvn-blue-700 {
-	background-color: var(--wp--preset--color--skvn-blue-700, #0369a1);
-}
-.skvn-collection-card__cta--bg-skvn-mint-100 {
-	background-color: var(--wp--preset--color--skvn-mint-100, #ddfaf4);
-}
-.skvn-collection-card__cta--bg-skvn-gold-300 {
-	background-color: var(--wp--preset--color--skvn-gold-300, #e9c766);
-}
-.skvn-collection-card__cta--bg-skvn-teal-600 {
-	background-color: var(--wp--preset--color--skvn-teal-600, #0d9488);
-}
-.skvn-collection-card__cta--bg-skvn-sky-50 {
-	background-color: var(--wp--preset--color--skvn-sky-50, #eaf7ff);
-}
-.skvn-collection-card__cta--bg-skvn-slate-700 {
-	background-color: var(--wp--preset--color--skvn-slate-700, #334155);
-}
-.skvn-collection-card__cta--bg-skvn-slate-900 {
-	background-color: var(--wp--preset--color--skvn-slate-900, #0f172a);
-}
-.skvn-collection-card__cta--bg-skvn-white {
-	background-color: var(--wp--preset--color--skvn-white, #ffffff);
-}
 
 /* Action CTA text */
-.skvn-collection-card__cta--text-skvn-blue-950 {
-	color: var(--wp--preset--color--skvn-blue-950, #082f49);
-}
-.skvn-collection-card__cta--text-skvn-blue-900 {
-	color: var(--wp--preset--color--skvn-blue-900, #0c4a6e);
-}
-.skvn-collection-card__cta--text-skvn-blue-700 {
-	color: var(--wp--preset--color--skvn-blue-700, #0369a1);
-}
-.skvn-collection-card__cta--text-skvn-mint-100 {
-	color: var(--wp--preset--color--skvn-mint-100, #ddfaf4);
-}
-.skvn-collection-card__cta--text-skvn-gold-300 {
-	color: var(--wp--preset--color--skvn-gold-300, #e9c766);
-}
-.skvn-collection-card__cta--text-skvn-teal-600 {
-	color: var(--wp--preset--color--skvn-teal-600, #0d9488);
-}
-.skvn-collection-card__cta--text-skvn-sky-50 {
-	color: var(--wp--preset--color--skvn-sky-50, #eaf7ff);
-}
-.skvn-collection-card__cta--text-skvn-slate-700 {
-	color: var(--wp--preset--color--skvn-slate-700, #334155);
-}
-.skvn-collection-card__cta--text-skvn-slate-900 {
-	color: var(--wp--preset--color--skvn-slate-900, #0f172a);
-}
-.skvn-collection-card__cta--text-skvn-white {
-	color: var(--wp--preset--color--skvn-white, #ffffff);
-}
 
 /* Action CTA focus-visible indicator (độc lập, không xóa focus indicator) */
-.skvn-collection-card__cta:focus-visible {
-	outline: 2px solid currentColor;
-	outline-offset: 2px;
-}
 
 /* ── Media presets — Product only (S6 / P4) ──
  * Width % is relative to the card width, so cards of different sizes stay
@@ -1341,60 +841,11 @@ a.skvn-collection-card__badge:hover {
 
 /* flush: full card width, contain, no float/shadow/padding. Legacy blocks
  * without a mediaLayout class keep their existing cover/ratio rules. */
-.skvn-collection-card--media-flush .skvn-collection-card__media {
-	border-radius: 8px 8px 0 0;
-	overflow: hidden;
-}
-.skvn-collection-card--media-flush .skvn-collection-card__image {
-	aspect-ratio: 1 / 1;
-	object-fit: contain;
-	width: 100%;
-	height: auto;
-	border-radius: 0;
-	transform: none;
-	box-shadow: none;
-}
 
 /* padded: even padding top/left/right; inner radius shrinks with padding. */
-.skvn-collection-card--media-padded .skvn-collection-card__media {
-	border-radius: calc(8px - var(--skvn-media-padding-side, 0.5rem));
-	overflow: hidden;
-	padding: var(--skvn-media-padding-top, 0.5rem)
-		var(--skvn-media-padding-side, 0.5rem) 0;
-	width: calc(100% - 2 * var(--skvn-media-padding-side, 0.5rem));
-	margin: 0 auto;
-}
-.skvn-collection-card--media-padded .skvn-collection-card__image {
-	object-fit: contain;
-	width: 100%;
-	height: auto;
-	border-radius: calc(
-		8px - var(--skvn-media-padding-side, 0.5rem) - 2px
-	);
-	transform: none;
-	box-shadow: none;
-}
 
 /* floating: card keeps its box, media frame lifts so the image is never
  * clipped by the card's top edge. Card/body do not move. */
-.skvn-collection-card--media-floating {
-	overflow: visible;
-}
-.skvn-collection-card--media-floating .skvn-collection-card__media {
-	overflow: visible;
-}
-.skvn-collection-card--media-floating .skvn-collection-card__image {
-	position: relative;
-	width: var(--skvn-media-float-width, 100%);
-	max-width: 100%;
-	height: auto;
-	object-fit: contain;
-	display: block;
-	margin: 0 auto;
-	transform: translateY(var(--skvn-media-float-offset, -12px));
-	border-radius: 0;
-	box-shadow: var(--skvn-media-float-shadow, none);
-}
 
 /* Reduced motion: freeze the float lift and shadow. */
 @media (prefers-reduced-motion: reduce) {

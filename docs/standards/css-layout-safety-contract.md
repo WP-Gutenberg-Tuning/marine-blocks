@@ -35,6 +35,61 @@ When the SKVN canvas is already full width, use:
 }
 ```
 
+## Container Nesting — Two-Step Width
+
+The width contract above applies to the direct children of the content wrapper
+only. When a block is nested inside a container (core Group, column, pattern
+surface), ownership changes:
+
+- A plain container becomes the direct child and is clamped to
+  `--skvn-content-width` (760px); everything inside follows.
+- Gutenberg constrained layout re-applies the contract to container children
+  that carry alignment classes (`> .alignwide`, `> .alignfull`).
+- Blocks without alignment support stay at content width inside any container.
+- Container queries flip layout silently at their breakpoints (collection
+  grids at `max-width: 760px`, category grid at `min-width: 880px`), so a
+  nested block can drop to tablet layout with no warning when an ancestor
+  loses width.
+
+Required recipe for an island surface (a container with background holding
+wide blocks):
+
+1. Align the container itself to **Full**, not Wide. A background paints the
+   block's own box, so a Wide container stops the background at
+   `--skvn-wide-width` and leaves white gutters; Full is what makes the
+   background bleed to both page edges. Wide is only correct when the surface
+   is supposed to be a floating card.
+2. Constrain the content inside — Gutenberg constrained layout gives
+   unaligned children `contentSize` (760px); align the nested block Wide for
+   `wideSize` (1200px) — Content width control for Product/Post Collection,
+   toolbar align for Category Grid, Slider, Feature Showcase.
+3. The page must own a full-width canvas. Without it, `alignfull` only reaches
+   the GeneratePress content box and the background still looks boxed.
+
+This two-step recipe is the mechanical equivalent of Elementor's **Boxed**
+content width (outer box stretches to the available width, inner content is
+boxed). Elementor does not give the background superpowers either: its
+`Full Width` + Width 1200 stops the background at 1200px, exactly like an
+`alignwide` block here. A "background only wraps its own width" report is
+therefore usually an alignment/default mismatch, not a paint bug — compare
+with Elementor before treating it as one. SKVN's `contentSize` is a reading
+measure (760px) while Elementor's Site Settings content width is a layout
+measure (~1140–1200px), so an island holding grids needs the Wide measure, not
+760. Elementor-reference rebuttal:
+`docs/testing/group-island-width-1.3.20.md` §4.
+
+Do not re-implement width propagation for grandchildren in theme CSS to force a
+measure on a band. Gutenberg's constrained layout already owns inside-container
+layout; duplicating it breaks the one-owner rule. Productize the band as a
+pattern or style variation instead (island pattern deferred to 1.4.x — see
+PITFALLS DP-07, recipe/verification: `docs/testing/group-island-width-1.3.20.md`).
+
+Human 2026-11-12: until that island group exists, site WindPress may carry a
+scoped class on the Groups used as temporary islands. Direct children take the
+Group width and the Group background covers them. Do not clip with
+`overflow`. Remove the class when the island group owns the box. Decision:
+`docs/decisions/group-island-windpress-stopgap-1.3.20.md`.
+
 ## Viewport Unit Rule
 
 Do not use the following as a default full-width technique:

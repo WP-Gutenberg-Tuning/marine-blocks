@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "skvn-marine/step-slide",
+  "version": "1.3.23",
+  "title": "Step Slide",
+  "category": "skvn-marine",
+  "icon": "slides",
+  "description": "Single fullscreen step for the Step Slider block.",
+  "parent": [
+    "skvn-marine/step-slider"
+  ],
+  "textdomain": "skvn-marine-blocks",
+  "attributes": {
+    "backgroundImageId": {
+      "type": "number",
+      "default": 0
+    },
+    "backgroundImageUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "backgroundImageAlt": {
+      "type": "string",
+      "default": ""
+    },
+    "backgroundImageFocalPoint": {
+      "type": "object",
+      "default": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "overlayPreset": {
+      "type": "string",
+      "enum": [
+        "light",
+        "medium",
+        "strong"
+      ],
+      "default": "medium"
+    },
+    "textSurface": {
+      "type": "boolean",
+      "default": false
+    },
+    "tabLabel": {
+      "type": "string",
+      "default": "Step"
+    },
+    "textPosition": {
+      "type": "string",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ],
+      "default": "left"
+    }
+  },
+  "supports": {
+    "html": false,
+    "reusable": false
+  }
+}

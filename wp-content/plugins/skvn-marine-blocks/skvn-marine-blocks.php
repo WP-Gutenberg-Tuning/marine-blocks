@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SKVN Marine Blocks
  * Description: Custom Gutenberg blocks for SKVN Marine.
- * Version: 1.3.19
+ * Version: 1.3.23
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Text Domain: skvn-marine-blocks
@@ -18,8 +18,11 @@ require_once __DIR__ . '/modules/header-settings/header-settings.php';
 require_once __DIR__ . '/modules/collection-render/collection-render.php';
 require_once __DIR__ . '/modules/category-grid/category-grid.php';
 require_once __DIR__ . '/modules/slider-render/slider-render.php';
+require_once __DIR__ . '/modules/step-slider-render/step-slider-render.php';
 require_once __DIR__ . '/modules/feature-showcase-render/feature-showcase-render.php';
 require_once __DIR__ . '/modules/typography-settings/typography-settings.php';
+require_once __DIR__ . '/modules/product-design/product-design.php';
+require_once __DIR__ . '/modules/pdp-related-settings/pdp-related-settings.php';
 require_once __DIR__ . '/modules/core-control/core-control.php';
 require_once __DIR__ . '/modules/sidebar-blog-content/sidebar-blog-content.php';
 require_once __DIR__ . '/modules/preloader-settings/preloader-settings.php';
@@ -61,6 +64,7 @@ function skvn_marine_blocks_register_blocks() {
 	if ( ! function_exists( 'register_block_type' ) ) {
 		return;
 	}
+	$card_style_deps = skvn_marine_blocks_register_product_card_assets() ? array( 'skvn-marine-product-card' ) : array();
 
 	$editor_script = __DIR__ . '/build/index.ts.js';
 	$editor_asset  = __DIR__ . '/build/index.ts.asset.php';
@@ -81,6 +85,7 @@ function skvn_marine_blocks_register_blocks() {
 			$editor_ver,
 			true
 		);
+
 	}
 
 	$editor_style = __DIR__ . '/build/style-index.ts.css';
@@ -89,7 +94,7 @@ function skvn_marine_blocks_register_blocks() {
 		wp_register_style(
 			'skvn-marine-blocks-editor',
 			plugins_url( 'build/style-index.ts.css', __FILE__ ),
-			array(),
+			$card_style_deps,
 			filemtime( $editor_style )
 		);
 	}
@@ -136,6 +141,78 @@ function skvn_marine_blocks_register_blocks() {
 				? array( 'skvn-marine-slider-core' )
 				: array(),
 			filemtime( $slider_style )
+		);
+	}
+
+	$slider_editor_style = __DIR__ . '/assets/css/slider-editor.css';
+	if ( file_exists( $slider_editor_style ) ) {
+		wp_register_style(
+			'skvn-marine-slider-editor',
+			plugins_url( 'assets/css/slider-editor.css', __FILE__ ),
+			wp_style_is( 'skvn-marine-slider-view', 'registered' )
+				? array( 'skvn-marine-slider-view' )
+				: array(),
+			filemtime( $slider_editor_style )
+		);
+	}
+
+	$step_slider_view_script = __DIR__ . '/build/frontend.ts.js';
+	$step_slider_view_asset  = __DIR__ . '/build/frontend.ts.asset.php';
+	$step_slider_view_deps   = array();
+	$step_slider_view_ver    = file_exists( $step_slider_view_script ) ? filemtime( $step_slider_view_script ) : '1.3.23';
+
+	if ( file_exists( $step_slider_view_asset ) ) {
+		$asset                = require $step_slider_view_asset;
+		$step_slider_view_deps = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+		$step_slider_view_ver  = isset( $asset['version'] ) ? $asset['version'] : $step_slider_view_ver;
+	}
+
+	if ( file_exists( $step_slider_view_script ) ) {
+		wp_register_script(
+			'skvn-marine-step-slider-view',
+			plugins_url( 'build/frontend.ts.js', __FILE__ ),
+			$step_slider_view_deps,
+			$step_slider_view_ver,
+			true
+		);
+	}
+
+	$step_slider_core_style = __DIR__ . '/build/frontend.ts.css';
+
+	if ( file_exists( $step_slider_core_style ) ) {
+		wp_register_style(
+			'skvn-marine-step-slider-core',
+			plugins_url( 'build/frontend.ts.css', __FILE__ ),
+			array(),
+			filemtime( $step_slider_core_style )
+		);
+	}
+
+	$step_slider_style = __DIR__ . '/build/style-frontend.ts.css';
+
+	if ( file_exists( $step_slider_style ) ) {
+		wp_register_style(
+			'skvn-marine-step-slider-view',
+			plugins_url( 'build/style-frontend.ts.css', __FILE__ ),
+			wp_style_is( 'skvn-marine-step-slider-core', 'registered' )
+				? array( 'skvn-marine-step-slider-core' )
+				: array(),
+			filemtime( $step_slider_style )
+		);
+	}
+
+	// editor.css is not named style.css, so wp-scripts emits it as index.ts.css.
+	// The shared editor handle only loads style-index.ts.css.
+	$step_slider_editor_style = __DIR__ . '/build/index.ts.css';
+
+	if ( file_exists( $step_slider_editor_style ) ) {
+		wp_register_style(
+			'skvn-marine-step-slider-editor',
+			plugins_url( 'build/index.ts.css', __FILE__ ),
+			wp_style_is( 'skvn-marine-blocks-editor', 'registered' )
+				? array( 'skvn-marine-blocks-editor' )
+				: array(),
+			filemtime( $step_slider_editor_style )
 		);
 	}
 
@@ -198,14 +275,28 @@ function skvn_marine_blocks_register_blocks() {
 		wp_register_style(
 			'skvn-marine-blocks-collection-view',
 			plugins_url( 'build/collection-view.ts.css', __FILE__ ),
-			array(),
+			$card_style_deps,
 			filemtime( $collection_view_style )
 		);
 	}
 
+	// Small static block: its frontend needs CSS only, never the editor bundle.
+	$spacer_style = __DIR__ . '/assets/css/responsive-spacer.css';
+	if ( file_exists( $spacer_style ) ) {
+		wp_register_style(
+			'skvn-marine-responsive-spacer',
+			plugins_url( 'assets/css/responsive-spacer.css', __FILE__ ),
+			array(),
+			filemtime( $spacer_style )
+		);
+	}
+
 	$blocks = array(
+		'responsive-spacer',
 		'slider',
 		'slide',
+		'step-slider',
+		'step-slide',
 		'accordion',
 		'card-grid',
 		'card',
@@ -226,7 +317,7 @@ function skvn_marine_blocks_register_blocks() {
 			}
 
 			if (
-				in_array( $block, array( 'slider', 'slide', 'feature-showcase' ), true ) &&
+				in_array( $block, array( 'slider', 'slide', 'feature-showcase', 'responsive-spacer' ), true ) &&
 				wp_style_is( 'skvn-marine-blocks-editor', 'registered' )
 			) {
 				$args['editor_style_handles'] = array( 'skvn-marine-blocks-editor' );
@@ -237,6 +328,13 @@ function skvn_marine_blocks_register_blocks() {
 				wp_style_is( 'skvn-marine-slider-view', 'registered' )
 			) {
 				$args['editor_style_handles'][] = 'skvn-marine-slider-view';
+			}
+
+			if (
+				in_array( $block, array( 'slider', 'slide' ), true ) &&
+				wp_style_is( 'skvn-marine-slider-editor', 'registered' )
+			) {
+				$args['editor_style_handles'][] = 'skvn-marine-slider-editor';
 			}
 
 			if ( 'slider' === $block && wp_script_is( 'skvn-marine-slider-view', 'registered' ) ) {
@@ -258,6 +356,46 @@ function skvn_marine_blocks_register_blocks() {
 				wp_style_is( 'skvn-marine-slider-view', 'registered' )
 			) {
 				$args['style_handles'] = array( 'skvn-marine-slider-view' );
+			}
+
+			if (
+				in_array( $block, array( 'step-slider', 'step-slide' ), true ) &&
+				wp_style_is( 'skvn-marine-blocks-editor', 'registered' ) &&
+				! isset( $args['editor_style_handles'] )
+			) {
+				$args['editor_style_handles'] = array( 'skvn-marine-blocks-editor' );
+			}
+
+			if (
+				in_array( $block, array( 'step-slider', 'step-slide' ), true ) &&
+				wp_style_is( 'skvn-marine-step-slider-editor', 'registered' )
+			) {
+				if ( ! isset( $args['editor_style_handles'] ) ) {
+					$args['editor_style_handles'] = array();
+				}
+
+				$args['editor_style_handles'][] = 'skvn-marine-step-slider-editor';
+			}
+
+			if (
+				in_array( $block, array( 'step-slider', 'step-slide' ), true ) &&
+				wp_style_is( 'skvn-marine-step-slider-view', 'registered' )
+			) {
+				$args['style_handles'] = array( 'skvn-marine-step-slider-view' );
+			}
+
+			if ( 'step-slider' === $block && wp_script_is( 'skvn-marine-step-slider-view', 'registered' ) ) {
+				$args['view_script'] = 'skvn-marine-step-slider-view';
+			}
+
+			if ( 'step-slider' === $block ) {
+				$args['render_callback']   = 'skvn_marine_blocks_render_step_slider';
+				$args['skip_inner_blocks'] = true;
+			}
+
+			if ( 'step-slide' === $block ) {
+				$args['render_callback']   = 'skvn_marine_blocks_render_step_slide';
+				$args['skip_inner_blocks'] = true;
 			}
 
 			if ( 'feature-showcase' === $block ) {

@@ -306,7 +306,7 @@ export function CategoryDetailsPanel( {
 
 				<p className="skvn-category-details__cards-note">
 					{ __(
-						'The card shows a plain-text excerpt. The saved description itself is not trimmed or stripped.',
+						"The saved description itself is not trimmed or stripped. Cards using this category show an excerpt or the full plain text, depending on each block's display settings.",
 						'skvn-marine-blocks'
 					) }
 				</p>

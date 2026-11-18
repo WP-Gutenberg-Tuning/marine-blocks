@@ -1,0 +1,85 @@
+/* Theme Design sidebar spacing. PluginSidebar chrome lives in the parent
+ * document editor, so this stylesheet is enqueued on enqueue_block_editor_assets
+ * (handle skvn-marine-blocks-design-sidebar), never through block editorStyle.
+ * Scoped to the shared Theme Design fieldset class only. WP admin chrome color,
+ * no theme tokens, no !important, no fixed widths. */
+.skvn-theme-design {
+	border: 0;
+	margin: 0;
+	min-width: 0;
+	padding: 0;
+}
+/* Fieldset accessible name. Visually hidden with the 1px clip pattern; never
+ * display: none, which would drop the legend from the accessibility tree. */
+.skvn-theme-design > legend {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+.skvn-theme-design .components-base-control {
+	margin-bottom: 16px;
+}
+.skvn-theme-design__toggles .components-base-control {
+	margin-bottom: 8px;
+}
+.skvn-theme-design__section .components-base-control:last-child {
+	margin-bottom: 0;
+}
+.skvn-theme-design__section h3 {
+	font-size: 11px;
+	font-weight: 600;
+	margin: 16px 0 8px;
+	text-transform: uppercase;
+}
+.skvn-theme-design__section:first-of-type h3 {
+	margin-top: 0;
+}
+.skvn-theme-design__actions {
+	align-items: flex-start;
+	border-top: 1px solid #dcdcde;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-top: 16px;
+	padding-top: 12px;
+}
+
+/* Marine Blocks sidebar toggle icon (plan 080). Three states split by mechanism:
+ * hover = CSS on the parent .components-button, selected = .is-open class set by
+ * the icon component (core/edit-post active sidebar). Variants overlay the base
+ * absolutely so a missing variant img simply never displays; the base stays as
+ * fallback. Scoped to the wrapper class; never targets .interface-pinned-items. */
+.skvn-marine-sidebar-icon {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+}
+.skvn-marine-sidebar-icon__img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: block;
+	width: 24px;
+	height: 24px;
+}
+.skvn-marine-sidebar-icon__img--hover,
+.skvn-marine-sidebar-icon__img--selected {
+	display: none;
+}
+.components-button:hover .skvn-marine-sidebar-icon:not(.is-open) .skvn-marine-sidebar-icon__img--hover,
+.components-button:focus-visible .skvn-marine-sidebar-icon:not(.is-open) .skvn-marine-sidebar-icon__img--hover {
+	display: block;
+}
+.skvn-marine-sidebar-icon.is-open .skvn-marine-sidebar-icon__img--selected {
+	display: block;
+}

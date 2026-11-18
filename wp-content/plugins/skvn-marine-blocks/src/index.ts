@@ -2,6 +2,11 @@ import { registerBlockType } from '@wordpress/blocks';
 
 import './core-controls';
 import './design-sidebar';
+import './product-design/panel';
+import './pdp-related/panel';
+import spacerMetadata from './responsive-spacer/block.json';
+import { Edit as SpacerEdit } from './responsive-spacer/edit';
+import { save as spacerSave } from './responsive-spacer/save';
 
 import accordionMetadata from './accordion/block.json';
 import { Edit as AccordionEdit } from './accordion/edit';
@@ -16,6 +21,14 @@ import sliderDeprecated from './slider/deprecated';
 import { Edit as SliderEdit } from './slider/edit';
 import { save as sliderSave } from './slider/save';
 import { registerSliderVariations } from './slider/variations';
+
+import stepSlideMetadata from './step-slide/block.json';
+import { Edit as StepSlideEdit } from './step-slide/edit';
+import { save as stepSlideSave } from './step-slide/save';
+
+import stepSliderMetadata from './step-slider/block.json';
+import { Edit as StepSliderEdit } from './step-slider/edit';
+import { save as stepSliderSave } from './step-slider/save';
 
 import cardGridMetadata from './card-grid/block.json';
 import { Edit as CardGridEdit } from './card-grid/edit';
@@ -46,6 +59,12 @@ import productCategoryGridMetadata from './product-category-grid/block.json';
 import { Edit as ProductCategoryGridEdit } from './product-category-grid/edit';
 import './product-category-grid/style.css';
 
+registerBlockType( spacerMetadata.name, {
+	...spacerMetadata,
+	edit: SpacerEdit,
+	save: spacerSave,
+} );
+
 registerBlockType( accordionMetadata.name, {
 	...accordionMetadata,
 	edit: AccordionEdit,
@@ -65,6 +84,18 @@ registerBlockType( sliderMetadata.name, {
 	save: sliderSave,
 } );
 registerSliderVariations();
+
+registerBlockType( stepSlideMetadata.name, {
+	...stepSlideMetadata,
+	edit: StepSlideEdit,
+	save: stepSlideSave,
+} );
+
+registerBlockType( stepSliderMetadata.name, {
+	...stepSliderMetadata,
+	edit: StepSliderEdit,
+	save: stepSliderSave,
+} );
 
 registerBlockType( cardGridMetadata.name, {
 	...cardGridMetadata,

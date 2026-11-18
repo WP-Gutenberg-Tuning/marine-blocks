@@ -7,11 +7,47 @@
 
 ## 0. Milestone hiện tại
 
-Current milestone: **V1 / 1.3.19 — Plugin Design Sidebar Foundation**
+Current milestone: **V1 / 1.3.24 — Fullscreen Step Slider** (PLANNED pointer only — **chưa start**, không auto-start)
+
+Human transition2026-11-16: 1.3.22 DONE_WITH_CARRY_OVER (tạm PASS); bump-only mở **1.3.23** rồi **cùng ngày defer 1.3.23 — Post Page Basic Design Controls → stockpile 1.4.x** vì chưa chốt tách Theme/template surfaces vs Block. Planning gate: [078](.context/planning/078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md); decision `docs/decisions/template-surface-theme-block-boundary.md`. POST-* và GATE-078 tại MILESTONES §1.3.23 + §1.4.x stockpile. **Không** implement Post / không copy 067 P3 Theme Design cho Post cho đến khi human chốt 078 SURFACE-01/02. Current pointer **1.3.24** chỉ là hàng tiếp theo trong roadmap; coding 1.3.24 cần lệnh human. Metadata repo có thể vẫn `1.3.23` working build — không bắt buộc bump ngay. Agent không build/lint/deploy/git remote push trừ lệnh. Deferred baseline **1.3.20** vẫn nhắc trước follow-up runtime khác.
+
+(lịch sử, superseded bởi transition2026-11-16) Human transition2026-11-13: “Đã xong toàn phần 1.3.21” rồi lệnh **“Chuyển sang 1.3.22 ngay”**, sau đó chốt **“Nói chung đã xong, pass, không cần carry over, cái nào lỗi sẽ phân tích sửa sau”**. 1.3.21 → **DONE**, carry **waived**; snapshot + tên acceptance giữ tại MILESTONES_HISTORY §1.3.21 để audit nhưng **không phải nghĩa vụ mở** (không nhắc lại HERO-TECH/N01–03/AF/perf/build-lint như carry). Tension Hero 2026-10-19 đã move sang TENSIONS_HISTORY với `Status: ARCHIVED`. Current1.3.22 IN PROGRESS, implementation Chưa làm; plan067 (Product Page Design Controls) được mở khoá. Metadata working sync1.3.22 bằng bump-only; agent không build/lint/deploy/git remote push. Lỗi phát sinh sau này (kể cả DP-09/Pitfall 10 slider nhích size sau fade) xử lý bằng task phân tích riêng khi human yêu cầu. Plan071 overlay color: human “đã test rồi, xong rồi pass” nhưng **repo không có source `overlayColor`** — ghi audit, không coi là code đã xong.
+
+Scope addition2026-11-16: human lệnh “làm cùng với milestone hiện tại, làm xong commit riêng để biết sau này có gì revert” — **Marine Blocks Sidebar Icon States (Hover/Selected)** gộp vào current pointer **1.3.24** (không bump metadata/chuyển current; Step Slider vẫn PLANNED chưa start). Plan [080](.context/planning/080_FUTURE_CANDIDATE_MARINE_BLOCKS_SIDEBAR_ICON_STATES_PLANNING.md) + runbook `docs/testing/marine-blocks-sidebar-icon-states.md`; A+B hybrid (Hover = CSS `:hover`/`:focus-visible`, Selected = React `core/edit-post` active sidebar → `.is-open`, priority selected > hover). Source implement 2026-11-16; build/lint/onsite **chưa PASS**. Commit riêng `feature patch:` làm revert unit độc lập. MILESTONES.md + AGENTS.md đang chứa uncommitted boundary transition notes — không được trộn vào commit feature.
+
+Scope addition2026-11-14 — **PDP Related Card Profile & Chips** gộp vào current1.3.22 theo Q&A 9 điểm của human (SemVer kế thừa 1.3.22, không bump/chuyển current). Decision `docs/decisions/pdp-related-card-profile.md` (ACTIVE); planning [076](.context/planning/076_VER_1_3_22_PDP_RELATED_CARD_PROFILE_PLAN.md). Chốt: Theme Design group `related` (option `skvn_pdp_related`, 15 key); owner `useCustomRelatedCard` default off (inactive = Woo native); override per-product panel + classic meta; presenter `related`, grouped specs P0 gate 060; chip hai lớp + allowlist UI; active: `relatedCount` + `columns = clamp(relatedCount,1,4)`; Copy card settings v1 (first block only, bật owner, not linked). Defer v1: upsells, intersection bật, token typography/color. Acceptance REL-UI-01/02, REL-UX-01/02, REL-TECH-01/02/03, REL-TRACE-01 tại MILESTONES §1.3.22 — tất cả Chưa làm. Plan067 §12–20 giữ nguyên; ba file chung (typography-settings.php, theme-design.tsx, inc/customizer.php) theo sequencing plan076 §2 (P1–P4 plan067 trước, hoặc viết cơ chế group hỗ trợ cả hai trong một lượt). Bắt đầu implement cần lệnh human riêng; deferred baseline 1.3.20 chạy trước follow-up runtime khác.
+
+Human clarification2026-11-12 (lịch sử, đã superseded bởi transition2026-11-13): câu “Đẩy version, đã pass toàn bộ, những lỗi nếu có sẽ sửa trong milestone khác, các thứ cần làm đã đủ và thực hiện đúng với thiết kế” của human thuộc **ngữ cảnh1.3.20**, không phải nghiệm thu1.3.21. 1.3.20 → **DONE_WITH_CARRY_OVER** (chi tiết MILESTONES_HISTORY §1.3.20; evidence kỹ thuật chưa thu thập là carry).
+
+Human update2026-11-13 (lịch sử): “đã hết chớp, các cái khác pass, đang sửa một số cái nhỏ” — HERO-TECH-03 (chớp) **không còn tái hiện**; sau đó cùng ngày human chốt **“Đã xong toàn phần 1.3.21”** → acceptance1.3.21 PASS theo human, rồi waiver carry (“không cần carry over”) → evidence kỹ thuật còn thiếu **không còn là carry**.
+
+Human transition2026-11-12: yêu cầu “commit để tiến hành push milestone sang1.3.21”, bắt đầu current1.3.21. 1.3.20 lúc chuyển mốc ghi **DEFERRED_WITH_CARRY_OVER**, sau đó human PASS2026-11-12 → **DONE_WITH_CARRY_OVER**; full snapshot tại MILESTONES_HISTORY §1.3.20 và carry register current1.3.21 giữ CG/CGD/DS + AM1/AL/AR/AC + DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Hero contrast044 (source có, runtime Chờ kiểm chứng) + Slider Editor UI Redesign theo062/063 (Concept01 source, P0/native/fidelity chưa PASS). Step Slider1.3.24, Blog/M2, ratio controls và Sidebar054 vẫn ngoài scope. Sync working metadata development1.3.21 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current1.3.20 hoặc “không-chuyển-mốc” là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests1.3.20 trước follow-up khác; evidence kỹ thuật còn thiếu của1.3.20 là carry.
+
+Human transition2026-11-07: yêu cầu “cho agent push milestone lên1.3.20”, bắt đầu current1.3.20. 1.3.19 → **DEFERRED_WITH_CARRY_OVER**, không completed/PASS; full snapshot tại MILESTONES_HISTORY và carry register current1.3.20 giữ DS/TD/S19/SR2/CP/EF/RS/CCP + Carousel carry. Scope current: Category049 + Woo Archive059/060, card1:1; ratio controls scope kế tiếp, Blog/M2 chưa start. Sync working metadata development1.3.20 bằng bump-only; agent không build/lint/deploy/git remote push. Các checkpoint dated trước transition còn ghi current cũ hoặc không-chuyển-mốc là lịch sử, superseded bởi quyết định này. Khi bắt đầu phải nhắc human deferred tests trước follow-up khác.
+
+Scope addition2026-11-06: human yêu cầu thực hiện plan059§9 và chọn “chung với1.3.20”. Woo Archive M1 bổ sung vào1.3.20 Product Category Grid + Category details; được coding source cùng mốc đó, theo precedent Category source ngoài current. Không tự đóng/chuyển current1.3.19 hoặc bump metadata. Desktop category sidebar trái, tablet navigation trên; native Woo query, theme visuals, CF7/CFDB7 quote giữ nguyên. Blog archive và Archive M2 chưa start. Acceptance AM1/AL/AR và CG/DS độc lập, không runtime PASS từ source. Plan059§10/runbook ghi triển khai và các design defaults cần human review.
+
+Archive card amendment2026-11-07: human duyệt plan060/shared Product Carousel card và start trong scope1.3.20; ảnh **1:1**, cho đổi ratio để scope kế tiếp chưa gánversion/control owner. Không thêm ratio setting bây giờ; preserve native query/fallback/Collection behavior.060§11–12 và runbook là source/evidence ledger, không runtime PASS hoặc chuyển current.
+
+Scope addition2026-11-05 — Content Actions: human duyệt toàn gói plan057 §11–14 (Product/Post Collections + Slider/Slide), bổ sung current1.3.19, không bump metadata/chuyển milestone; cho agent coding và commit prefix `feature patch:`. Menu ⋮ từng block, giữ style đích, exact type/shape, query là content, empty ghi đè; API/runtime preflight và acceptance vẫn phải kiểm. Right-click plan058 Deferred sau2.0. Handoff `docs/workflows/prompts/block-content-actions-agent-handoff.md`; không hỏi lại scope/version/start đã duyệt, không coi approval là runtime PASS.
+
+Scope addition2026-11-05: human duyệt Responsive Spacer plan055, cho implementation và commit `feature patch:` trong current1.3.19; không chuyển milestone/bump metadata. Source/acceptance riêng RS-*; build/lint/onsite chưa nghiệm thu. Spec `.context/planning/055_VER_1_3_19_RESPONSIVE_SPACER_PLAN.md`.
 
 Human start 2026-11-04: giao agent Sol coding theo plan 048, Q1=A/Q2=A. 1.3.18 được chuyển ưu tiên, **DEFERRED_WITH_CARRY_OVER**, không phải toàn bộ PASS; checklist/evidence giữ trong MILESTONES_HISTORY và carry register 1.3.19. Loading/navigation 046 vẫn thuộc 1.3.18, source/test/debt riêng, chưa nghiệm thu. Các đoạn checkpoint dưới là lịch sử trước lệnh start này. Metadata 1.3.19 là milestone development build, không phải release approval.
 
 Milestone source of truth: `.context/MILESTONES.md`.
+
+Slider Concept01 source2026-11-09: human “Đã test, đúng UX” xác nhận flow P1 sau onsite; tiếp tục layout theo lệnh Tiến hành. P2/P3 có source frame/rail/native stage/footer và controls/states; **bỏ P1 query gate/harness/bootstrap**, normal editor dùng UI mới sau build.19selection/Add mocked tests + syntax10files PASS; presentation suite10/10 human PASS (64.42s, React SSR/WP mocks). Full AF/native technical/geometry/fidelity/3–10Slide/perf chưa PASS.063§13/runbook§0 là checkpoint hiện hành, supersede các dòng P1 default-off/chờ gate bên dưới; không bump/transition/commit/build/lint/deploy.
+
+Slider execution2026-11-09: human “Tiến hành” start source theo063/062 ngoài current1.3.20, không transition/bump. P1 default-off QA harness `skvn-slider-editor-proof=1`, native per-root context/one InnerBlocks/mounted inactive presentation;14 mocked selection/action tests PASS, native N01–03/onsite version/iframe chưa proof. **Không rollout P2/P3 trước gate**; không coi harness là final Concept01. Source/limits/evidence tại063§12 và runbook§2.1. Các entry planning-only sau đây là checkpoint lịch sử superseded về source start; current/acceptance giữ.
+
+Slider execution planning2026-11-09: detailed plan **063** cho1.3.21 nối044/062; bắt buộc P0 pin WP/Gutenberg runtime/tagged API và P1 native3slide proof trước rollout UI. Một InnerBlocks tree, UI-only per-root context/active state, mounted inactive visibility hypothesis, dedicated editor CSS handle; không copy demo store. P0–P5/source map/Inspector inventory/states/runbook `docs/testing/slider-editor-ui-1.3.21.md`; chưa coding/start/bump, current1.3.20 giữ. Khi triển khai/review phải đọc063 cùng062/canonical artifact.
+
+Artifact fidelity2026-11-09: human xem Slider Concept01 và nói “Good”, yêu cầu bám artifact khi thực hiện. **Bắt buộc đọc plan062 + HTML/CSS/JS canonical trước coding/review1.3.21**, kiểm hash, map AF01–10→source, so ảnh artifact/actual cùng available width; mọi thay đổi bố cục/khung/nền/labels phải có delta/evidence để human quyết trước pivot. Không copy demo state/iframe vào Gutenberg. Reference accepted không là runtime PASS/start; current1.3.20 giữ. Plan062 chứa handoff bắt buộc; prototype review tools không thành product controls.
+
+Scope amendment2026-11-09: human thêm **Slider Editor UI Redesign** vào **1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**. Contrast có source/hotfix ngoài current; redesign là scope đã nhận, chưa thiết kế chi tiết/coding/start. Nối plan044§10 và phần Slider P3/EF-SLIDER/EF-06 của053; Step Slider vẫn1.3.24. Giữ current1.3.20, không bump; scope approval không phải duyệt mockup/palette hoặc cho chạy Swiper trong editor.
+
+Category controls planning2026-11-09: human duyệt hướng Full plain-text description, description alignment và Action width/alignment/radius px/placement/gap; yêu cầu detailed planning, chưa giao coding delta này. Plan061 bổ sung Category trong current1.3.20, runbook `docs/testing/category-grid-description-actions-1.3.20.md`. CGD-* implement xong, human-tested 2026-11-11 (T07/T09/T10/T11 PASS theo human, còn lại confirm mức UX; commits `cdf46dc` implement + `1edda8b` docs đã push). Chuyển mốc 1.3.20 chờ human theo Transition Rule. Defaults cũ giữ khi thiếu attrs; pixel inputs là ngoại lệ hẹp Category Action. Không start toàn bộ Sidebar054, bump hoặc đổi current.
 
 Human chuyển current 2026-10-19 sau khi approve 1.3.17 onsite. 1.3.17 → `MILESTONES_HISTORY.md` với `DONE_WITH_CARRY_OVER`: gói A (width) và B (grouped attributes + `+N`) PASS; gói C PASS về chức năng nhưng **bản sửa regression state owner ngày 2026-10-19 chưa kiểm chứng lại**; gói D skeleton **có source, chưa test**. Sáu mục carry sang 1.3.18: xác minh lại C, test D, Post visual riêng, controls hide/disabled, G-MEDIA, editor preview 040 §13. Editor preview chưa được code dù milestone đã mở. Plan `045_VER_1_3_18_CAROUSEL_EDITOR_UX_TECHNICAL_EXECUTION_PLAN.md` đã tồn tại; §9–13 cập nhật planning chi tiết ngày 2026-10-20. Human yêu cầu không sửa skeleton trong đợt này; không triển khai skeleton toàn trang, giữ debt D và hiện tượng chớp chưa giải quyết. Arrow centering đã có source riêng, chờ onsite. Lượt planning không bump metadata hoặc bắt đầu implementation Editor UX.
 
@@ -60,6 +96,7 @@ Mỗi task bắt đầu bằng 4 bước này, không có ngoại lệ:
 3. Đọc .context/TENSIONS_OPEN.md     → check toàn bộ OPEN tensions
 4. Đọc .context/TENSIONS_ACTIVE.md   → check RESOLVED_ACTIVE tensions của milestone hiện tại, dùng tag filter
 5. Đọc .context/modules/<module>.md  → load context của module sắp sửa
+6. Đọc .context/CONVENTION.md → Load các coding convention của dự án
 ```
 
 Nếu `.context/modules/<module>.md` chưa tồn tại → load `GLOBAL.md` + hỏi lại trước khi tạo file mới.
@@ -663,10 +700,16 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 | 1.3.7 | Collection Block UI & Card Styles |
 | 1.3.8 | Slider Parallax |
 | 1.3.9 | Custom Icon Upload |
-| 1.3.10 | Fullscreen Step Slider |
+| 1.3.10 | Fullscreen Step Slider — DEFERRED; scope chuyển sang 1.3.24 |
+| 1.3.24 | Fullscreen Step Slider — human gán 2026-11-07; PLANNED, chưa start; current giữ 1.3.21 |
 | 1.3.11 | Comprehensive Onsite QA (Slider, Collections & Controls) |
 | 1.3.12 | SKVN Team Credits Easter Egg |
 | 1.3.16 | Comprehensive Testing (1.3.x Feature QA) |
+| 1.3.20 | Product Category Grid + Category details + Woo Archive M1 |
+| 1.3.21 | Hero Slider Contrast Repair + Slider Editor UI Redesign |
+| 1.3.22 | Product Page Basic Design Controls + PDP Related plan076/077 — DONE_WITH_CARRY_OVER (tạm PASS theo human 2026-11-16; rework 1.4.x) |
+| 1.3.23 | Post Page Basic Design Controls — **deferred → 1.4.x stockpile** (boundary plan 078) |
+| 1.3.24 | Fullscreen Step Slider — **current pointer** (PLANNED, chưa start) |
 | 1.4.1 | SKVN Theme Init Setup UI |
 | 1.4.2 | Layout Blocks Validation & Quote Evaluation |
 | 1.5.0 | Woo Catalog Plugin |

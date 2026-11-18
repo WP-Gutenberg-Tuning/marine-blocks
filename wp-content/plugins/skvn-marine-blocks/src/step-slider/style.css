@@ -1,0 +1,407 @@
+/* Step Slider — frontend styles (Phase 1, manual).
+ * Pre-.is-ready: steps stack vertically and stay readable without JS.
+ * Post-.is-ready: Swiper manages active slide state.
+ * Palette values are initial placeholders; the editor palette is out of scope.
+ */
+
+.skvn-step-slider {
+	position: relative;
+	width: 100%;
+}
+
+.skvn-step-slider .swiper {
+	width: 100%;
+	min-height: 100svh;
+}
+
+.skvn-step-slider .swiper-slide {
+	width: 100%;
+	height: auto;
+	min-height: 100svh;
+}
+
+/* No runtime / not ready yet: plain vertical stack. */
+.skvn-step-slider:not(.is-ready) .swiper {
+	overflow: visible;
+	height: auto;
+}
+
+.skvn-step-slider:not(.is-ready) .swiper-wrapper {
+	display: block;
+	transform: none;
+	height: auto;
+}
+
+.skvn-step-slider:not(.is-ready) .swiper-slide {
+	position: static;
+	width: 100%;
+	height: auto;
+	opacity: 1;
+	visibility: visible;
+}
+
+.skvn-step-slider:not(.is-ready) .skvn-step-slider__tabs,
+.skvn-step-slider:not(.is-ready) .skvn-step-slider__arrow {
+	display: none;
+}
+
+.skvn-step-slide {
+	position: relative;
+	overflow: hidden;
+	background: #101f30;
+}
+
+.skvn-step-slide__media {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.skvn-step-slide__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: var(--skvn-slide-bg-pos-x, 50%)
+		var(--skvn-slide-bg-pos-y, 50%);
+}
+
+.skvn-step-slide__overlay {
+	position: absolute;
+	inset: 0;
+}
+
+.skvn-step-slide__overlay.is-overlay-light {
+	background: rgba(8, 18, 30, 0.22);
+}
+
+.skvn-step-slide__overlay.is-overlay-medium {
+	background: rgba(8, 18, 30, 0.45);
+}
+
+.skvn-step-slide__overlay.is-overlay-strong {
+	background: rgba(8, 18, 30, 0.65);
+}
+
+.skvn-step-slide__content {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 1.25rem;
+	width: 100%;
+	min-height: 100svh;
+	padding: clamp(2.5rem, 9vh, 6rem) clamp(1.25rem, 7vw, 7rem);
+	padding-bottom: calc(clamp(2.5rem, 9vh, 6rem) + 4.5rem);
+	color: #f5f7fa;
+}
+
+.skvn-step-slide__content.is-position-left {
+	align-items: flex-start;
+	text-align: left;
+}
+
+.skvn-step-slide__content.is-position-center {
+	align-items: center;
+	text-align: center;
+}
+
+.skvn-step-slide__content.is-position-right {
+	align-items: flex-end;
+	text-align: right;
+}
+
+.skvn-step-slide__content--surface {
+	background: rgba(10, 20, 33, 0.72);
+	backdrop-filter: blur(6px);
+}
+
+.skvn-step-slide__content h1,
+.skvn-step-slide__content h2,
+.skvn-step-slide__content h3,
+.skvn-step-slide__content h4,
+.skvn-step-slide__content h5,
+.skvn-step-slide__content h6,
+.skvn-step-slide__content p,
+.skvn-step-slide__content ul,
+.skvn-step-slide__content ol {
+	margin-top: 0;
+}
+
+/* Controls
+ * Tabs stay siblings of .swiper and overlay the bottom of the step box.
+ * Width is 100% of .skvn-step-slider. No 100vw and no negative margin.
+ * A step taller than the viewport keeps the bar at the end of that step.
+ */
+.skvn-step-slider__tabs {
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 3;
+	display: flex;
+	gap: 0.5rem;
+	box-sizing: border-box;
+	max-width: 100%;
+	overflow-x: auto;
+	padding: 0.75rem;
+	scrollbar-width: thin;
+}
+
+.skvn-step-slider__tab {
+	position: relative;
+	flex: 0 0 auto;
+	padding: 0.45rem 0.95rem;
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	border-radius: 999px;
+	background: rgba(10, 20, 33, 0.55);
+	backdrop-filter: blur(4px);
+	color: #f5f7fa;
+	font: inherit;
+	line-height: 1.2;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dwell progress — lives inside the active tab pill.
+ * Width is set by JS from the dwell percentage; no width transition here
+ * so the clock never animates on its own.
+ */
+.skvn-step-slider__tab-progress {
+	position: absolute;
+	inset-inline: 0.55rem;
+	bottom: 0.3rem;
+	display: block;
+	width: 0%;
+	height: 2px;
+	border-radius: 2px;
+	background: currentColor;
+	opacity: 0.85;
+	pointer-events: none;
+}
+
+.skvn-step-slider__tab:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.skvn-step-slider__tab[aria-current="true"],
+.skvn-step-slider__tab.is-active {
+	background: #f5f7fa;
+	border-color: #f5f7fa;
+	color: #10233a;
+}
+
+.skvn-step-slider__arrow {
+	position: absolute;
+	top: 50%;
+	z-index: 4;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	border-radius: 50%;
+	background: rgba(10, 20, 33, 0.6);
+	backdrop-filter: blur(4px);
+	color: #ffffff;
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	transform: translateY(-50%);
+	transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.skvn-step-slider__arrow--prev {
+	left: 1rem;
+}
+
+.skvn-step-slider__arrow--next {
+	right: 1rem;
+}
+
+.skvn-step-slider__arrow:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+/* Play — rendered hidden by PHP, revealed only by a focus stop.
+ * Sibling of .swiper like the arrows. */
+.skvn-step-slider__play {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	z-index: 4;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	border-radius: 50%;
+	background: rgba(10, 20, 33, 0.6);
+	backdrop-filter: blur(4px);
+	color: #ffffff;
+	font: inherit;
+	font-size: 0.8rem;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.skvn-step-slider__play:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.skvn-step-slider__play[hidden] {
+	display: none;
+}
+
+.skvn-step-slider__arrow:focus-visible,
+.skvn-step-slider__tab:focus-visible,
+.skvn-step-slider__play:focus-visible {
+	outline: 2px solid #ffffff;
+	outline-offset: 2px;
+}
+
+/* Wipe — active slide media only, 800 ms. Fade stays with Swiper. */
+@keyframes skvn-step-wipe {
+	from {
+		clip-path: inset(0 100% 0 0);
+	}
+	to {
+		clip-path: inset(0 0 0 0);
+	}
+}
+
+.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__media {
+	animation: skvn-step-wipe 800ms ease both;
+}
+
+/* Text cascade — heading 0 / paragraph 100 / list 200 / buttons 300 ms, 400 ms. */
+@keyframes skvn-step-cascade {
+	from {
+		opacity: 0;
+		transform: translateY(0.75rem);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > * {
+	opacity: 1;
+}
+
+.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > .wp-block-heading {
+	animation: skvn-step-cascade 400ms ease both;
+	animation-delay: 0ms;
+}
+
+.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > .wp-block-paragraph {
+	animation: skvn-step-cascade 400ms ease both;
+	animation-delay: 100ms;
+}
+
+.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > .wp-block-list {
+	animation: skvn-step-cascade 400ms ease both;
+	animation-delay: 200ms;
+}
+
+.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > .wp-block-buttons {
+	animation: skvn-step-cascade 400ms ease both;
+	animation-delay: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__media {
+		animation: none;
+		clip-path: none;
+	}
+
+	.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > * {
+		opacity: 1 !important;
+		transform: none !important;
+		animation: none !important;
+	}
+
+	/* No autoplay under reduced motion; the progress clock must not animate. */
+	.skvn-step-slider__tab-progress {
+		transition: none;
+	}
+}
+
+@media print {
+	.skvn-step-slider__tabs,
+	.skvn-step-slider__arrow,
+	.skvn-step-slider__play {
+		display: none !important;
+	}
+
+	.skvn-step-slider .swiper {
+		overflow: visible;
+		height: auto;
+		min-height: auto;
+	}
+
+	.skvn-step-slider .swiper-wrapper {
+		display: block;
+		transform: none !important;
+		height: auto;
+	}
+
+	.skvn-step-slider .swiper-slide {
+		position: static;
+		width: 100%;
+		height: auto;
+		min-height: auto;
+		opacity: 1 !important;
+		visibility: visible !important;
+		page-break-inside: avoid;
+	}
+
+	.skvn-step-slide__content {
+		min-height: auto;
+		padding-bottom: 1.5rem;
+	}
+
+	.skvn-step-slide__media {
+		position: relative;
+		max-height: 240px;
+		overflow: hidden;
+	}
+
+	.skvn-step-slide__image {
+		height: 240px;
+	}
+
+	.skvn-step-slide__content,
+	.skvn-step-slide__media,
+	.skvn-step-slide * {
+		animation: none !important;
+	}
+}
+
+@media (max-width: 640px) {
+	.skvn-step-slider__arrow,
+	.skvn-step-slider__play {
+		width: 2.25rem;
+		height: 2.25rem;
+	}
+
+	.skvn-step-slider__arrow {
+		font-size: 1.25rem;
+	}
+
+	.skvn-step-slider__play {
+		font-size: 0.7rem;
+	}
+
+	.skvn-step-slider__arrow--prev {
+		left: 0.5rem;
+	}
+
+	.skvn-step-slider__arrow--next {
+		right: 0.5rem;
+	}
+}

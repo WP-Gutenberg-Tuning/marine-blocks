@@ -148,6 +148,53 @@ function skvn_marine_blocks_core_control_inject_config() {
 		'window.skvnCoreControls = ' . $json . ';',
 		'before'
 	);
+
+	if ( ! empty( $enabled['block_clipboard'] ) ) {
+		// This menu lives in the editor chrome, not the block canvas/frontend.
+		// Keep the small style independent of the shared block style bundle.
+		wp_register_style( 'skvn-block-content-actions-editor', false, array( 'wp-components' ) );
+		wp_enqueue_style( 'skvn-block-content-actions-editor' );
+		wp_add_inline_style(
+			'skvn-block-content-actions-editor',
+			<<<'CSS'
+/* The native Slot group owns horizontal inset; never pad its child group. */
+.skvn-block-content-actions {
+	padding-inline: 0;
+}
+/* Outer native groups own their boundary separators. Only add internal ones. */
+.skvn-block-content-actions:not(:first-child) {
+	border-block-start: 1px solid #ccc;
+	margin-block-start: 8px;
+	padding-block-start: 8px;
+}
+.skvn-block-content-actions:not(:last-child) {
+	border-block-end: 1px solid #ccc;
+	margin-block-end: 8px;
+	padding-block-end: 8px;
+}
+.skvn-block-content-actions > .skvn-block-content-actions__heading {
+	background: #f0f9ff;
+	color: #075985;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.5;
+	padding: 6px 8px;
+	text-transform: none;
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+@media (forced-colors: active) {
+	.skvn-block-content-actions {
+		border-color: CanvasText;
+	}
+	.skvn-block-content-actions > .skvn-block-content-actions__heading {
+		background: Canvas;
+		color: CanvasText;
+	}
+}
+CSS
+		);
+	}
 }
 
 /**

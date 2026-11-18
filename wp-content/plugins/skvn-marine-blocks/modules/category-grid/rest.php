@@ -76,6 +76,12 @@ function skvn_marine_blocks_category_grid_term_payload( $term, $counts, $details
 		),
 	);
 
+	if ( $details ) {
+		// Full plain text for the canvas. Every editor role that can read this
+		// route sees it; the raw `description` below stays permission-gated.
+		$payload['descriptionText'] = skvn_marine_blocks_category_grid_description_text( $term->description );
+	}
+
 	if ( $details && $can_edit ) {
 		// Raw value so the editor can round-trip native HTML without the code
 		// block rewriting or normalizing it (Q3=B).

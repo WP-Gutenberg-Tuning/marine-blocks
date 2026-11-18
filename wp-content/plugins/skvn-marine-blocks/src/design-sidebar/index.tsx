@@ -9,6 +9,7 @@ import type { CollectionAttributes } from '../collection/types';
 import { CategoryDesignControls } from '../product-category-grid/design';
 import type { CategoryGridAttributes } from '../product-category-grid/types';
 import { canUseDesignSidebar, designGroups, designStore, resetDesign } from './navigation';
+import { MarineBlocksSidebarIcon } from './sidebar-icon';
 import { ThemeDesign, useThemeDesign } from './theme-design';
 
 function DesignSidebar() {
@@ -36,7 +37,7 @@ function PostDesignSidebar() {
 		if ( ! block || editor.getSelectedBlockClientIds().length !== 1 || editor.getSelectedBlockClientId() !== block.clientId || ! editor.getBlock( block.clientId ) ) return;
 		dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, attrs );
 	};
-	return <PluginSidebar name="design" title={ __( 'Marine Blocks', 'skvn-marine-blocks' ) } icon="admin-customizer">
+	return <PluginSidebar name="design" title={ __( 'Marine Blocks', 'skvn-marine-blocks' ) } icon={ window.skvnMarineDesign?.iconUrl ? MarineBlocksSidebarIcon : 'admin-customizer' }>
 		<PanelBody>
 			<div role="group" aria-label={ __( 'Settings scope', 'skvn-marine-blocks' ) }>
 				<Button variant={ ui.tab === 'selected' ? 'primary' : 'secondary' } aria-pressed={ ui.tab === 'selected' } onClick={ () => dispatch( designStore ).tab( 'selected' ) }>{ __( 'Selected block', 'skvn-marine-blocks' ) }</Button>

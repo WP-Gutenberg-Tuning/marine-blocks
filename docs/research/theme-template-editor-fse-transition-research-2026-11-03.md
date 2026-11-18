@@ -2,7 +2,7 @@
 
 Ngày ghi nhận: **2026-11-03**. Phạm vi: kiến trúc theme, template Product/Post và trải nghiệm biên tập.
 
-**Mapping human đã chốt sau nghiên cứu:** 1.3.22 — Product Page Basic Design Controls; 1.3.23 — Post Page Basic Design Controls, sau nền sidebar 1.3.19. Cả hai PLANNED, chưa start; ngoại lệ đánh số PATCH đã được human xác nhận. Scope/acceptance chính thức ở [MILESTONES.md](../../.context/MILESTONES.md); phải đối chiếu acceptance 1.3.5 trước implementation. Các mốc này giữ child theme và template PHP, không đưa migration FSE về 1.3.x.
+**Mapping human đã chốt sau nghiên cứu:** 1.3.22 — Product Page Basic Design Controls; 1.3.23 — Post (thứ tự nghiệp vụ). **Cập nhật 2026-11-16:** Post **defer → 1.4.x stockpile** pending plan [078](../../.context/planning/078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md). Scope/acceptance ở [MILESTONES.md](../../.context/MILESTONES.md). Child theme + template PHP; không FSE migration 1.3.x.
 
 **Trạng thái: human đã chấp nhận hướng planning; chưa phê duyệt bắt đầu implementation.** Báo cáo này là điểm tiếp nối cho thảo luận sau, không phải bằng chứng runtime PASS hoặc lệnh chuyển milestone.
 

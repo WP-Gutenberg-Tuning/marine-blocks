@@ -9,6 +9,12 @@ export type CategorySelection = {
 
 export type CategoryGap = 'small' | 'medium' | 'large';
 export type CategoryMediaFit = 'contain' | 'cover';
+export type CategoryDescriptionDisplay = 'excerpt' | 'full';
+export type CategoryDescriptionAlign = 'left' | 'center' | 'right' | 'justify';
+export type CategoryActionWidthMode = 'auto' | 'full' | 'custom';
+export type CategoryActionAlign = 'left' | 'center' | 'right';
+export type CategoryActionRadiusMode = 'pill' | 'custom';
+export type CategoryActionPlacement = 'flow' | 'bottom';
 export type CategoryRadius = 'none' | 'sm' | 'md' | 'lg';
 export type CategoryPadding = 'none' | 'sm' | 'md' | 'lg';
 export type CategoryShadow = 'none' | 'soft' | 'strong';
@@ -25,10 +31,21 @@ export type CategoryGridAttributes = {
 	showImage: boolean;
 	showName: boolean;
 	showDescription: boolean;
+	descriptionDisplay?: CategoryDescriptionDisplay;
+	/** Plan 061 §4: enum attributes fall back to their default when invalid. */
+	descriptionAlign?: CategoryDescriptionAlign;
 	showPath: boolean;
 	showCount: boolean;
 	showCta: boolean;
 	ctaLabel: string;
+	/** Button geometry (plan 061 §4). `actionGapPx` absent = Default 0.4rem. */
+	actionWidthMode?: CategoryActionWidthMode;
+	actionWidthPercent?: number;
+	actionAlign?: CategoryActionAlign;
+	actionRadiusMode?: CategoryActionRadiusMode;
+	actionRadiusPx?: number;
+	actionPlacement?: CategoryActionPlacement;
+	actionGapPx?: number;
 	cardBackground?: string;
 	cardRadius?: CategoryRadius;
 	cardPadding?: CategoryPadding;
@@ -62,6 +79,12 @@ export type CategoryRecord = {
 	count: number;
 	hasProducts: boolean;
 	descriptionExcerpt: string;
+	/**
+	 * Full plain-text description (presentation field, resolved server side).
+	 * Optional: stale API responses without the field must not be treated as
+	 * full text (plan 061 §5.1 - never coalesce excerpt into full).
+	 */
+	descriptionText?: string;
 	canEdit: boolean;
 	thumbnail: CategoryThumbnail;
 	/** Raw native value; only present for editors that may edit the term. */

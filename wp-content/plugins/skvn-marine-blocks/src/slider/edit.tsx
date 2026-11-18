@@ -1,10 +1,7 @@
 import {
-	InnerBlocks,
 	InspectorControls,
-	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
 import {
 	BaseControl,
 	Button,
@@ -15,15 +12,17 @@ import {
 	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { SliderEditorCanvas } from './editor/canvas';
+import { arrowStyleOptions, arrowPositionOptions, paginationStyleOptions, paginationPositionOptions } from './editor/navigation-options';
+import { useEditorPreviewFrame } from '../shared/editor-preview-frame';
 import { GovernedTimeControl } from '../shared/governed-time-control';
 import {
 	SLIDER_AUTOPLAY_TIME,
 	SLIDER_TRANSITION_TIME,
 } from './time';
 
-type SliderAttributes = {
+export type SliderAttributes = {
 	autoplay: boolean;
 	autoplayDelay: number;
 	loop: boolean;
@@ -44,12 +43,14 @@ type SliderAttributes = {
 	effect: string;
 	transitionStyle: '' | 'directional-wipe' | 'fade' | 'zoom-out';
 	transitionDuration: number;
+	contentMotion: 'off' | 'stagger' | 'fade';
 	heightPreset:
 		| 'default'
 		| 'content'
 		| 'medium'
 		| 'tall'
 		| 'viewport-below-header';
+	align?: 'none' | 'wide' | 'full';
 	slidesPerView: number;
 	preset: string;
 	responsiveSlides: string;
@@ -61,6 +62,7 @@ type SliderAttributes = {
 	parallaxTranslate: number;
 	parallaxScale: number;
 	parallaxInset: number;
+	parallaxBlur: number;
 };
 
 type SliderEditProps = {
@@ -69,109 +71,24 @@ type SliderEditProps = {
 	setAttributes: (attributes: Partial<SliderAttributes>) => void;
 };
 
-const TEMPLATE = [['skvn-marine/slide'], ['skvn-marine/slide']];
-
 export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
-	const presetClass = attributes.preset
-		? ` skvn-slider--${ attributes.preset }`
-		: '';
-	const slideCount = useSelect(
-		( select ) => {
-			const editor = select( blockEditorStore ) as {
-				getBlockCount: ( blockClientId: string ) => number;
-			};
-
-			return editor.getBlockCount( clientId );
-		},
-		[ clientId ]
-	);
-	const hasFiveSlideLimit = [ 'hero', 'product-showcase' ].includes(
-		attributes.preset
-	);
-	const hasGovernedSlidesPerView = [
-		'hero',
-		'product-showcase',
-		'card-carousel',
-	].includes( attributes.preset );
+	const presetClass = attributes.preset ? ` skvn-slider--${ attributes.preset }` : '';
+	const frameRef = useEditorPreviewFrame();
+	const hasGovernedSlidesPerView = [ 'hero', 'product-showcase', 'card-carousel' ].includes( attributes.preset );
 	const hasMultiViewTransition = attributes.preset === 'card-carousel' ||
 		( ! hasGovernedSlidesPerView && attributes.slidesPerView > 1 );
-	const reachedSlideLimit = hasFiveSlideLimit && slideCount >= 5;
-	const effectiveTransitionStyle =
-		attributes.transitionStyle ||
-		(attributes.effect === 'fade' ? 'fade' : 'directional-wipe');
-	const allowedBlocks =
-		reachedSlideLimit ? [] : [ 'skvn-marine/slide' ];
-	const { insertBlock, selectBlock } = useDispatch( blockEditorStore ) as {
-		insertBlock: (
-			block: ReturnType< typeof createBlock >,
-			index: number,
-			rootClientId: string
-		) => void;
-		selectBlock: ( blockClientId: string ) => void;
-	};
-	const addSlide = () => {
-		if ( reachedSlideLimit ) {
-			return;
-		}
-
-		const slide = createBlock( 'skvn-marine/slide' );
-		insertBlock( slide, slideCount, clientId );
-		selectBlock( slide.clientId );
-	};
-	const blockProps = useBlockProps({
-		className: `skvn-slider skvn-slider--editor skvn-slider--height-${ attributes.heightPreset }${ presetClass }`,
-	});
-	const controlsFlank =
-		attributes.showArrows &&
-		attributes.showPagination &&
-		slideCount > 1 &&
-		attributes.arrowPosition === 'bottom-center' &&
-		attributes.paginationPosition === 'bottom-center' &&
-		attributes.arrowStyle !== 'pill';
-	const controlsCluster =
-		attributes.showArrows &&
-		attributes.showPagination &&
-		attributes.arrowPosition !== 'side-center' &&
-		attributes.arrowPosition === attributes.paginationPosition &&
-		! controlsFlank;
-	let staticControlsClass =
-		'skvn-slider__controls skvn-slider__controls--editor-preview';
-	if ( controlsFlank ) {
-		staticControlsClass += ` skvn-slider__controls--cluster skvn-slider__controls--bottom-center skvn-slider__controls--cluster-flank skvn-slider__controls--arrows-${ attributes.arrowStyle }`;
-	} else if ( controlsCluster ) {
-		staticControlsClass += ` skvn-slider__controls--cluster skvn-slider__controls--${ attributes.arrowPosition }`;
-	}
-	const paginationPreview = attributes.showPagination ? (
-		<div
-			className={ `skvn-slider__pagination skvn-slider__pagination--${ attributes.paginationStyle } skvn-slider__pagination--${ attributes.paginationPosition }` }
-		>
-			{ attributes.paginationStyle.includes( 'fraction' ) ? (
-				<>
-					<span>01</span>
-					{ attributes.paginationStyle === 'timed-fraction' && (
-						<span
-							aria-hidden="true"
-							className="skvn-slider__timer"
-						/>
-					) }
-					<span>{ String( slideCount ).padStart( 2, '0' ) }</span>
-				</>
-			) : (
-				Array.from( { length: slideCount }, ( _, index ) => (
-					<span
-						aria-current={ index === 0 ? 'true' : undefined }
-						className="skvn-slider__static-bullet"
-						key={ index }
-					/>
-				) )
-			) }
-		</div>
-	) : null;
+	const effectiveTransitionStyle = attributes.transitionStyle ||
+		( attributes.effect === 'fade' ? 'fade' : 'directional-wipe' );
+	const alignClass = attributes.align ? ` align${ attributes.align }` : '';
+	const blockProps = useBlockProps( {
+		ref: frameRef,
+		className: `skvn-slider skvn-slider--editor skvn-slider--editor-focus skvn-editor-preview-frame skvn-slider--height-${ attributes.heightPreset }${ presetClass }${ alignClass }`,
+	} );
 
 	return (
 		<div {...blockProps}>
 			<InspectorControls>
-				<PanelBody title={__('Slider settings', 'skvn-marine-blocks')}>
+				<PanelBody title={__('Playback', 'skvn-marine-blocks')}>
 					<ToggleControl
 						checked={attributes.autoplay}
 						label={__('Autoplay', 'skvn-marine-blocks')}
@@ -216,17 +133,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 											arrowStyle as SliderAttributes['arrowStyle'],
 									})
 								}
-								options={[
-									{ label: __('Minimal', 'skvn-marine-blocks'), value: 'minimal' },
-									{ label: __('Circle', 'skvn-marine-blocks'), value: 'circle' },
-									{
-										disabled:
-											attributes.arrowPosition ===
-											'side-center',
-										label: __('Pill', 'skvn-marine-blocks'),
-										value: 'pill',
-									},
-								]}
+								options={ arrowStyleOptions( attributes.arrowPosition ) }
 								value={attributes.arrowStyle}
 							/>
 							<SelectControl
@@ -245,17 +152,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 											arrowPosition as SliderAttributes['arrowPosition'],
 									})
 								}
-								options={[
-									{
-										disabled:
-											attributes.arrowStyle === 'pill',
-										label: __('Side center', 'skvn-marine-blocks'),
-										value: 'side-center',
-									},
-									{ label: __('Bottom left', 'skvn-marine-blocks'), value: 'bottom-left' },
-									{ label: __('Bottom center', 'skvn-marine-blocks'), value: 'bottom-center' },
-									{ label: __('Bottom right', 'skvn-marine-blocks'), value: 'bottom-right' },
-								]}
+								options={ arrowPositionOptions( attributes.arrowStyle ) }
 								value={attributes.arrowPosition}
 							/>
 						</>
@@ -282,12 +179,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 											paginationStyle as SliderAttributes['paginationStyle'],
 									})
 								}
-								options={[
-									{ label: __('Dots', 'skvn-marine-blocks'), value: 'dots' },
-									{ label: __('Fraction', 'skvn-marine-blocks'), value: 'fraction' },
-									{ label: __('Timed fraction', 'skvn-marine-blocks'), value: 'timed-fraction' },
-									{ label: __('Timed segments', 'skvn-marine-blocks'), value: 'timed-segments' },
-								]}
+								options={ paginationStyleOptions() }
 								value={attributes.paginationStyle}
 							/>
 							<SelectControl
@@ -298,11 +190,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 											paginationPosition as SliderAttributes['paginationPosition'],
 									})
 								}
-								options={[
-									{ label: __('Bottom left', 'skvn-marine-blocks'), value: 'bottom-left' },
-									{ label: __('Bottom center', 'skvn-marine-blocks'), value: 'bottom-center' },
-									{ label: __('Bottom right', 'skvn-marine-blocks'), value: 'bottom-right' },
-								]}
+								options={ paginationPositionOptions() }
 								value={attributes.paginationPosition}
 							/>
 						</>
@@ -354,6 +242,32 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 									})
 								}
 								value={ attributes.transitionDuration }
+							/>
+							<SelectControl
+								help={
+									attributes.contentMotion === 'fade'
+										? __(
+												'Each block in order, 0.2s apart, from the side the slide is moving. Applies to blocks placed directly in the slide. Has no effect in the editor.',
+												'skvn-marine-blocks'
+										  )
+										: __(
+												'Heading, then the paragraph, then the buttons. Applies to blocks placed directly in the slide. Has no effect in the editor.',
+												'skvn-marine-blocks'
+										  )
+								}
+								label={__('Text motion', 'skvn-marine-blocks')}
+								onChange={(contentMotion) =>
+									setAttributes({
+										contentMotion:
+											contentMotion as SliderAttributes['contentMotion'],
+									})
+								}
+								options={[
+									{ label: __('Off', 'skvn-marine-blocks'), value: 'off' },
+									{ label: __('Stagger', 'skvn-marine-blocks'), value: 'stagger' },
+									{ label: __('Fade', 'skvn-marine-blocks'), value: 'fade' },
+								]}
+								value={attributes.contentMotion || 'off'}
 							/>
 						</>
 					)}
@@ -413,7 +327,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 					<ToggleControl
 						checked={attributes.enableParallax}
 						help={__(
-							'Background image moves at a different speed than the slide, creating a sense of depth. Has no effect in the editor.',
+							'While the slide changes, the background moves at a different speed. The still image stays the same size. Has no effect in the editor.',
 							'skvn-marine-blocks'
 						)}
 						label={__('Enable parallax', 'skvn-marine-blocks')}
@@ -422,7 +336,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 					{ attributes.enableParallax && ! attributes.parallaxAdvanced && (
 						<BaseControl
 							help={__(
-								'Controls how far the background travels and how much it scales during the transition.',
+								'How far the background travels while the slide changes. The still image does not zoom.',
 								'skvn-marine-blocks'
 							)}
 							label={__('Intensity', 'skvn-marine-blocks')}
@@ -458,12 +372,32 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 							}
 						/>
 					) }
+					{ attributes.enableParallax &&
+						( ! attributes.parallaxAdvanced ||
+							attributes.parallaxDepth !== 'scale' ) && (
+						<RangeControl
+							help={__(
+								'Blurs a still copy of the image behind the one that moves, so the gap is not a flat color. 0 turns this off. The still image stays the same size. Has no effect in the editor.',
+								'skvn-marine-blocks'
+							)}
+							label={__('Edge blur', 'skvn-marine-blocks')}
+							max={48}
+							min={0}
+							onChange={(parallaxBlur) =>
+								setAttributes({
+									parallaxBlur: parallaxBlur ?? 0,
+								})
+							}
+							step={1}
+							value={attributes.parallaxBlur}
+						/>
+					) }
 					{ attributes.enableParallax && attributes.parallaxAdvanced && (
 						<>
 							<SelectControl
 								label={__('Depth mechanism', 'skvn-marine-blocks')}
 								help={__(
-									'Both compounds a slide and a zoom for the strongest depth.',
+									'Both moves and zooms the background. Translate only moves it and can show the slide fill at the edge. Scale only zooms.',
 									'skvn-marine-blocks'
 								)}
 								onChange={(parallaxDepth) =>
@@ -497,10 +431,17 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 									/>
 									<RangeControl
 										label={__('Translate', 'skvn-marine-blocks')}
-										help={__(
-											'How far the background travels, in percent.',
-											'skvn-marine-blocks'
-										)}
+										help={
+											attributes.parallaxDepth === 'translate'
+												? __(
+														'How far the background travels, in percent. Translate only does not zoom. The slide fill can show along the edge while the slide changes.',
+														'skvn-marine-blocks'
+												  )
+												: __(
+														'How far the background travels, in percent. During the change the slider also zooms enough to keep the edge covered.',
+														'skvn-marine-blocks'
+												  )
+										}
 										max={80}
 										min={0}
 										onChange={(parallaxTranslate) =>
@@ -511,32 +452,23 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 										}
 										value={attributes.parallaxTranslate}
 									/>
-									<RangeControl
-										label={__('Edge guard (inset)', 'skvn-marine-blocks')}
-										help={__(
-											'Extra background beyond the frame so the edge is not revealed during travel. Raise if you see a gap.',
-											'skvn-marine-blocks'
-										)}
-										max={80}
-										min={0}
-										onChange={(parallaxInset) =>
-											setAttributes({
-												parallaxInset:
-													parallaxInset ?? 35,
-											})
-										}
-										value={attributes.parallaxInset}
-									/>
 								</>
 							) }
 							{ attributes.parallaxDepth !== 'translate' && (
 								<RangeControl
 									label={__('Scale', 'skvn-marine-blocks')}
-									help={__(
-										'How much the background zooms during the transition.',
-										'skvn-marine-blocks'
-									)}
-									max={1.5}
+									help={
+										attributes.parallaxDepth === 'both'
+											? __(
+													'Zoom while the slide changes. If this is lower than the translate needs to hide the edge, the slider raises it.',
+													'skvn-marine-blocks'
+											  )
+											: __(
+													'Zoom while the slide changes. The still image stays the same size.',
+													'skvn-marine-blocks'
+											  )
+									}
+									max={2}
 									min={1}
 									step={0.01}
 									onChange={(parallaxScale) =>
@@ -552,105 +484,7 @@ export function Edit({ attributes, clientId, setAttributes }: SliderEditProps) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<div className="skvn-slider__editor-toolbar">
-				<Button
-					className="skvn-slider__add-slide"
-					disabled={ reachedSlideLimit }
-					icon="plus-alt2"
-					onClick={ addSlide }
-					title={
-						reachedSlideLimit
-							? __(
-									'This Slider preset supports up to five slides.',
-									'skvn-marine-blocks'
-							  )
-							: __( 'Add slide', 'skvn-marine-blocks' )
-					}
-					variant="primary"
-				>
-					{ reachedSlideLimit
-						? __( 'Slide limit reached', 'skvn-marine-blocks' )
-						: __( 'Add slide', 'skvn-marine-blocks' ) }
-				</Button>
-				{ attributes.enableParallax && (
-					<span className="skvn-slider__parallax-badge">
-						{ `Parallax ON · ${ attributes.parallaxAdvanced ? 'custom' : attributes.parallaxIntensity }` }
-					</span>
-				) }
-			</div>
-			<div className="skvn-slider__editor-stack">
-				<InnerBlocks
-					allowedBlocks={ allowedBlocks }
-					renderAppender={
-						reachedSlideLimit
-							? false
-							: InnerBlocks.ButtonBlockAppender
-					}
-					template={ TEMPLATE }
-				/>
-			</div>
-			<div
-				aria-hidden="true"
-				aria-label={__(
-					'Static controls preview',
-					'skvn-marine-blocks'
-				)}
-				className={ staticControlsClass }
-			>
-				{ controlsFlank ? (
-					<>
-						<button
-							aria-label={ __(
-								'Previous slide',
-								'skvn-marine-blocks'
-							) }
-							className="skvn-slider__arrow skvn-slider__arrow--prev"
-							type="button"
-						/>
-						{ paginationPreview }
-						<button
-							aria-label={ __(
-								'Next slide',
-								'skvn-marine-blocks'
-							) }
-							className="skvn-slider__arrow skvn-slider__arrow--next"
-							type="button"
-						/>
-					</>
-				) : (
-					<>
-						{ attributes.showArrows && (
-							<div
-								className={ `skvn-slider__arrows skvn-slider__arrows--${ attributes.arrowStyle } skvn-slider__arrows--${ attributes.arrowPosition }` }
-							>
-								<button
-									aria-label={ __(
-										'Previous slide',
-										'skvn-marine-blocks'
-									) }
-									className="skvn-slider__arrow skvn-slider__arrow--prev"
-									type="button"
-								/>
-								<button
-									aria-label={ __(
-										'Next slide',
-										'skvn-marine-blocks'
-									) }
-									className="skvn-slider__arrow skvn-slider__arrow--next"
-									type="button"
-								/>
-							</div>
-						) }
-						{ controlsCluster && (
-							<span
-								aria-hidden="true"
-								className="skvn-slider__controls-separator"
-							/>
-						) }
-						{ paginationPreview }
-					</>
-				) }
-			</div>
+			<SliderEditorCanvas clientId={ clientId } attributes={ attributes } />
 		</div>
 	);
 }

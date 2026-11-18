@@ -1,13 +1,14 @@
 {
   "name": "skvn-marine-blocks",
-  "version": "1.3.19",
+  "version": "1.3.23",
   "private": true,
   "description": "Custom Gutenberg blocks for SKVN Marine.",
   "scripts": {
-    "build": "wp-scripts build src/index.ts src/slider/view.ts src/motion-view.ts src/collection-view.ts --output-path=build --webpack-copy-php",
-    "start": "wp-scripts start src/index.ts src/slider/view.ts src/motion-view.ts src/collection-view.ts --output-path=build --webpack-copy-php"
+    "build": "wp-scripts build src/index.ts src/slider/view.ts src/motion-view.ts src/collection-view.ts src/step-slider/frontend.ts --output-path=build --webpack-copy-php",
+    "start": "wp-scripts start src/index.ts src/slider/view.ts src/motion-view.ts src/collection-view.ts src/step-slider/frontend.ts --output-path=build --webpack-copy-php"
   },
   "dependencies": {
+    "@wordpress/icons": "^10.0.0",
     "swiper": "^11.1.15"
   },
   "devDependencies": {

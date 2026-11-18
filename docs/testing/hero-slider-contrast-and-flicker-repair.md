@@ -1,5 +1,9 @@
 # Hero Slider — contrast repair và kiểm chứng fade
 
+**Detailed native editor suite2026-11-09:** [slider-editor-ui-1.3.21.md](slider-editor-ui-1.3.21.md) expands SED/AF cases into P1 feasibility N01–03 and full UI U01–09 from plan063. Use it for redesign; keep HERO-* contrast/flicker fixtures/results here. No new implementation/tests executed. Official API inventory must be pinned to actual WP/Gutenberg runtime before native proof.
+
+**Scope update2026-11-09:**1.3.21 là **Hero Slider Contrast Repair + Slider Editor UI Redesign**, current1.3.20. Contrast source có/runtime pending; redesign mới nhận scope, chưa mockup/coding/start. Implementation/version TBD dưới đây là checkpoint cũ; HERO-* và SED-* phải có evidence riêng, chưa PASS.
+
 Ngày: 2026-10-19 (cập nhật sau audit source). Status: **Chưa chạy — test plan**, implementation/version TBD; không phải PASS hoặc test đã được human defer.
 
 Plan: `.context/planning/044_HERO_SLIDER_CONTRAST_AND_FLICKER_REPAIR_PLAN.md` (đã sửa 2026-10-19 sau audit: specificity thật của rule theme, cơ chế `!important` của WP preset, và hướng sửa mới "carrier + inherit" thay cho "gán trắng trực tiếp").
@@ -63,3 +67,27 @@ Outcome được phép: **PASS/FAIL contrast**, và riêng **chớp tái hiện 
 - Bảng kết quả theo HERO-UI-01/02/03, HERO-UX-01, HERO-TECH-01/02/03 của plan, giữ mục chưa kiểm ở trạng thái Chờ kiểm chứng.
 
 Agent tiếp tục từ evidence để chỉnh cascade hoặc mở điều tra chớp cụ thể; không bắt human chạy lại fixtures đã đủ bằng chứng nếu source mới không ảnh hưởng chúng.
+
+## Slider Editor UI Redesign — tests bổ sung (planned2026-11-09)
+
+Spec044§10/053. Chưa có mockup/implementation mới để chạy. Sau chốt thiết kế phải bổ sung exact labels/control locations/expected geometry; các cases sau chưa phải approval một kiểu preview cụ thể.
+
+Target: xác nhận edit URL report page trên và test copy/staging cho Hero/Showcase/Card Carousel/default; không tự sửa production. Setup: human-built assets đúng commit, old/new saved content, empty/one/many/limit/missing media/long text, desktop/narrow canvas/sidebar, giữ frontend settings để so trước/sau.
+
+| IDs | Steps sau approved design | Expected/PASS | Evidence |
+|---|---|---|---|
+| SED-ED01/02 | So canvas/Inspector với mockup từng variation; chọn parent/child rồi đổi setting, thu hẹp editor/sidebar | Không mất content/controls, đúng target, hierarchy/labels/help theo design; không horizontal overflow | Mockup/decision, screenshots/attrs/rect |
+| SED-ED03 | Add/select/reorder/remove/duplicate, native List View, RichText/IME, Undo/Redo, Save/reopen, đạt limit | Content/order/focus đúng, không mất chữ/invalid-block; limit5 Hero/Showcase giữ; không store song song | Video/saved content/console/focused element |
+| SED-ED04 | Empty/1/many/limit/missing/long, selected/unselected, blocks kề nhau/narrow parent | Frame/label/palette theo design, spacing053, notices rõ; preview static không giả autoplay | Shots/gap/boxes/clientWidth/scrollWidth |
+| SED-TECH01 | Editor cold load, network/stylesheets, reopen old content, kiểm không Swiper/autoplay editor | CSS thực sự enqueue đúng handle, không chỉ có trong build; saved schema giữ, không leak/init thừa | Assets/network/DOM/saved diff/console |
+| SED-UI01 | Frontend smoke mọi variation cùng content/settings trước/sau; HERO-* bị ảnh hưởng | Layout/navigation/motion giữ baseline, contrast/custom colors đúng; chớp outcome riêng | Paired shots/video/build identity/HERO và SED results |
+
+Tất cả Chưa làm/not run. Human gửi URL/build/browser/width/role và expected-vs-actual mỗi ID; agent tiếp tục từ evidence. Một screenshot hoặc model test không PASS toàn redesign. Step Slider ở1.3.24, ngoài bộ này.
+
+## Artifact fidelity gate — Concept01 (2026-11-09)
+
+Required reference: [contract062](../../.context/planning/062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md), [canonical HTML](../artifacts/editor-ui/slider-editor-redesign-prototype.html) and [notes](../artifacts/editor-ui/slider-editor-redesign-prototype.md). Human accepted the layout as implementation reference; this is not Gutenberg runtime PASS. Match source hash before comparison; do not modify the artifact to hide implementation drift.
+
+For AF01–10, record actual source file:symbol, status, screenshot/DOM evidence and deviations. Open reference and real Gutenberg editor with matched content/available canvas width/font and selected slide. Capture wide, narrow (including Sidebar open/nested parent),10-slide list where allowed, Hero limit5, selected/unselected and long-content/missing/empty states. Side-by-side screenshots must identify which is reference vs actual, build/URL/browser/viewport/root width and hash. Use root/rail/stage/footer rectangles, list scrollTop/active row bounds and loaded stylesheet URLs to explain differences; raw viewport alone is insufficient.
+
+PASS requires the AF checklist plus native SED/HERO tests; matching detached HTML is insufficient. Fail the fidelity gate if frame/background/left-list/right-stage/Arrow–Add–Pagination captions disappear, samples become editor navigation, or layout is changed without a recorded human decision. Capture differences in062 deviation register before pivot. Native toolbar/List View/accessibility adaptations must be explicit, not silently dropped to match a picture. Missing evidence remains pending. No screenshot/geometry evidence has been generated in this docs-only lock task.

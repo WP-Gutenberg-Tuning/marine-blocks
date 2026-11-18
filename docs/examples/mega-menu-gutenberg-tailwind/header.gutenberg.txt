@@ -1,0 +1,66 @@
+<!-- wp:group {"className":"marine-menu-demo bg-white","layout":{"type":"default"}} -->
+<div class="wp-block-group marine-menu-demo bg-white"><!-- wp:group {"className":"marine-menu-shell mx-auto w-full px-5 py-5","layout":{"type":"default"}} -->
+<div class="wp-block-group marine-menu-shell mx-auto w-full px-5 py-5"><!-- wp:group {"className":"flex flex-wrap items-center justify-between gap-x-8 gap-y-4","layout":{"type":"default"}} -->
+<div class="wp-block-group flex flex-wrap items-center justify-between gap-x-8 gap-y-4"><!-- wp:site-title {"level":0,"className":"marine-menu-brand"} /-->
+<!-- wp:group {"className":"marine-menu-links flex flex-wrap items-center gap-x-6 gap-y-3","layout":{"type":"default"}} -->
+<div class="wp-block-group marine-menu-links flex flex-wrap items-center gap-x-6 gap-y-3"><!-- wp:details {"className":"marine-menu-disclosure"} -->
+<details class="wp-block-details marine-menu-disclosure"><summary>Products</summary><!-- wp:group {"className":"marine-menu-panel grid grid-cols-1 gap-8 md:grid-cols-3","layout":{"type":"default"}} -->
+<div class="wp-block-group marine-menu-panel grid grid-cols-1 gap-8 md:grid-cols-3"><!-- wp:group {"className":"min-w-0","layout":{"type":"default"}} -->
+<div class="wp-block-group min-w-0"><!-- wp:heading {"level":3,"className":"marine-menu-heading"} -->
+<h3 class="wp-block-heading marine-menu-heading">Products</h3>
+<!-- /wp:heading --><!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-grouper-url">Grouper</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-barramundi-url">Barramundi</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-fusilier-url">Fusilier</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-mahi-mahi-url">Mahi-Mahi</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-red-snapper-url">Red Snapper</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-pangasius-url">Pangasius</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-all-products-url">All products</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"min-w-0","layout":{"type":"default"}} -->
+<div class="wp-block-group min-w-0"><!-- wp:heading {"level":3,"className":"marine-menu-heading"} -->
+<h3 class="wp-block-heading marine-menu-heading">Food Service</h3>
+<!-- /wp:heading --><!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-food-service-url">Food service solutions</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-product-formats-url">Product formats</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"min-w-0","layout":{"type":"default"}} -->
+<div class="wp-block-group min-w-0"><!-- wp:heading {"level":3,"className":"marine-menu-heading"} -->
+<h3 class="wp-block-heading marine-menu-heading">Capabilities</h3>
+<!-- /wp:heading --><!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-processing-url">Processing &amp; packing</a></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"className":"marine-menu-link"} -->
+<p class="marine-menu-link"><a href="#replace-quality-url">Quality &amp; traceability</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group --></details>
+<!-- /wp:details --><!-- wp:paragraph {"className":"marine-menu-toplink"} -->
+<p class="marine-menu-toplink"><a href="#replace-about-url">About us</a></p>
+<!-- /wp:paragraph --><!-- wp:paragraph {"className":"marine-menu-toplink"} -->
+<p class="marine-menu-toplink"><a href="#replace-contact-url">Contact</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --><!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"className":"marine-menu-cta"} -->
+<div class="wp-block-button marine-menu-cta"><a class="wp-block-button__link wp-element-button" href="#replace-quote-url">Request a quote</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->

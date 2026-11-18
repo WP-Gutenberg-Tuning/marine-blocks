@@ -1,8 +1,11 @@
 import { __, _n, sprintf } from '@wordpress/i18n';
+import type { CSSProperties } from 'react';
 import {
 	CATEGORY_COLOR_SLUGS,
 	buildGridClass,
 	buildWrapperClass,
+	buildWrapperStyleVars,
+	descriptionAlignClass,
 	roleClass,
 } from './constants';
 import type {
@@ -53,6 +56,30 @@ function countLabel( count: number ): string {
 	);
 }
 
+/** Normalized display mode: anything unknown falls back to the excerpt. */
+function descriptionDisplay( attributes: CategoryGridAttributes ): 'excerpt' | 'full' {
+	const display = attributes.descriptionDisplay;
+	return display === 'full'
+		? 'full'
+		: display === 'excerpt'
+		? 'excerpt'
+		: 'excerpt';
+}
+
+/** Card description text for the current mode; invalid enums fall back to excerpt. */
+function descriptionCardText(
+	display: 'excerpt' | 'full',
+	record: CategoryRecord
+): string {
+	if ( display === 'full' ) {
+		// A stale API response without the field is never coalesced into the
+		// excerpt (plan 061 §5.1): full text renders only what the server sent.
+		return record.descriptionText ?? '';
+	}
+
+	return record.descriptionExcerpt;
+}
+
 function PreviewCard( {
 	attributes,
 	record,
@@ -63,6 +90,16 @@ function PreviewCard( {
 	const classes = roleClasses( attributes );
 	const hidden = record.count < 1;
 	const pathText = record.path.length > 1 ? record.path.slice( 0, -1 ).join( ' › ' ) : '';
+	const display = descriptionDisplay( attributes );
+	const descriptionText = descriptionCardText( display, record );
+	// The content group owns content-to-content spacing; it renders only when
+	// at least one part does, so a CTA with no text above never gets a
+	// phantom gap (plan 061 §5.2). The count renders inside the name head
+	// (baseline parity), so showCount alone renders no group.
+	const hasContent =
+		attributes.showName === true ||
+		( attributes.showPath === true && pathText !== '' ) ||
+		( attributes.showDescription === true && descriptionText !== '' );
 
 	return (
 		<li
@@ -90,25 +127,35 @@ function PreviewCard( {
 					</div>
 				) }
 				<div className="skvn-category-grid__body">
-					{ attributes.showName && (
-						<div className="skvn-category-grid__head">
-							<h3 className={ classes.name }>{ record.name }</h3>
-							{ attributes.showCount && (
-								<span className={ `skvn-category-grid__count ${ classes.details }` }>
-									{ countLabel( record.count ) }
-								</span>
+					{ hasContent && (
+						<div className="skvn-category-grid__content">
+							{ attributes.showName && (
+								<div className="skvn-category-grid__head">
+									<h3 className={ classes.name }>{ record.name }</h3>
+									{ attributes.showCount && (
+										<span className={ `skvn-category-grid__count ${ classes.details }` }>
+											{ countLabel( record.count ) }
+										</span>
+									) }
+								</div>
+							) }
+							{ attributes.showPath && pathText && (
+								<p className={ `skvn-category-grid__path ${ classes.details }` }>
+									{ pathText }
+								</p>
+							) }
+							{ attributes.showDescription && descriptionText && (
+								<p
+									className={
+										`skvn-category-grid__description${ display === 'full' ? ' skvn-category-grid__description--full' : '' }`
+										+ descriptionAlignClass( attributes )
+										+ ` ${ classes.details }`
+									}
+								>
+									{ descriptionText }
+								</p>
 							) }
 						</div>
-					) }
-					{ attributes.showPath && pathText && (
-						<p className={ `skvn-category-grid__path ${ classes.details }` }>
-							{ pathText }
-						</p>
-					) }
-					{ attributes.showDescription && record.descriptionExcerpt && (
-						<p className={ `skvn-category-grid__description ${ classes.details }` }>
-							{ record.descriptionExcerpt }
-						</p>
 					) }
 					{ attributes.showCta && (
 						<span className={ classes.action }>
@@ -165,6 +212,7 @@ export function CategoryGridPreview( {
 	const selection: CategorySelection[] = attributes.categories || [];
 	const wrapperClass = `${ buildWrapperClass( attributes ) } skvn-category-grid--editor`;
 	const gridClass = buildGridClass( attributes );
+	const wrapperStyleVars = buildWrapperStyleVars( attributes ) as CSSProperties;
 
 	if ( selection.length === 0 ) {
 		return (
@@ -216,7 +264,7 @@ export function CategoryGridPreview( {
 	const allEmpty = visible.length === 0 && state.missingIds.length === 0;
 
 	return (
-		<div className={ wrapperClass }>
+		<div className={ wrapperClass } style={ wrapperStyleVars }>
 			{ allEmpty && (
 				<div className="skvn-category-grid__notice">
 					{ __(

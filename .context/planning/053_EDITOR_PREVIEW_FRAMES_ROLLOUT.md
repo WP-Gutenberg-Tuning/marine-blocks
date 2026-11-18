@@ -1,5 +1,9 @@
 # Editor preview frames — rollout plan
 
+**Concept01 fidelity2026-11-09:** human nhận mẫu Slider làm reference và yêu cầu bám artifact; [062](062_VER_1_3_21_SLIDER_EDITOR_ARTIFACT_IMPLEMENTATION_CONTRACT.md) là contract đối chiếu cho P3/EF-SLIDER, không đổi Step scope. Frame fill/border của Concept01 là baseline review của Slider; không tự bỏ/đổi palette, không promote thành token toàn theme. AF01–10/evidence actual editor bắt buộc; design reference không runtime PASS.
+
+**Scheduling amendment2026-11-09:** human đưa **Slider Editor UI Redesign vào1.3.21**, cùng Hero contrast;044§10 giữ scope/SED acceptance. P3/EF-SLIDER và phần Slider EF-06 nhận tại1.3.21, chưa thiết kế/palette/coding/start. Audit canvas/chrome và tổ chức controls Slider/Slide. Step Slider giữ1.3.24, EF-STEP/Step acceptance không chuyển sang1.3.21. Current1.3.20; các current cũ dưới đây là checkpoint lịch sử.
+
 Ngày: 2026-11-05. **Human approved planning/documentation; chưa triển khai khung chung.** Current vẫn V1 / 1.3.19. Không bump/build/chuyển milestone trong lượt docs này.
 
 ## Execution override — 2026-11-05

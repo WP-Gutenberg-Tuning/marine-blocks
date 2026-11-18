@@ -12,6 +12,10 @@ Notes: quyết định LOCKED 2026-06-23; launch boundary = sau khi V1 / 1.5.x �
 
 ## Decision
 
+### Marketplace preparation note — 2026-11-06
+
+Human yêu cầu tổng hợp sale points trước, trình bày sau khi chuẩn bị đưa lên marketplace. Register: [Marine Blocks selling points](../product/marketplace-selling-points.md); Content Actions là SP-01 đã được human chọn. Khi mở task marketplace/launch, agent phải đọc register, kiểm evidence/scope hiện hành và trình human chọn cách trình bày trước khi viết/xuất bản listing. Đây là yêu cầu chuẩn bị nội dung, không tự chọn marketplace/ngày/version hoặc thay launch gate bên dưới.
+
 ### Amendment — 2026-11-04 (hiệu lực ưu tiên)
 
 Human chốt **Marine Blocks** (`marine-blocks`, PHP `marine_blocks_`), thay identity GU/Gutenberg Supercharger; không hướng full-FSE supercharger. Plugin styling/runtime riêng; website WindPress enhance core/pattern. Migration chuyển sang **1.4.0**, SemVer đã xác nhận, chưa start, không đợi public launch. Xem [plan 047](../../.context/planning/047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md).

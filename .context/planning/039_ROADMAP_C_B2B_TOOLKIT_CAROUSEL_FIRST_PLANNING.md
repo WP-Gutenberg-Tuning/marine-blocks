@@ -1,7 +1,9 @@
 # 039 — Roadmap C: B2B Toolkit, Carousel First (stack — M1 → 1.3.17 IN PROGRESS)
 
+**Slider scope amendment2026-11-09:** M5 → **1.3.21 — Hero Slider Contrast Repair + Slider Editor UI Redesign**. Human thêm editor redesign theo044§10/053 P3/EF-SLIDER/Slider part EF-06; SED-* Chưa làm, mockup/palette chưa chốt, chưa coding/start. Contrast source/hotfix và HERO-* riêng. Các giới hạn “chỉ đụng Hero contrast” bên dưới là repair gốc, nay bổ sung editor có chủ đích; không mở parallax/motion repair. Step Slider giữ1.3.24; current1.3.20 không đổi.
+
 **Status:** Human đã promote/bắt đầu M1 → V1 / 1.3.17 ngày 2026-10-13: Product/Post Carousel Stability & QA. IN PROGRESS; chưa có test PASS hoặc release approval. 5 chỉnh sửa audit PM vẫn hiệu lực.
-**Milestone chính thức hiện tại:** V1 / 1.3.17 — Product/Post Carousel Block UI & Visual QA (IN PROGRESS, started 2026-10-13). 1.3.10 DEFERRED → M5, chưa hoàn thành.
+**Milestone chính thức hiện tại:** V1 /1.3.20 — Product Category Grid + Category details + Woo Archive M1 (IN PROGRESS, human start2026-11-07).1.3.19 DEFERRED_WITH_CARRY_OVER; carry register trong MILESTONES.md, snapshot/history giữ checklist, không completed/PASS. Các dòng status/mapping dated cũ bên dưới là lịch sử.
 **Nguồn:** `docs/decisions/project-goals-and-roadmap-reset.md` (quyết định human đã chốt + audit Muse 2026-10-13).
 **POC chuẩn:** `.local/product-carousel-swiper-poc-03.html` (đã chốt, không chọn lại).
 **Engine:** Swiper 11 giữ nguyên (`docs/decisions/collection-carousel-engine-keep-swiper.md`).
@@ -12,9 +14,17 @@
 
 ## 1. Mục tiêu roadmap C (human đã chốt)
 
+Mapping addition **2026-11-07**: human gán **V1 / 1.3.24 — Fullscreen Step Slider**, **PLANNED/chưa start**. Mapping **1.3.10 DEFERRED → M5 (phần Step Slider) → 1.3.24**; kế thừa toàn bộ acceptance/plan018/research, không kích hoạt toàn bộ M5. PATCH là ngoại lệ human xác nhận theo precedent1.3.22–23; slot chưa được gán. Current giữ1.3.20, không bump/build/chuyển milestone. Các câu Step Slider chưa-gán-SemVer bên dưới là snapshot lịch sử được supersede bởi mapping này.
+
+Mapping transition2026-11-07: current **1.3.20 Category Grid/details + Woo Archive M1**, kế thừa nền M1 follow-up/sidebar consumer và theme native archive scope, không kích hoạt toàn bộ stackM3/M6.1.3.19 deferred với full carry/checklist, không PASS; Hero1.3.21 riêng, Blog/M2/ratio controls chưa start. Không rename plugin hoặc đổi query ownership. Metadata development1.3.20, không git remote push/deploy.
+
+Mapping addition2026-11-06: human cho triển khai Woo Archive M1 (plan059§9–10) **chung1.3.20 Product Category Grid + Category details**, giữ version đã dùng và CG/DS acceptance; theme native archive visuals, không archive builder/query ownership migration. Đây là source scope addition ngoài current1.3.19 theo precedent Category source; không chuyển mốc/bump metadata. Blog archive và Archive M2 chưa start. Giữ AM1/AL/AR evidence riêng.
+
 **Mapping 2026-11-04:** human chốt **1.4.0 — Marine Blocks Identity & Compatibility Migration**, PLANNED chưa start; nền portability phục vụ M6, không kích hoạt toàn bộ M6/M3. [Plan 047](047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md). Setup UI cũ **1.4.0 → 1.4.1**; Layout Blocks Validation & Quote Evaluation/T-2 cũ **1.4.1 → 1.4.2**; giữ acceptance PENDING. Các bảng snapshot cũ bên dưới dùng số trước khi dời, đối chiếu mapping này và MILESTONES.md khi thực thi. Current vẫn 1.3.18, không bump metadata hoặc archive. MINOR mới dành cho scope migration sản phẩm/compatibility; naming đã chốt, start chưa chốt.
 
-**Cập nhật 2026-11-03:** human chốt **1.3.19 → 1.3.22 Product Page Basic Design Controls → 1.3.23 Post Page Basic Design Controls**. Hai mốc mới PLANNED, chưa start; số PATCH là ngoại lệ human xác nhận cho feature mới, không đổi quy tắc SemVer. Scope và acceptance nằm trong `../MILESTONES.md`. Consumer template liên quan M6, nền visual/editor liên quan M3; không kích hoạt toàn bộ hai stack. Giữ PHP/GeneratePress, default chung và override giới hạn; đối chiếu acceptance 1.3.5 trước implementation, không xóa scope cũ. **2.0 bắt đầu migration từng bước**, không phải đã độc lập. Current vẫn 1.3.18.
+**Cập nhật 2026-11-03:** human chốt **1.3.19 → 1.3.22 Product → 1.3.23 Post** (thứ tự nghiệp vụ).
+
+**Cập nhật 2026-11-16:** **1.3.23 Post** → **defer stockpile 1.4.x** (plan [078](078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md)); current pointer **1.3.24** Step Slider (PLANNED, chưa start). Số PATCH 1.3.22–23 vẫn là ngoại lệ human; Post không còn slot 1.3.x active. Scope và acceptance nằm trong `../MILESTONES.md`. Consumer template liên quan M6, nền visual/editor liên quan M3; không kích hoạt toàn bộ hai stack. Giữ PHP/GeneratePress, default chung và override giới hạn; đối chiếu acceptance 1.3.5 trước implementation, không xóa scope cũ. **2.0 bắt đầu migration từng bước**, không phải đã độc lập. Current vẫn 1.3.18.
 
 **Cập nhật ưu tiên 2026-11-04:** human hoán đổi Sidebar/Hero: **1.3.19 Sidebar Foundation → 1.3.20 Product Category Grid → 1.3.21 Hero Contrast Repair**. Thay thứ tự Category trước Sidebar ngày 28/10. Sidebar nhận Carousel carry-over chưa hoàn tất từ 1.3.18, register tại MILESTONES.md; runtime QA giữ riêng với DS-01–07. Category tích hợp sidebar ở 1.3.20. Current vẫn 1.3.18; Sidebar/Category chưa start. Không kích hoạt toàn bộ M3/M6.
 
@@ -25,6 +35,10 @@
 - Settings basic trong Block / advanced sidebar riêng: **đã duyệt cách chia và ưu tiên milestone kế tiếp ngày 2026-10-21**; scope/states/acceptance theo ideation sidebar, SemVer/start chưa xác nhận.
 
 **Map milestone 2026-11-04:** human xác nhận **V1 / 1.4.3 — Interactive Illustrated Map**, PLANNED/Chưa làm, sau 1.4.2 và trước 1.5.0; ngoại lệ đánh số cho feature mới, không đổi SemVer rule. Scope/acceptance MAP-* tại MILESTONES.md và `docs/ideations/svg-maps/README.md`. Map là candidate consumer của nền sidebar/plugin; **chưa gán vào M1–M6**, không kích hoạt M3/M6. Giữ scope các mốc hiện có và debt map/contact cũ 1.1.2. Current vẫn 1.3.18, chưa start/bump/build.
+
+**Future candidate 2026-11-11:** human ghi nhận bảng màu hiện tại (palette tĩnh 10 màu SKVN — `COLOR_PALETTE_OPTIONS`, không custom color, không brand colors, không brand kits) **chưa phù hợp làm việc đa site B2B** — sắp tới cần xây bộ **brand kit**. Ghi nhận tại `064_FUTURE_CANDIDATE_BRAND_KIT_COLOR_SYSTEM.md`; chưa gán vào M1–M6, chưa có SemVer, chưa start. Khi đưa vào triển khai phải qua stack→SemVer protocol (AGENTS.md) và detailed planning riêng.
+
+**Future candidate 2026-11-11 (2):** human đề xuất làm lại **giao diện chọn danh sách Category trong Category Grid** (picker + selected list, hiện là functional MVP design lock 2026-10-28) **sau khi 1.4.x hoàn tất, phục vụ publish plugin luôn** (gate Marine Blocks Public Launch, Post 1.5.x). Ghi nhận tại `065_FUTURE_CANDIDATE_CATEGORY_PICKER_UI_REDESIGN.md`; chưa gán SemVer, chưa start; khi duyệt qua stack→SemVer protocol và cần artifact mockup mới do human phê duyệt trước khi coding.
 
 ## 2. Milestone stack M1–M6 (định danh scope, không phải SemVer)
 

@@ -1,6 +1,6 @@
-# SKVN Marine
+# Marine Blocks
 
-SKVN Marine is a WordPress source repository for a B2B seafood/export website.
+Marine Block is a WordPress source repository for a B2B seafood/export website.
 
 This repository contains the custom child theme, custom Gutenberg block plugin,
 AI context files, and development documentation used to build the site.

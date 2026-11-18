@@ -2,11 +2,27 @@
 
 ## [manual] Role
 
+Current transition2026-11-07: human bắt đầu **1.3.20 — Product Category Grid + Category details + Woo Archive M1**.1.3.19 DEFERRED_WITH_CARRY_OVER; acceptance chưa nghiệm thu giữ current carry register/history, không completed/PASS. Metadata development1.3.20, không release/deploy.049/059/060 là scope; ảnh1:1, ratio controls next scope, Blog/M2 chưa start. Checkpoint current1.3.19 bên dưới là lịch sử. Nhắc chạy deferred tests trước follow-up runtime khác.
+
 GeneratePress child theme for SKVN Marine visual system.
 
 Human decision 2026-11-04: theme giữ identity SKVN Marine. Website được dùng WindPress enhance core blocks/patterns; plugin Marine Blocks ship styling/runtime riêng. Trong migration 1.4.0 (SemVer đã xác nhận, chưa start), có thể sửa điểm gọi API plugin hoặc dùng compatibility wrapper, không rename prefix/tokens theme. Quy tắc surface presets độc lập WindPress vẫn áp riêng cho presets. Xem plan `.context/planning/047_VER_1_4_0_MARINE_BLOCKS_MIGRATION_PLANNING.md`.
 
 ## [manual] Responsibilities
+
+Header menu responsive repair2026-11-08: user chốt hamburger+drawer toàn menu rồi report Home thiếu responsive.390px onsite header246px/toggle0/dialog0; CSS mới đã nạp nhưng JS companion chưa tích hợp. Existing assets/js/animations.js nay có controller scoped `.marine-menu-demo`, độc lập reveal early-return, native dialog/focus/scroll/resize/reduced-motion; inc/enqueue.php thêm wp-i18n/theme domain translations, giữ handle/filemtime.9Node VM model testsPASS; PHP lint/native browser/site deploy pending. CSS owner vẫn WindPress companion unlayered; example mirror sync từ shared runtime. Không sửa plugin/header GP, không bump/chuyển milestone. Runbook `docs/testing/mega-menu-gutenberg-tailwind-prototype.md`, artifact README có2files cần deploy.
+
+Archive hotfix059§12–13 start2026-11-07: human duyệt “Thực hiện”; outer grid header/nav/toolbar/results chung240px+32px/container1120, narrow DOM H1→Categories→count/sort→cards. Một nav/disclosure theme-only archive-categories.js, CSS mode owner/ResizeObserver/no animation/no-JS open/focus-safe resize.5Node VM state testsPASS, geometry/native Woo/PHP lint pending; AP-11/runbook giữ evidence. Supersede flex§11; không đổi plugin/query/card1:1/version hoặc claim runtime PASS.
+
+Archive heading hotfix2026-11-07 — plan059§11 human duyệt/source: native H1 + result count/sort cùng heading row bằng public Woo header hook và guarded native dispatchers; sidebar giữ, narrow wrap/stack, no query/JS/plugin bundle changes. Old/custom-header/shortcode fallback giữ controls. HF-HDR-* source/onsite status tại runbook archive, chưa runtime PASS hoặc bump/commit/deploy.
+
+PDP Related P4 2026-11-15: `inc/pdp-related.php` related-loop hooks + `inc/templates/related-product-card.php`. Active only when plugin API exists, `is_product()`, assets enqueued, and `useCustomRelatedCard` true. Args: `posts_per_page = relatedCount`, `columns = clamp(1–4)`. Template swap scoped to Woo loop name `related` / `single-product/related.php` flag (Woo 10.7 has no before/after_related_products). `inc/woocommerce.php` untouched. Fallback native when inactive/plugin-off/missing template. Mocked `tools/tests/pdp-related-hooks.test.php`. REL-* Chưa làm.
+
+Archive shared-card060 update2026-11-07: human duyệt1:1, source optional public plugin presenter/card-only CSS + native template-part adapter. Theme giữ category shell/query-native integration/fallback;5loop actions preserved với known callbacks suppress/restore mỗi item. Missing API/CSS/template fallback5rows cũng1:1.060§11/runbook cho evidence; actual UI/Woo/GP/build chưa kiểm, no ratio setting cho tới scope kế tiếp được chốt.
+
+Archive M1 update2026-11-06: human cho coding chung1.3.20; source inc/woocommerce.php + style.css, không thêm runtime include. Shop/product category/tag: category sidebar desktop/tablet top navigation,5specs/read existing attributes+MOQ meta, native quote/details, empty shell, native Woo placeholder chỉ archive. Query/order/pagination không thay. Current1.3.19 không chuyển/bump; Blog/M2 chưa start. Plan059§10/runbook là execution/evidence mới, supersede checkpoint discussion bên dưới; runtime chưa kiểm chứng.
+
+Archive repair discussion2026-11-06: human yêu cầu WooCommerce + Blog archive trong1.3.x; plan059 là nơi ghi thảo luận, đề xuất sau1.3.23, predecessor/SemVer/start chưa chốt. Audit Shop/product taxonomy và posts-index/category/tag routes/template thực trước design/code; theme owns visuals, WP/Woo giữ native query/routing, không mở archive builder hoặc đổi plugin Collection ownership. Source baseline archive.php/inc/woocommerce.php + plan025; chưa có archive URLs/defect screenshots, AR-* Chưa làm. Current1.3.19 giữ nguyên.
 
 - Theme styles and tokens.
 - GeneratePress child customization.
@@ -104,6 +120,30 @@ Implementation rules:
 - Do not increase global `theme.json` `contentSize` to repair one pattern.
 - Do not depend on generated `wp-container-*` classes.
 - Do not use `!important` to defeat Gutenberg constrained layout.
+- Containers (core Group / island surfaces) need the two-step width recipe:
+  align the container **Full** (background paints the block box, so Wide stops
+  the background at 1200px and leaves white gutters) AND constrain the nested
+  content (default constrained 760px; Content width control for Product/Post
+  Collection, toolbar align for Category Grid, Slider, Feature Showcase for
+  1200px). `alignfull` only reaches the page edge when the page owns a
+  full-width canvas. A plain Group is clamped to content width, and container
+  queries flip nested blocks to tablet layout silently at their breakpoints.
+  Do not propagate width to grandchildren in theme CSS — Gutenberg constrained
+  layout owns inside-container layout. Standard:
+  `docs/standards/css-layout-safety-contract.md` (Container Nesting);
+  recipe/verification: `docs/testing/group-island-width-1.3.20.md`;
+  background: PITFALLS DP-07 (2026-11-11).
+- The two-step recipe equals Elementor's **Boxed** content width (outer box
+  full, content boxed). Elementor `Full Width` + Width 1200 also stops its
+  background at 1200. Theme `contentSize` 760 is a reading measure;
+  Elementor's Site Settings content width is a layout measure (~1140–1200px).
+  Elementor rebuttal: recipe doc §4.
+- Human 2026-11-12: a Category Grid inside a Group is one box. The child takes
+  the parent's width and the parent's background covers the child. Measured
+  hang-out of 80px on the right is a containment failure. Until an island
+  group owns that box, site WindPress may patch only the temporary island
+  Groups. Decision:
+  `docs/decisions/group-island-windpress-stopgap-1.3.20.md`.
 
 Agent debugging checklist:
 
