@@ -49,6 +49,16 @@ const SLIDE_FIELDS: ContentField[] = [
 	{ key: 'backgroundImageFocalPoint', kind: 'focal' },
 ];
 
+const STEP_SLIDER_FIELDS: ContentField[] = [];
+
+const STEP_SLIDE_FIELDS: ContentField[] = [
+	{ key: 'tabLabel', kind: 'plain' },
+	{ key: 'backgroundImageId', kind: 'int', min: 0, max: 2147483647 },
+	{ key: 'backgroundImageUrl', kind: 'url' },
+	{ key: 'backgroundImageAlt', kind: 'plain' },
+	{ key: 'backgroundImageFocalPoint', kind: 'focal' },
+];
+
 const CORE_HEADING_FIELDS: ContentField[] = [
 	{ key: 'content', kind: 'richtext' },
 ];
@@ -86,6 +96,8 @@ const FIELD_SPECS: Record< string, ContentField[] > = {
 	'skvn-marine/post-collection': POST_COLLECTION_FIELDS,
 	'skvn-marine/slider': SLIDER_FIELDS,
 	'skvn-marine/slide': SLIDE_FIELDS,
+	'skvn-marine/step-slider': STEP_SLIDER_FIELDS,
+	'skvn-marine/step-slide': STEP_SLIDE_FIELDS,
 	'core/heading': CORE_HEADING_FIELDS,
 	'core/paragraph': CORE_PARAGRAPH_FIELDS,
 	'core/button': CORE_BUTTON_FIELDS,
@@ -102,6 +114,8 @@ const SUPPORTED_ROOTS = [
 	'skvn-marine/post-collection',
 	'skvn-marine/slider',
 	'skvn-marine/slide',
+	'skvn-marine/step-slider',
+	'skvn-marine/step-slide',
 ];
 
 /** Allowed child names per parent. A child outside this table rejects the paste. */
@@ -114,6 +128,13 @@ const ALLOWED_CHILDREN: Record< string, string[] > = {
 		'core/image',
 		'core/columns',
 		'core/group',
+	],
+	'skvn-marine/step-slider': [ 'skvn-marine/step-slide' ],
+	'skvn-marine/step-slide': [
+		'core/heading',
+		'core/paragraph',
+		'core/list',
+		'core/buttons',
 	],
 	'core/buttons': [ 'core/button' ],
 	'core/columns': [ 'core/column' ],
