@@ -2,7 +2,7 @@
 Theme Name: SKVN Marine
 Template: generatepress
 Text Domain: skvn-marine
-Version: 1.3.23
+Version: 1.3.24
 Requires at least: 6.5
 Requires PHP: 7.4
 Update URI: false
@@ -1003,8 +1003,15 @@ body.skvn-has-footer-page .site {
 	max-width: var(--skvn-wide-width);
 }
 
-/* GeneratePress compatibility: neutralize its descendant alignfull margins. */
-.skvn-full-width-canvas .entry-content .alignfull {
+/* GeneratePress compatibility: neutralize its descendant alignfull margins.
+ * GP's inline rule is body:not(.no-sidebar) .entry-content .alignfull
+ * (0,3,1): width calc(100% + 80px), margin-left -40px. body + one class
+ * only ties that score, and the inline rule is later, so .site-content
+ * is included to win.
+ * Canvas layer only (every .alignfull on SKVN). Plugin blocks that use
+ * alignfull must also ship their own reset in plugin CSS — this file is
+ * not in the plugin zip. GLOBAL A13 / DP-12 / 2026-11-19. */
+body.skvn-full-width-canvas .site-content .entry-content .alignfull {
 	box-sizing: border-box;
 	margin-left: 0;
 	margin-right: 0;

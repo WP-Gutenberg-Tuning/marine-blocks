@@ -18,6 +18,15 @@
 - **Repair:** Human chọn A. Cùng file editor, selector `.skvn-slide--editor.skvn-slide--hero-max-height`: `min-height: 36rem`, `max-height: none`. Rail giữ `356px`. Slide không phải Hero giữ sàn 356px. File editor enqueue sau `style-view` và dùng `filemtime`, không cần build webpack cho rule này.
 - **Evidence:** Screenshot editor 2026-11-13, stage hẹp. Plan062 §3 ghi delta. Pitfall 9 trong `docs/debug-casebook/PITFALLS.md`. Chiều cao editor chưa được human đo lại.
 
+### AP-15 — Agent đề xuất / implement màu block bằng hex TextControl thay vì design system WordPress
+
+- **Case 2026-11-18:** Step Slider `progressColor`: source dùng `TextControl` + “Hex only”, agent gợi ý “đủ để code” với `ColorControl` + sanitize hex vì tension `RESOLVED_ACTIVE` 13:36. Human: không theo cách thiết kế WP — marketing không nên gõ hoặc chỉ lấy mã hex; phải bám palette `theme.json` và pattern Inspector giống core/plugin chỗ khác.
+- **Lỗi của agent:** (1) Coi “picker + hex” là đủ governance trong khi SKVN/AGENTS và nhiều decision (`blog-sidebar-content-settings`, `footer-appearance-settings`, `onsite-editor-controls-0.8.0`) yêu cầu **preset slug** / `var(--wp--preset--color--*)`, không raw hex trong UI. (2) Không đối chiếu precedent trong repo: `PanelColorGradientSettings` (slide, button-hover), `theme.json` `color.custom: false`. (3) Ghi plan “Phase A = ColorControl hex” và nói đủ spec settings trong khi human chưa duyệt surface control. (4) Tension 13:36 là **ngoại lệ hẹp hai màu** — agent mở rộng thành giải pháp sản phẩm chính mà không nêu xung đột với Editor Controls / design tokens.
+- **Rule:** Màu marketing-facing trên block plugin: ưu tiên **slug palette/gradient theme** + `ColorPalette` / `PanelColorGradientSettings` (solid hoặc gradient theo `wp_get_global_settings`), output `var(--wp--preset--color--{slug})` hoặc gradient preset; sanitize allowlist slug. Không `TextControl` / ô “hex only” trừ migration read hoặc human explicit one-off đã ghi decision. Nếu có tension “cho hex” và human sau đó phản hồi design system → **supersede tension**, cập nhật plan, **DỪNG** hex UI. Đọc `wp-content/themes/skvn-marine/theme.json` palette trước khi thêm attribute màu. **Ngoại lệ đã chốt 2026-11-18 muộn:** Step Slider progress (plan 083 §13) không bị câu “DỪNG hex UI” gỡ color picker. Vẫn cấm `TextControl`. Custom progress = picker + hex sanitize, cộng palette slug, và bỏ qua `color.custom` chỉ trên control đó. Fill và màu khác vẫn theo rule này.
+- **Repair direction:** Plan 083 §13.1 là spec. Giữ `progressColor`, default `#7ec8e3`. Không tạo `progressColorSlug`, không migrate hex → slug, không đổi default. PHP phải nhận slug và hex. Fill giữ `PanelColorGradientSettings` và không ghi đè cờ theme. Phase A không còn blocked bởi SS-DS-01; vẫn chờ lệnh code. 081 đã có source.
+- **Evidence:** `src/step-slider/edit.tsx` `sanitizeProgressHex` + TextControl; `modules/step-slider-render/step-slider-render.php` `sanitize_hex_color`; `.context/planning/083_VER_1_3_24_STEP_SLIDER_SETTINGS_PARITY_PLAN.md` §13; `TENSIONS_ACTIVE.md` 2026-11-18 13:36.
+- **Tránh:** Trước task màu block: grep `PanelColorGradientSettings` | `ColorPalette` | `wp--preset--color` trong repo + đọc `AGENTS.md` SKVN Editor Controls. Decision memo / plan phải nêu **WP pattern**, không chỉ “sanitize hex”. Không kết luận “đủ để code settings” khi còn lệch design system.
+
 ### AP-13 — Kiểm DOM sau compile rồi bỏ sót CSS cache của first response
 
 - **Case2026-11-09:** header Home đẹp sau tải nhưng co/thiếu lúc đầu trên desktop. Agent trước đó chỉ xem computed DOM sau WindPress compiler:27212ký tự CSS có menu. Raw HTML thực trả cache21218ký tự, thiếu companion và utilities header; VFS `/mhf-header.css` đã mới.
@@ -497,3 +506,27 @@ Xem DP-01. Nếu `view.ts` cần đọc 1 attribute, attribute đó phải có t
 - **Chống tái diễn:** deploy theme **và** plugin cùng gói — `inc/pdp-related.php` + `inc/templates/related-product-card.php` phải có trên runtime, không chỉ ZIP plugin. “panel checked” ≠ evidence persist. Trước khi đổ CSS/deploy: theme file exists, `wp option get skvn_pdp_related`, `wp post meta get <id> _skvn_pdp_related`, frontend grep `skvn-related-shared-card`. Phân biệt Theme Design Save group `related` (option site) với Update sản phẩm (meta). Swap khi owner on, không gắn bắt buộc với enqueue-time CSS. Path Woo: exact **hoặc** suffix `/woocommerce/templates/content-product.php`. Meta object: cast JSON/`stdClass` trước `is_array`. Override last khi spread: `{ ...defaults, ...stored, override: true }`.
 - **Fixed (source 2026-11-15):** theme `inc/pdp-related.php` (ready không gate assets_ready; path suffix/realpath; product id captured ở enqueue); plugin `pdp_related_cast_stored`; `panel.tsx` override last + `override === 1`. Mocked: hooks 16 PASS, sanitize 15 PASS. Cần `npm run build` cho panel, Update sản phẩm hoặc Save Theme Design, hard-refresh. **Chưa runtime PASS.**
 - **Casebook:** `docs/debug-casebook/PITFALLS.md` Pitfall 12. Runbook `docs/testing/pdp-related-card-1.3.22.md`.
+
+### DP-12 — `npm run build` / zip plugin ≠ theme `style.css`; GP `.alignfull` bleed còn khi reset chỉ nằm theme [2026-11-19]
+
+- **Case:** onsite `https://minhhaifishery.com/test-page-2/` Step Slider tràn ngang. Human đã build plugin đầy đủ. Viewport 1920: `clientWidth` 1905, `scrollWidth` 1945, `.skvn-step-slider` width 1985, `x=-40`, `margin-left:-40px`. Theme live `style.css?ver=1794791780` (2026-11-16 08:16 +07). Plugin live `style-frontend.ts.css?ver=1795023969` (2026-11-19 00:46 +07).
+- **Root cause:** GeneratePress **inline** `#generate-style-inline-css` `body:not(.no-sidebar) .entry-content .alignfull { margin-left:-40px; width:calc(100% + 80px); }` thắng. Neutralize local nằm theme `body.skvn-full-width-canvas .site-content .entry-content .alignfull` — **không** vào `npm run build` hay zip plugin. Plugin Step Slider `width:100%` không đủ specificity. Cùng đêm plugin chrome (heading `#f5f7fa`, clamp 3.9rem, tab blur) **đã** lên vì nằm CSS plugin.
+- **Không phải:** CSS plugin “sai” so với artifact (Play ẩn, progress `#7ec8e3`, không counter 01/04, tab cuộn, không trừ header — Plan 081 Cấm). Không phải overflow-x. Không phải mũi tên `left:1rem` sai — offset đúng trên slider đang `x=-40`.
+- **Chống tái diễn:** CSS block cần để đúng hình/đúng width đi cùng zip plugin. Neutralize GP `.alignfull` của **chính block** nằm plugin, selector ≥ `(0,3,1)`, không đòi `body.skvn-full-width-canvas`. Theme adapter canvas giữ cho mọi `.alignfull` trên SKVN — không xóa, không coi là đủ cho độc lập plugin. Sau sửa Step Slider: `.entry-content .wp-block-skvn-marine-step-slider.skvn-step-slider.alignfull` trong `src/step-slider/style.css` (specificity `(0,4,0)`).
+- **Audit 2026-11-19 (source, không chuyển hàng loạt):**
+
+| Surface | Evidence | Owner đúng | Lượt này |
+|---|---|---|---|
+| Step Slider full-bleed | `block.json` align default `full`; PHP `get_block_wrapper_attributes` → `alignfull`; reset **đã** vào plugin CSS | Plugin block box | **Moved** |
+| Theme canvas `.alignfull` | `style.css` `body.skvn-full-width-canvas .site-content .entry-content .alignfull` — canvas mọi block SKVN (từ 0.5.0; bump specificity uncommitted 2026-11-19 để thắng GP `(0,3,1)`). Không phải chrome Step Slider | Theme canvas | **Keep** |
+| Slider (`skvn-marine/slider`) | `slider-render.php` ~403 hard-code `alignfull`; `block.json` default `wide`; plugin CSS không neutralize GP | Plugin reset (list) | List only |
+| Product/Post Collection | `collection/controls.tsx` `contentWidth===full` → `alignfull`; không có plugin GP reset | Plugin reset khi Full | List only |
+| Product Category Grid | `block.json` align default `wide`; GP `.alignwide` cùng math `-40/+80` | Plugin hoặc canvas (wide) | List only |
+| Feature Showcase | `supports.align` wide/full; không plugin GP reset | Plugin nếu dùng Full | List only |
+| PDP related swap | Theme `inc/pdp-related.php` — DP-11 / tension 1.4.0 | Plugin (1.4.0) | Already tracked |
+| Card Grid chrome | Theme `style.css` ~1779 `.wp-block-skvn-marine-card`; `src/card-grid/` không có `style.css` | Plugin chrome + theme SKVN enhance | List only |
+| `--skvn-*` tokens | Plugin consume theme tokens | A13 token debt | Accepted debt |
+| Theme preloader Hero | `inc/preloader.php` ~304 query `.skvn-slider--hero` | Theme site shell (OK) | N/A |
+
+- **Fixed (source 2026-11-19):** plugin Step Slider reset; GLOBAL A13; AGENTS.md Marine Blocks; CONVENTION; canvas decision amendment; css-layout-safety. **Chưa runtime PASS.** Cần `npm run build` plugin rồi upload **plugin** (không cần chờ theme cho overflow block này).
+- **Casebook:** `docs/debug-casebook/PITFALLS.md` Pitfall 13.

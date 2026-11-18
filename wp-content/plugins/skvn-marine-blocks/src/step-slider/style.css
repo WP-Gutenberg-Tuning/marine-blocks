@@ -3,6 +3,22 @@
  * Post-.is-ready: Swiper manages active slide state.
  */
 
+/*
+ * Plugin-owned alignfull reset (2026-11-19). GeneratePress inline
+ * body:not(.no-sidebar) .entry-content .alignfull is (0,3,1):
+ * margin-left:-40px; width:calc(100% + 80px). Theme canvas adapter is not
+ * in the plugin zip. Four classes (0,4,0) beat GP without SKVN body classes.
+ * Dual-layer: theme may still reset every .alignfull on SKVN canvas.
+ * Do not use 100vw / -50vw / overflow-x:hidden. Do not subtract header.
+ */
+.entry-content .wp-block-skvn-marine-step-slider.skvn-step-slider.alignfull {
+	box-sizing: border-box;
+	margin-left: 0;
+	margin-right: 0;
+	max-width: none;
+	width: 100%;
+}
+
 .skvn-step-slider {
 	position: relative;
 	width: 100%;
@@ -100,8 +116,8 @@
 	max-width: 46rem;
 	margin-right: auto;
 	min-height: 100svh;
-	padding: clamp(2.5rem, 9vh, 6rem) clamp(1.25rem, 7vw, 7rem);
-	padding-bottom: clamp(6.5rem, 17vh, 9.5rem);
+	padding: clamp(4.5rem, 11vh, 7.5rem) clamp(1.25rem, 5vw, 4.5rem)
+		clamp(6.5rem, 17vh, 9.5rem);
 	color: #f5f7fa;
 }
 
@@ -143,6 +159,22 @@
 	margin-top: 0;
 }
 
+/* Theme paints every h2 with --skvn-heading-color (0,1,2). This must win so
+ * the title stays light on the dark step. Size matches the artifact clamp. */
+body:not(.wp-admin) .skvn-step-slide__content :is(h1, h2, h3, h4, h5, h6, .wp-block-heading) {
+	color: #f5f7fa;
+	font-size: clamp(2rem, 1.25rem + 3.75vw, 3.9rem);
+	font-weight: 800;
+	letter-spacing: 0;
+	line-height: 1.08;
+}
+
+body:not(.wp-admin) .skvn-step-slide__content p {
+	color: rgba(245, 247, 250, 0.75);
+	font-size: 1.05rem;
+	line-height: 1.7;
+}
+
 /* Step bar — full-width strip, equal columns, rendered step number + tab label. */
 .skvn-step-slider__tabs {
 	position: absolute;
@@ -159,8 +191,10 @@
 	gap: 0;
 	overflow-x: auto;
 	scrollbar-width: thin;
-	background: rgba(8, 16, 28, 0.92);
-	border-top: 1px solid rgba(255, 255, 255, 0.12);
+	background: rgba(4, 12, 20, 0.62);
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
 }
 
 .skvn-step-slider__tab {
@@ -169,14 +203,16 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	justify-content: flex-end;
-	min-width: 0;
+	justify-content: center;
+	min-width: min-content;
+	min-height: 54px;
 	margin: 0;
-	padding: 0.65rem 0.75rem 0.75rem;
+	padding: 0.85rem 1.1rem;
 	border: 0;
+	border-top: 2px solid rgba(255, 255, 255, 0.14);
 	border-radius: 0;
 	background: transparent;
-	color: rgba(245, 247, 250, 0.82);
+	color: rgba(255, 255, 255, 0.72);
 	font: inherit;
 	line-height: 1.25;
 	text-align: left;
@@ -186,23 +222,25 @@
 
 .skvn-step-slider__tab-number {
 	display: block;
-	font-size: 0.7rem;
+	font-size: 0.72rem;
 	font-weight: 700;
-	letter-spacing: 0.06em;
-	opacity: 0.9;
+	letter-spacing: 0.18em;
+	opacity: 0.75;
 }
 
 .skvn-step-slider__tab-label {
 	display: block;
-	margin-top: 0.2rem;
-	font-size: 0.85rem;
-	font-weight: 500;
+	margin-top: 0.15rem;
+	font-size: 0.82rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	white-space: nowrap;
 }
 
 .skvn-step-slider__tab-progress {
 	position: absolute;
-	top: 0;
+	top: -2px;
 	left: 0;
 	display: block;
 	width: 0%;
@@ -221,7 +259,7 @@
 .skvn-step-slider__tab[aria-current="true"],
 .skvn-step-slider__tab.is-active {
 	color: #ffffff;
-	background: rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.09);
 }
 
 /* Arrows — chevron SVG, desktop center; narrow screens top-left pair. */
@@ -235,10 +273,11 @@
 	width: 2.875rem;
 	height: 2.875rem;
 	padding: 0;
-	border: 1px solid rgba(255, 255, 255, 0.5);
+	border: 1px solid rgba(255, 255, 255, 0.25);
 	border-radius: 50%;
-	background: rgba(10, 20, 33, 0.6);
-	backdrop-filter: blur(4px);
+	background: rgba(4, 12, 20, 0.45);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
 	color: #ffffff;
 	line-height: 1;
 	cursor: pointer;
@@ -463,5 +502,18 @@
 	.skvn-step-slider__play {
 		font-size: 0.8rem;
 		padding: 0.45rem 0.95rem;
+	}
+
+	.skvn-step-slider__tab {
+		padding: 0.7rem 0.45rem;
+	}
+
+	.skvn-step-slider__tab-number {
+		font-size: 0.66rem;
+	}
+
+	.skvn-step-slider__tab-label {
+		font-size: 0.68rem;
+		letter-spacing: 0.04em;
 	}
 }

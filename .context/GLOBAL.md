@@ -229,7 +229,7 @@ Technical reports (không phải decision scope):
 ### Marine Blocks — human decision 2026-11-04
 
 - Định vị: bộ block chuyên dụng và patterns giúp dựng, chỉnh sửa, bàn giao website nhanh; không hướng tới supercharge toàn bộ FSE. Ưu tiên core blocks/patterns, custom block khi cần dữ liệu/tương tác/UX biên tập chuyên dụng. Không tự mở lại query ownership của Collection.
-- Plugin có styling/runtime riêng, hoạt động độc lập với WindPress và theme SKVN. Website được dùng WindPress/Tailwind enhance core blocks/patterns; không coi đây là hai lựa chọn loại trừ nhau. Layout/style trên mỗi surface phải có owner rõ ràng.
+- Plugin có styling/runtime riêng, hoạt động độc lập với WindPress và theme SKVN. Website được dùng WindPress/Tailwind enhance core blocks/patterns; không coi đây là hai lựa chọn loại trừ nhau. Layout/style trên mỗi surface phải có owner rõ ràng. Độc lập kiểm được: xem A13 (2026-11-19).
 - Identity đích: Marine Blocks; slug/text domain `marine-blocks`, block namespace `marine-blocks/*`, PHP functions `marine_blocks_*`, constants `MARINE_BLOCKS_*`, plugin CSS `marine-blocks-*`, variables `--marine-blocks-*`.
 - Theme giữ identity `skvn-marine`, PHP `skvn_marine_`, CSS/tokens theme. Có thể cập nhật điểm gọi API plugin khi migrate, không đổi thương hiệu theme.
 - Human xác nhận 2026-11-04: **1.4.0 — Marine Blocks Migration**; Setup UI cũ 1.4.0 → 1.4.1, Layout/Quote Validation cũ 1.4.1 → 1.4.2, giữ acceptance. Version đã chốt, chưa start; current vẫn 1.3.18. Trước migration giữ naming source hiện hành.
@@ -245,8 +245,11 @@ Invariant: KHÔNG BAO GIỜ sửa file trong `themes/generatepress/`.
 
 **A2. Theme vs Plugin boundary**
 Rule: nếu thay theme mà feature bị mất → feature thuộc plugin, không thuộc theme.
-Visual/layout → theme. Logic/data → plugin.
+Canvas / visual system của website SKVN → theme. Chrome, runtime, và CSS mà **block plugin cần để render đúng khi không có theme SKVN** → plugin.
+Logic/data → plugin.
+Không đọc “Visual/layout → theme” thành “mọi width/full-bleed của block plugin đặt ở `style.css` theme”.
 Invariant: custom blocks KHÔNG được đặt trong theme.
+Amended 2026-11-19: A13 (testable independence) và `docs/decisions/canvas-alignment-and-generatepress-exit.md`.
 
 **A3. Không custom CPT cho product ở V1**
 Dùng WooCommerce native products. Custom fields (ACF/Meta Box) chỉ thêm khi WC attributes không đủ.
@@ -264,12 +267,19 @@ Page-level controls such as Hide site header and Hide site footer belong to the 
 **A12. Footer Page Settings**
 0.9.0 adds a plugin settings page for `skvn_footer_page_id`. The theme renders the selected footer page through GeneratePress' `generate_footer` surface, with GeneratePress default footer as fallback. No custom CPT, no display rules system, and no GeneratePress replacement. Implement footer settings as a migration-ready module inside the current `skvn-marine-blocks` plugin; do not create or rename to `gutenberg-supercharger` or `gutenberg-turbo` in V1.
 
-**A13. Plugin CSS independence — token cascade**
+**A13. Plugin CSS independence — token cascade + ship-with-zip**
 Plugin `skvn-marine-blocks` phải có khả năng hoạt động độc lập, không phụ thuộc hoàn toàn vào theme.
 Sự phụ thuộc hiện tại (plugin dùng `--skvn-*` tokens từ theme) là **technical debt được chấp nhận có chủ ý** để phát triển nhanh.
 CSS token cascade đúng: Plugin CSS (define defaults/fallback) → Theme style.css (override `--skvn-*`) → GP Customizer (future).
 Invariant: KHÔNG tạo thêm dependency ngầm từ plugin → theme mà không ghi nhận. Nếu buộc dùng theme token, ghi chú technical debt rõ ràng tại chỗ.
 Roadmap: Dần move tokens cần thiết vào plugin block CSS với fallback values, để sau này tách hoàn toàn.
+
+Testable (human 2026-11-19, MB-06):
+- CSS/JS PHP mà block cần để **đúng hình + đúng width** phải nằm trong plugin bundle (`block.json` style / `src/<block>/style.css` / module enqueue). Zip plugin đủ để block không tràn, không mất chrome.
+- Plugin CSS **không** được yêu cầu `body.skvn-full-width-canvas` (hay class canvas SKVN khác) để block đúng.
+- Theme được enhance canvas SKVN cho **mọi** `.alignfull` (Cover, Group, Hero). Theme **không** được là owner duy nhất của chrome block plugin, cũng không được là owner duy nhất của neutralize GeneratePress `.alignfull` trên chính block đó.
+- Hai lớp width hợp lệ khi ghi rõ: theme = `100%` canvas SKVN cho mọi `.alignfull`; plugin = hộp block `width:100%; margin:0` so với parent, specificity ≥ GP inline `(0,3,1)`. Không `100vw` / `-50vw` / `overflow-x` để che tràn.
+- `npm run build` và zip plugin **không** đẩy `themes/skvn-marine/style.css`. Pitfall DP-12.
 
 **A5. Animation runtime dùng chung**
 `assets/js/animations.js` là single runtime. KHÔNG tạo animation logic riêng per block trừ khi bắt buộc.

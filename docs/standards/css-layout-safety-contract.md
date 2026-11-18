@@ -15,6 +15,14 @@ Before writing width, margin, overflow, positioning, or alignment CSS, identify:
 Do not make a component escape its container until the owning canvas has been
 inspected.
 
+Plugin blocks that opt into Gutenberg `alignfull` also own **their own used
+width** relative to the parent: `width: 100%`, `margin: 0`, specificity at
+least GeneratePress inline `(0,3,1)`. That rule lives in the **plugin** CSS
+so the block remains correct without `skvn-marine`. It is not a second
+viewport-escape (`100vw` / `-50vw`). Theme canvas adapter still owns every
+`.alignfull` on SKVN pages. See GLOBAL A13 and
+`docs/decisions/canvas-alignment-and-generatepress-exit.md` (amendment 2026-11-19).
+
 ## Gutenberg Width Contract
 
 ```text
@@ -122,16 +130,20 @@ Before changing `.alignfull` or `.alignwide`, search all layout owners:
 
 ```bash
 rg -n "alignfull|alignwide|100vw|50vw|overflow-x" \
-  wp-content/themes/skvn-marine
+  wp-content/themes/skvn-marine \
+  wp-content/plugins/skvn-marine-blocks
 ```
 
 If the task depends on GeneratePress runtime behavior, inspect its loaded CSS
 or runtime copy separately. GeneratePress parent files are read-only. Override
 them narrowly from the SKVN child theme using a selector scoped to the SKVN
-canvas or footer state.
+canvas or footer state — **and**, for a plugin block that uses `alignfull`,
+from that block's plugin CSS so zip plugin does not depend on theme deploy.
 
 Do not let Gutenberg, GeneratePress, an SKVN page template, and a component
-class independently calculate the same width.
+class independently calculate the same width. Theme canvas + plugin block-box
+reset may both set `width: 100%; margin: 0` on `.alignfull`; they must not
+disagree on geometry.
 
 ## Overflow Rule
 
@@ -184,7 +196,10 @@ Need a full-width section?
 |  +- No  -> inspect the owning wrapper and existing GP/Gutenberg rules.
 |
 +- Is the component itself responsible for page width?
-|  +- No -> fix the canvas/adapter layer, not the component.
+|  +- No, SKVN canvas / core Cover/Group -> fix the theme canvas adapter.
+|  +- Plugin block using alignfull -> plugin CSS must also reset GP bleed
+|     on that block (width:100%; margin:0; spec ≥ 0,3,1). Do not leave
+|     that reset only in theme style.css.
 |
 +- Are viewport units still necessary?
    +- No  -> do not use them.

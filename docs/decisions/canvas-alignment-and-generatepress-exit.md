@@ -45,14 +45,38 @@ Component         -> lays out only its own children
 
 A component must not calculate viewport escape margins.
 
+### Amendment 2026-11-19 — plugin block vs SKVN canvas
+
+Human: plugin Marine Blocks phải độc lập theme. GeneratePress `.alignfull` bleed
+is still a canvas problem on SKVN sites, and still a **plugin-ship** problem
+when the block uses core `alignfull` on a non-SKVN theme (or when only the
+plugin zip is uploaded).
+
+Two layers, same geometry (`width: 100%`, `margin: 0`, no `100vw`):
+
+| Layer | Owner | Selector scope | Job |
+|---|---|---|---|
+| Canvas | Theme `skvn-marine` | `body.skvn-full-width-canvas … .alignfull` | Every `.alignfull` on SKVN canvas (Cover, Group, Hero, plugin blocks) |
+| Block box | Plugin `skvn-marine-blocks` | plugin block + `.alignfull`, specificity ≥ GP `(0,3,1)` | This block does not exceed its parent even if SKVN theme CSS is absent |
+
+Theme adapter remains the owner of **page** width on SKVN. Plugin reset is not
+a second viewport-escape calculator; it refuses GP's `calc(100% + 80px)` /
+`margin-left: -40px` on **that block**. Do not delete the theme adapter. Do
+not make the theme adapter the only neutralize for plugin blocks.
+
+Evidence 2026-11-19: onsite `style.css?ver=1794791780` still old selector;
+plugin CSS `?ver=1795023969` already live; GP inline won; Step Slider
+`x=-40`, width `1985`. Pitfall DP-12. GLOBAL A13.
+
 ## V1 Compatibility Decision
 
 While GeneratePress remains active:
 
 - Keep GeneratePress parent files untouched.
 - Treat GeneratePress full-bleed CSS as an external compatibility concern.
-- Neutralize its negative margins only inside an explicit SKVN full-width
-  canvas or SKVN-rendered footer.
+- Neutralize its negative margins inside an explicit SKVN full-width
+  canvas or SKVN-rendered footer (theme canvas layer). Plugin blocks that
+  opt into `alignfull` also ship their own reset (amendment 2026-11-19).
 - The adapter must cover nested `.alignfull`, because GeneratePress itself uses
   a descendant selector.
 - Use normal document geometry: `margin-inline: 0`, `max-width: none`, and
@@ -156,7 +180,9 @@ Requirements:
 - Full-width SKVN pages have `scrollWidth <= clientWidth`.
 - Nested legacy `.alignfull` blocks do not receive negative viewport margins.
 - Normal, wide, and full blocks remain visually distinct.
-- Component CSS does not own page-width escape behavior.
+- Component CSS does not own page-width escape behavior (`100vw`, `-50vw`).
+- Plugin `alignfull` blocks ship a parent-relative reset (`width: 100%`,
+  `margin: 0`) so zip plugin does not depend on theme `style.css`.
 - GeneratePress parent remains unchanged.
 - The standalone theme does not inherit the GeneratePress negative-margin
   algorithm.

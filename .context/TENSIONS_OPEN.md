@@ -111,3 +111,31 @@ Default:    DỪNG chờ human
 Status:     OPEN
 Resolved:
 Decision:   OPEN
+
+## [2026-11-18 14:48] | slider, blocks
+Tension:    Step Slider dùng lại focal, biến CSS và hàm PHP của Slider. Lần dùng lại tiếp theo phải tách phần đó vào chỗ dùng chung, không copy thêm.
+Context:    Human 2026-11-18. O03 cho Step Slide dùng `FocalPointPicker` và `src/slide/focal.ts`. Đó là lần dùng thứ hai. Chưa tách trong lượt này.
+Proposal:   Giữ nguyên cho Slider và Step Slider. Block thứ ba cần cùng một mảnh thì tách mảnh đó vào `src/shared/` (TS) hoặc một hàm PHP một chỗ, rồi cả ba gọi. Không dán bản sao thứ ba.
+Constraint: Human: những gì dùng lại từ Slider, nếu còn dùng lại một lần nữa thì tách theo DRY.
+Severity:   high
+Tags:       slider, blocks, agent
+Milestone:  V1 / 1.3.24
+Evidence:   `src/slide/focal.ts` được `slide/*` và `step-slide/edit.tsx`, `step-slide/save.tsx` import. `skvn_marine_blocks_normalize_slide_background_focal_point()` định nghĩa ở `modules/slider-render/slider-render.php`, Step gọi ở `step-slider-render.php`. Biến `--skvn-slide-bg-pos-x/y` lặp trong `src/slider/style.css` và `src/step-slider/style.css`. UI `FocalPointPicker` hiện chỉ ở `src/slide/edit.tsx` và `apply-background-modal.tsx`; Step Slide sẽ là bản UI thứ hai khi làm O03. Human 2026-11-18 thêm vào danh sách dùng lại: `src/slide/fill.ts` (`default` / `custom` / `transparent`), `backgroundFillMode`, `backgroundFillColor`, `backgroundFillGradient`, `overlayOpacity`, và PHP `skvn_marine_blocks_sanitize_slide_fill_background()` cùng `skvn_marine_blocks_normalize_slide_fill_mode()`. Nền gradient gốc của plugin là bốn radial của artifact, ghi ở plan 081. `transparent` là không có lớp nền, giống nhãn Slider “Transparent (no fill layer)”. Overlay của Step dùng lớp tối trái và đáy của artifact; control bật độ phủ dùng lại `overlayOpacity`.
+Default:    DỪNG copy thứ ba. Tách mảnh bị dùng lại vào chỗ chung trong cùng task, rồi gọi.
+Status:     OPEN
+Resolved:
+Decision:   OPEN
+
+## [2026-11-19] | theme, blocks, slider
+Tension:    css-layout-safety “one width owner” vs plugin tự neutralize GeneratePress `.alignfull` (Marine Blocks độc lập theme).
+Context:    Human 2026-11-19: plugin phải chạy không cần SKVN; overflow Step Slider do GP inline `-40px` / `calc(100% + 80px)`; reset từng chỉ nằm theme `style.css` nên zip plugin không chữa. Human chốt chuyển reset vào plugin, giữ canvas theme, cập nhật luật/convention/pitfall.
+Proposal:   Dual-layer đã document: theme = canvas SKVN cho mọi `.alignfull`; plugin = used width của block khi chọn `alignfull` (`width:100%; margin:0; max-width:none`, specificity ≥ GP `(0,3,1)`), không `body.skvn-full-width-canvas`. Cùng geometry, không hai phép tính viewport. Lượt này chỉ Step Slider; Slider/Collection/Category/Showcase list, không chuyển hàng loạt.
+Constraint: `docs/standards/css-layout-safety-contract.md` one owner; `docs/decisions/canvas-alignment-and-generatepress-exit.md` “do not add component-specific fixes”; GLOBAL A13 / MB-06 plugin độc lập theme; AGENTS.md không sửa `themes/generatepress/`.
+Severity:   low
+Tags:       theme, blocks, slider
+Milestone:  V1 / 1.3.24
+Evidence:   Onsite `test-page-2` theme `?ver=1794791780` vs plugin `?ver=1795023969`; GP inline thắng; `x=-40` width=1985. Source: `src/step-slider/style.css` `.entry-content .wp-block-skvn-marine-step-slider.skvn-step-slider.alignfull`; theme canvas `style.css` ~1014. DP-12 / Pitfall 13.
+Default:    Giữ dual-layer. Không xóa theme canvas adapter. Không dời canvas vào plugin. Không chuyển Slider/Collection trong lượt này.
+Status:     OPEN
+Resolved:
+Decision:   OPEN

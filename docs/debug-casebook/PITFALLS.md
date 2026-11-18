@@ -26,6 +26,7 @@ Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05)
 | Slider đổi size sau fade load/chuyển trang | Khung và tỉ lệ nhích khi fade xong | Offset CSS `5rem` rồi JS ghi header + admin bar; scrollbar | Pitfall 10 |
 | Marine Blocks không có trong sidebar editor | Page / SKVN Page Display / GeneratePress còn; Preferences → Panels chỉ WindPress | `wp_localize_script` ép boolean thành `"1"` | Pitfall 11, [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14) |
 | PDP related panel bật, frontend không đổi | Native Woo related (placeholder + nút outline); không có `.skvn-related-shared-card` | Theme chưa cập nhật (swap ở theme); option/meta owner off; gate `assets_ready`; path Woo; spread `override` | Pitfall 12, [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15) |
+| Step Slider tràn ngang sau build plugin | `clientWidth` 1905 / `scrollWidth` 1945; slider `x=-40` width 1985 | GP `.alignfull` −40px; reset chỉ ở theme `style.css`; zip plugin không chứa theme | Pitfall 13, [DP-12](../../.context/PITFALLS.md#dp-12--npm-run-build--zip-plugin--theme-stylecss-gp-alignfull-bleed-còn-khi-reset-chỉ-nằm-theme-2026-11-19) |
 
 ---
 
@@ -298,6 +299,7 @@ không giữ appender Gutenberg.
 [ ] Đã đưa lệnh getBoundingClientRect() cho human verify
 [ ] Regression guard trong tests/slider-block.test.mjs nếu thêm rule mới
 [ ] Không dùng overflow-x/100vw để che geometry (css-layout-safety-contract)
+[ ] Plugin block `alignfull`: reset GP bleed nằm CSS plugin, không chỉ theme (Pitfall 13 / DP-12)
 ```
 
 ## Checklist agent — trước khi submit slider **editor** fix
@@ -429,6 +431,29 @@ Local runtime đã có adapter + `product-card.css` khi theme đủ file. Không
 Chi tiết và source fix: [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15).
 
 **Đừng làm:** sửa CSS related/placeholder khi DOM vẫn `li.product` native. Đừng deploy mỗi plugin khi swap còn nằm theme. Đừng coi panel checked là owner on. Đừng gắn swap vào enqueue-time CSS. Đừng spread `...stored` sau `override: true`.
+
+## Pitfall 13 — Build plugin xong, Step Slider vẫn tràn vì reset `.alignfull` nằm theme
+
+**Xảy ra 2026-11-19.** Human chạy `npm run build` đầy đủ. Onsite `test-page-2`: viewport 1920, `clientWidth` 1905, `scrollWidth` 1945, `.skvn-step-slider` 1985px / `x=-40`. Plugin chrome (heading, tab) đã lên. Theme `style.css?ver=1794791780` (16/11).
+
+**State delta:**
+
+```text
+State A (kỳ vọng): .alignfull width 100% của parent, left >= 0, right <= clientWidth
+State B (lỗi):     GP inline margin-left:-40px; width:calc(100% + 80px)
+Delta:             neutralize nằm theme, không có trong zip plugin
+```
+
+**Case này do gì:**
+
+1. GeneratePress inline `body:not(.no-sidebar) .entry-content .alignfull` `(0,3,1)`.
+2. Local theme đã có `body.skvn-full-width-canvas .site-content .entry-content .alignfull` — file tĩnh, không compile trong plugin build, live còn selector cũ.
+3. Plugin `width:100%` trên `.skvn-step-slider` không thắng GP.
+4. `?ver=` = `filemtime` **trên server**, không phải giờ build local.
+
+**Đừng làm:** kết luận “CSS sai” khi live thiếu selector local. Đừng sửa `themes/generatepress`. Đừng `overflow-x:hidden`. Đừng trừ header. Đừng coi build plugin là đã deploy theme.
+
+Chi tiết: [DP-12](../../.context/PITFALLS.md#dp-12--npm-run-build--zip-plugin--theme-stylecss-gp-alignfull-bleed-còn-khi-reset-chỉ-nằm-theme-2026-11-19).
 
 ## Related
 
