@@ -10,16 +10,6 @@ import {
 	type SlideFillAttributes,
 } from '../slide/fill';
 
-const STEP_OVERLAY_BACKGROUND =
-	'linear-gradient(0deg, rgba(4, 12, 20, 0.6) 0%, rgba(4, 12, 20, 0) 26%), linear-gradient(90deg, rgba(4, 12, 20, 0.84) 0%, rgba(4, 12, 20, 0.42) 44%, rgba(4, 12, 20, 0) 70%)';
-
-const STEP_DEFAULT_FILLS = [
-	'radial-gradient(110% 80% at 18% 8%,  #2a7f9e 0%, #0f4266 42%, #071c33 100%)',
-	'radial-gradient(110% 80% at 82% 12%, #2f8f83 0%, #14524b 46%, #0a2422 100%)',
-	'radial-gradient(110% 80% at 20% 85%, #b97a2a 0%, #5c3a17 45%, #1d130a 100%)',
-	'radial-gradient(110% 80% at 80% 88%, #5b5bd6 0%, #2c2c6e 48%, #101024 100%)',
-];
-
 type StepSlideAttributes = SlideFillAttributes & {
 	backgroundImageId: number;
 	backgroundImageUrl: string;
@@ -68,8 +58,6 @@ export function save( { attributes }: StepSlideSaveProps ) {
 	} else if ( fillMode === 'custom' ) {
 		const customBg = resolveCustomFillBackground( attributes );
 		wrapperStyle = customBg ? { background: customBg } : undefined;
-	} else if ( fillMode !== 'transparent' ) {
-		wrapperStyle = { background: STEP_DEFAULT_FILLS[ 0 ] };
 	}
 
 	const blockProps = useBlockProps.save( {
@@ -98,7 +86,6 @@ export function save( { attributes }: StepSlideSaveProps ) {
 						aria-hidden="true"
 						className="skvn-step-slide__overlay"
 						style={ {
-							background: STEP_OVERLAY_BACKGROUND,
 							opacity: overlayOpacity / 100,
 						} }
 					/>

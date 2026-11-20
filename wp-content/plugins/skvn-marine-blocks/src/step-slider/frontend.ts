@@ -41,6 +41,7 @@ roots.forEach( ( root ) => {
 		DWELL_DELAYS[ root.getAttribute( 'data-dwell' ) ?? '' ] ?? 8000;
 	const loopWanted =
 		root.getAttribute( 'data-loop' ) === '1' && tabs.length > 1;
+	const pauseOnHover = root.getAttribute( 'data-pause-hover' ) !== '0';
 
 	const progressEls = tabs.map( ( tab ) =>
 		tab.querySelector< HTMLElement >( '.skvn-step-slider__tab-progress' )
@@ -55,6 +56,66 @@ roots.forEach( ( root ) => {
 	let pausedByUs = false;
 	let stoppedByFocus = false;
 
+	const isContentHeight = root.classList.contains(
+		'skvn-step-slider--height-content'
+	);
+
+	const syncShellOffset = () => {
+		if ( isContentHeight || ! ( root instanceof HTMLElement ) ) {
+			return;
+		}
+		const offset = Math.max(
+			0,
+			Math.round( root.getBoundingClientRect().top + window.scrollY )
+		);
+		root.style.setProperty( '--skvn-step-slider-offset', `${ offset }px` );
+	};
+	syncShellOffset();
+	window.addEventListener( 'resize', syncShellOffset );
+	window.addEventListener( 'load', syncShellOffset );
+
+	const equalizeContentHeights = () => {
+		if ( ! isContentHeight ) {
+			return;
+		}
+
+		const contents = Array.from(
+			viewport.querySelectorAll< HTMLElement >(
+				'.skvn-step-slide__content'
+			)
+		);
+		const boxes = Array.from(
+			viewport.querySelectorAll< HTMLElement >(
+				'.swiper-slide, .skvn-step-slide'
+			)
+		);
+
+		contents.forEach( ( el ) => {
+			el.style.minHeight = '';
+		} );
+		boxes.forEach( ( el ) => {
+			el.style.minHeight = '';
+		} );
+		viewport.style.minHeight = '';
+
+		let max = 0;
+		contents.forEach( ( el ) => {
+			max = Math.max( max, el.scrollHeight );
+		} );
+		if ( max <= 0 ) {
+			return;
+		}
+
+		const value = `${ max }px`;
+		viewport.style.minHeight = value;
+		boxes.forEach( ( el ) => {
+			el.style.minHeight = value;
+		} );
+		contents.forEach( ( el ) => {
+			el.style.minHeight = value;
+		} );
+	};
+
 	try {
 		const swiper = new Swiper( viewport, {
 			modules: [ A11y, Autoplay, EffectFade, Keyboard, Navigation ],
@@ -64,7 +125,9 @@ roots.forEach( ( root ) => {
 			loop: loopWanted,
 			allowTouchMove: false,
 			simulateTouch: false,
-			autoHeight: true,
+			// 081 §9: all tabs share the tallest content height. autoHeight
+			// resizes to the active slide and is not the product spec.
+			autoHeight: false,
 			keyboard: { enabled: true, onlyInViewport: true },
 			navigation: {
 				prevEl,
@@ -114,6 +177,24 @@ roots.forEach( ( root ) => {
 
 		swiper.on( 'slideChange', syncControls );
 		syncControls();
+		equalizeContentHeights();
+		swiper.on( 'imagesReady', equalizeContentHeights );
+
+		viewport
+			.querySelectorAll< HTMLImageElement >( 'img' )
+			.forEach( ( img ) => {
+				if ( ! img.complete ) {
+					img.addEventListener( 'load', equalizeContentHeights, {
+						once: true,
+					} );
+				}
+			} );
+
+		let resizeTimer = 0;
+		window.addEventListener( 'resize', () => {
+			window.clearTimeout( resizeTimer );
+			resizeTimer = window.setTimeout( equalizeContentHeights, 100 );
+		} );
 
 		if ( autoplayWanted ) {
 			const anyTransient = () =>
@@ -159,18 +240,20 @@ roots.forEach( ( root ) => {
 				}
 			} );
 
-			root.addEventListener( 'pointerenter', ( event ) => {
-				if ( event.pointerType === 'mouse' ) {
-					transient.hover = true;
-					applyPauseStack();
-				}
-			} );
-			root.addEventListener( 'pointerleave', ( event ) => {
-				if ( event.pointerType === 'mouse' ) {
-					transient.hover = false;
-					applyPauseStack();
-				}
-			} );
+			if ( pauseOnHover ) {
+				root.addEventListener( 'pointerenter', ( event ) => {
+					if ( event.pointerType === 'mouse' ) {
+						transient.hover = true;
+						applyPauseStack();
+					}
+				} );
+				root.addEventListener( 'pointerleave', ( event ) => {
+					if ( event.pointerType === 'mouse' ) {
+						transient.hover = false;
+						applyPauseStack();
+					}
+				} );
+			}
 
 			document.addEventListener( 'visibilitychange', () => {
 				transient.hidden = document.hidden;

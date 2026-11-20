@@ -21,24 +21,67 @@
 
 .skvn-step-slider {
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
 	width: 100%;
 	--skvn-step-slider-progress-color: #7ec8e3;
+	--skvn-step-slider-tab-height: 54px;
+}
+
+/*
+ * Viewport shell is the slide plus the step bar. The site header stays
+ * in normal flow. --skvn-step-slider-offset is this block's document top,
+ * measured in frontend.ts, so the shell fills the viewport under the header.
+ */
+.skvn-step-slider:not(.skvn-step-slider--height-content) {
+	min-height: 100svh;
+}
+
+.skvn-step-slider:not(.skvn-step-slider--height-content).is-ready {
+	height: calc(100svh - var(--skvn-step-slider-offset, 0px));
+	min-height: 0;
+	max-height: calc(100svh - var(--skvn-step-slider-offset, 0px));
+	overflow: hidden;
 }
 
 .skvn-step-slider .swiper {
+	flex: 1 1 auto;
 	width: 100%;
-	min-height: 100svh;
+	min-height: 0;
 }
 
 .skvn-step-slider .swiper-slide {
 	width: 100%;
 	height: auto;
+}
+
+.skvn-step-slider:not(.skvn-step-slider--height-content):not(.is-ready) .swiper,
+.skvn-step-slider:not(.skvn-step-slider--height-content):not(.is-ready) .swiper-slide {
 	min-height: 100svh;
+}
+
+.skvn-step-slider:not(.skvn-step-slider--height-content).is-ready .swiper {
+	flex: 1 1 0%;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.skvn-step-slider:not(.skvn-step-slider--height-content).is-ready .swiper-slide,
+.skvn-step-slider:not(.skvn-step-slider--height-content) .skvn-step-slide {
+	height: 100%;
+	min-height: 100%;
 }
 
 .skvn-step-slider--height-content .swiper,
 .skvn-step-slider--height-content .swiper-slide {
 	min-height: 0;
+}
+
+/* Content mode: fill the equalized box (JS sets min-height = tallest step). */
+.skvn-step-slider--height-content.is-ready .swiper-slide,
+.skvn-step-slider--height-content.is-ready .skvn-step-slide {
+	height: 100%;
 }
 
 /* No runtime / not ready yet: plain vertical stack. */
@@ -115,9 +158,9 @@
 	width: 100%;
 	max-width: 46rem;
 	margin-right: auto;
-	min-height: 100svh;
+	min-height: 100%;
 	padding: clamp(4.5rem, 11vh, 7.5rem) clamp(1.25rem, 5vw, 4.5rem)
-		clamp(6.5rem, 17vh, 9.5rem);
+		clamp(4.5rem, 11vh, 7.5rem);
 	color: #f5f7fa;
 }
 
@@ -177,44 +220,48 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 
 /* Step bar — full-width strip, equal columns, rendered step number + tab label. */
 .skvn-step-slider__tabs {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	position: relative;
+	left: auto;
+	right: auto;
+	bottom: auto;
+	flex: 0 0 auto;
 	z-index: 3;
 	display: flex;
+	align-items: stretch;
 	box-sizing: border-box;
 	width: 100%;
 	max-width: 100%;
 	margin: 0;
 	padding: 0;
 	gap: 0;
+	flex-wrap: nowrap;
 	overflow-x: auto;
 	scrollbar-width: thin;
 	background: rgba(4, 12, 20, 0.62);
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	border-top: 0;
 	-webkit-backdrop-filter: blur(8px);
 	backdrop-filter: blur(8px);
 }
 
 .skvn-step-slider__tab {
 	position: relative;
+	box-sizing: border-box;
 	flex: 1 1 0;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	justify-content: center;
 	min-width: min-content;
-	min-height: 54px;
+	min-height: var(--skvn-step-slider-tab-height, 54px);
+	height: var(--skvn-step-slider-tab-height, 54px);
 	margin: 0;
-	padding: 0.85rem 1.1rem;
+	padding: 0.4rem 0.45rem;
 	border: 0;
-	border-top: 2px solid rgba(255, 255, 255, 0.14);
 	border-radius: 0;
 	background: transparent;
 	color: rgba(255, 255, 255, 0.72);
 	font: inherit;
-	line-height: 1.25;
+	line-height: 1.15;
 	text-align: left;
 	cursor: pointer;
 	transition: color 0.2s ease, background-color 0.2s ease;
@@ -222,7 +269,7 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 
 .skvn-step-slider__tab-number {
 	display: block;
-	font-size: 0.72rem;
+	font-size: 0.66rem;
 	font-weight: 700;
 	letter-spacing: 0.18em;
 	opacity: 0.75;
@@ -231,16 +278,16 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 .skvn-step-slider__tab-label {
 	display: block;
 	margin-top: 0.15rem;
-	font-size: 0.82rem;
+	font-size: 0.68rem;
 	font-weight: 800;
-	letter-spacing: 0.08em;
+	letter-spacing: 0.04em;
 	text-transform: uppercase;
 	white-space: nowrap;
 }
 
 .skvn-step-slider__tab-progress {
 	position: absolute;
-	top: -2px;
+	top: 0;
 	left: 0;
 	display: block;
 	width: 0%;
@@ -252,26 +299,26 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 }
 
 .skvn-step-slider__tab:hover {
-	background: rgba(255, 255, 255, 0.06);
 	color: #f5f7fa;
 }
 
 .skvn-step-slider__tab[aria-current="true"],
 .skvn-step-slider__tab.is-active {
 	color: #ffffff;
-	background: rgba(255, 255, 255, 0.09);
 }
 
-/* Arrows — chevron SVG, desktop center; narrow screens top-left pair. */
+/* Arrows — narrow layout is the base: top-left pair, 2.25rem (081).
+ * min-width 641px centers them on the stage at 2.875rem.
+ * Viewport mode centers on the slide stage, not the tab strip. */
 .skvn-step-slider__arrow {
 	position: absolute;
-	top: 50%;
+	top: 1rem;
 	z-index: 4;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.875rem;
-	height: 2.875rem;
+	width: 2.25rem;
+	height: 2.25rem;
 	padding: 0;
 	border: 1px solid rgba(255, 255, 255, 0.25);
 	border-radius: 50%;
@@ -281,21 +328,23 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 	color: #ffffff;
 	line-height: 1;
 	cursor: pointer;
-	transform: translateY(-50%);
+	transform: none;
 	transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
 .skvn-step-slider__arrow-icon {
-	width: 1.35rem;
-	height: 1.35rem;
+	width: 1.1rem;
+	height: 1.1rem;
 }
 
 .skvn-step-slider__arrow--prev {
-	left: 1rem;
+	left: 0.5rem;
+	right: auto;
 }
 
 .skvn-step-slider__arrow--next {
-	right: 1rem;
+	left: 2.85rem;
+	right: auto;
 }
 
 .skvn-step-slider__arrow:disabled {
@@ -314,14 +363,14 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 	justify-content: center;
 	min-width: 4.25rem;
 	height: auto;
-	padding: 0.5rem 1.1rem;
+	padding: 0.45rem 0.95rem;
 	border: 1px solid rgba(255, 255, 255, 0.5);
 	border-radius: 999px;
 	background: rgba(10, 20, 33, 0.6);
 	backdrop-filter: blur(4px);
 	color: #ffffff;
 	font: inherit;
-	font-size: 0.875rem;
+	font-size: 0.8rem;
 	font-weight: 600;
 	line-height: 1.2;
 	cursor: pointer;
@@ -357,11 +406,24 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 	animation: skvn-step-wipe 800ms ease both;
 }
 
-/* Text cascade — heading 0 / paragraph 100 / list 200 / buttons 300 ms, 400 ms. */
-@keyframes skvn-step-cascade {
+/* Text presets. Only transform + opacity. Inactive copy cuts immediately
+ * (no exit transition) when .swiper-slide-active leaves. Tab labels are not
+ * in these selectors. Wipe above stays 800ms. */
+@keyframes skvn-step-text-slide {
 	from {
 		opacity: 0;
-		transform: translateY(0.75rem);
+		transform: translateX(56px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes skvn-step-text-rise {
+	from {
+		opacity: 0;
+		transform: translateY(24px);
 	}
 	to {
 		opacity: 1;
@@ -369,40 +431,75 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 	}
 }
 
-.skvn-step-slider.is-ready .swiper-slide-active .skvn-step-slide__content > * {
-	opacity: 1;
+.skvn-step-slider.is-ready .skvn-step-slide__content > .wp-block-heading,
+.skvn-step-slider.is-ready .skvn-step-slide__content > .wp-block-paragraph,
+.skvn-step-slider.is-ready .skvn-step-slide__content > .wp-block-list,
+.skvn-step-slider.is-ready .skvn-step-slide__content > .wp-block-buttons {
+	opacity: 0;
 }
 
-.skvn-step-slider.is-ready
+.skvn-step-slider.is-ready:not([data-text-animation='rise'])
 	.swiper-slide-active
 	.skvn-step-slide__content
-	> .wp-block-heading {
-	animation: skvn-step-cascade 400ms ease both;
+	> .wp-block-heading,
+.skvn-step-slider.is-ready:not([data-text-animation='rise'])
+	.swiper-slide-active
+	.skvn-step-slide__content
+	> .wp-block-paragraph:first-child {
+	animation: skvn-step-text-slide 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
 	animation-delay: 0ms;
 }
 
-.skvn-step-slider.is-ready
+.skvn-step-slider.is-ready:not([data-text-animation='rise'])
 	.swiper-slide-active
 	.skvn-step-slide__content
-	> .wp-block-paragraph {
-	animation: skvn-step-cascade 400ms ease both;
-	animation-delay: 100ms;
-}
-
-.skvn-step-slider.is-ready
+	> .wp-block-paragraph:not(:first-child),
+.skvn-step-slider.is-ready:not([data-text-animation='rise'])
 	.swiper-slide-active
 	.skvn-step-slide__content
 	> .wp-block-list {
-	animation: skvn-step-cascade 400ms ease both;
-	animation-delay: 200ms;
+	animation: skvn-step-text-slide 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: 90ms;
 }
 
-.skvn-step-slider.is-ready
+.skvn-step-slider.is-ready:not([data-text-animation='rise'])
 	.swiper-slide-active
 	.skvn-step-slide__content
 	> .wp-block-buttons {
-	animation: skvn-step-cascade 400ms ease both;
-	animation-delay: 300ms;
+	animation: skvn-step-text-slide 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: 180ms;
+}
+
+.skvn-step-slider.is-ready[data-text-animation='rise']
+	.swiper-slide-active
+	.skvn-step-slide__content
+	> .wp-block-heading,
+.skvn-step-slider.is-ready[data-text-animation='rise']
+	.swiper-slide-active
+	.skvn-step-slide__content
+	> .wp-block-paragraph:first-child {
+	animation: skvn-step-text-rise 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: 0ms;
+}
+
+.skvn-step-slider.is-ready[data-text-animation='rise']
+	.swiper-slide-active
+	.skvn-step-slide__content
+	> .wp-block-paragraph:not(:first-child),
+.skvn-step-slider.is-ready[data-text-animation='rise']
+	.swiper-slide-active
+	.skvn-step-slide__content
+	> .wp-block-list {
+	animation: skvn-step-text-rise 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: 100ms;
+}
+
+.skvn-step-slider.is-ready[data-text-animation='rise']
+	.swiper-slide-active
+	.skvn-step-slide__content
+	> .wp-block-buttons {
+	animation: skvn-step-text-rise 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: 200ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -411,10 +508,8 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 		clip-path: none;
 	}
 
-	.skvn-step-slider.is-ready
-		.swiper-slide-active
-		.skvn-step-slide__content
-		> * {
+	/* !important: đè animation/visibility của chính block, không đè theme inline. */
+	.skvn-step-slider.is-ready .skvn-step-slide__content > * {
 		opacity: 1 !important;
 		transform: none !important;
 		animation: none !important;
@@ -426,6 +521,7 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 }
 
 @media print {
+	/* !important: đè animation/visibility của chính block, không đè theme inline. */
 	.skvn-step-slider__tabs,
 	.skvn-step-slider__arrow,
 	.skvn-step-slider__play {
@@ -476,44 +572,49 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 	}
 }
 
-@media (max-width: 640px) {
+@media (min-width: 641px) {
 	.skvn-step-slider__arrow {
-		top: 1rem;
-		width: 2.25rem;
-		height: 2.25rem;
-		transform: none;
+		top: 50%;
+		width: 2.875rem;
+		height: 2.875rem;
+		transform: translateY(-50%);
+	}
+
+	.skvn-step-slider:not(.skvn-step-slider--height-content).is-ready .skvn-step-slider__arrow {
+		top: calc((100% - var(--skvn-step-slider-tab-height, 54px)) / 2);
 	}
 
 	.skvn-step-slider__arrow-icon {
-		width: 1.1rem;
-		height: 1.1rem;
+		width: 1.35rem;
+		height: 1.35rem;
 	}
 
 	.skvn-step-slider__arrow--prev {
-		left: 0.5rem;
+		left: 1rem;
 		right: auto;
 	}
 
 	.skvn-step-slider__arrow--next {
-		left: 2.85rem;
-		right: auto;
+		left: auto;
+		right: 1rem;
 	}
 
 	.skvn-step-slider__play {
-		font-size: 0.8rem;
-		padding: 0.45rem 0.95rem;
+		padding: 0.5rem 1.1rem;
+		font-size: 0.875rem;
 	}
 
 	.skvn-step-slider__tab {
-		padding: 0.7rem 0.45rem;
+		padding-right: 1.1rem;
+		padding-left: 1.1rem;
 	}
 
 	.skvn-step-slider__tab-number {
-		font-size: 0.66rem;
+		font-size: 0.72rem;
 	}
 
 	.skvn-step-slider__tab-label {
-		font-size: 0.68rem;
-		letter-spacing: 0.04em;
+		font-size: 0.82rem;
+		letter-spacing: 0.08em;
 	}
 }

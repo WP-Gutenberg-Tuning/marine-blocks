@@ -23,6 +23,7 @@ import { save as sliderSave } from './slider/save';
 import { registerSliderVariations } from './slider/variations';
 
 import stepSlideMetadata from './step-slide/block.json';
+import stepSlideDeprecated from './step-slide/deprecated';
 import { Edit as StepSlideEdit } from './step-slide/edit';
 import { save as stepSlideSave } from './step-slide/save';
 
@@ -87,6 +88,7 @@ registerSliderVariations();
 
 registerBlockType( stepSlideMetadata.name, {
 	...stepSlideMetadata,
+	deprecated: stepSlideDeprecated,
 	edit: StepSlideEdit,
 	save: stepSlideSave,
 } );
