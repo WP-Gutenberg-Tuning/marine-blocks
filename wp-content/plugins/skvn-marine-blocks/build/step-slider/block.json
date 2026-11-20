@@ -6,11 +6,14 @@
   "title": "Step Slider",
   "category": "skvn-marine",
   "icon": "images-alt2",
-  "description": "Fullscreen step slider with manual navigation, fade, wipe and text cascade.",
+  "description": "Fullscreen step slider with manual navigation, fade, wipe, and text animation.",
   "textdomain": "skvn-marine-blocks",
   "allowedBlocks": [
     "skvn-marine/step-slide"
   ],
+  "providesContext": {
+    "skvn-marine/stepFillPreset": "fillPreset"
+  },
   "attributes": {
     "align": {
       "type": "string",
@@ -21,6 +24,10 @@
       "default": true
     },
     "pauseOnHover": {
+      "type": "boolean",
+      "default": true
+    },
+    "showPlayButton": {
       "type": "boolean",
       "default": true
     },
@@ -45,9 +52,25 @@
       ],
       "default": "viewport"
     },
+    "tabHeight": {
+      "type": "number",
+      "default": 54
+    },
     "progressColor": {
       "type": "string",
       "default": "#7ec8e3"
+    },
+    "textAnimation": {
+      "type": "string",
+      "enum": [
+        "slide",
+        "rise"
+      ],
+      "default": "slide"
+    },
+    "fillPreset": {
+      "type": "string",
+      "default": "deep-marine"
     }
   },
   "supports": {

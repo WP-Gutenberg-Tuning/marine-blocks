@@ -10,6 +10,9 @@
   "parent": [
     "skvn-marine/step-slider"
   ],
+  "usesContext": [
+    "skvn-marine/stepFillPreset"
+  ],
   "textdomain": "skvn-marine-blocks",
   "attributes": {
     "backgroundImageId": {
