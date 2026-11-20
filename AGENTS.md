@@ -88,7 +88,7 @@ Quy tắc quản lý tension theo milestone:
 
 ## 1. Đọc trước — Bắt buộc
 
-Mỗi task bắt đầu bằng 4 bước này, không có ngoại lệ:
+Mỗi task bắt đầu bằng các bước sau, không có ngoại lệ:
 
 ```
 1. Đọc .context/GLOBAL.md       → hiểu stack, module index, invariants
@@ -96,10 +96,62 @@ Mỗi task bắt đầu bằng 4 bước này, không có ngoại lệ:
 3. Đọc .context/TENSIONS_OPEN.md     → check toàn bộ OPEN tensions
 4. Đọc .context/TENSIONS_ACTIVE.md   → check RESOLVED_ACTIVE tensions của milestone hiện tại, dùng tag filter
 5. Đọc .context/modules/<module>.md  → load context của module sắp sửa
-6. Đọc .context/CONVENTION.md → Load các coding convention của dự án
+6. Đọc convention chung theo mục "Cách đọc convention chung" — không đọc hết file
 ```
 
 Nếu `.context/modules/<module>.md` chưa tồn tại → load `GLOBAL.md` + hỏi lại trước khi tạo file mới.
+
+### Cách đọc convention chung
+
+Convention chung của repo này là `.context/CONVENTION.md`. AGENTS.md giữ luật riêng của skvn-marine và chỉ dẫn đọc file đó. MUST đọc theo Chỉ mục đọc ở đầu file (giao thức 4 bước, `.context/CONVENTION.md` dòng 15 và 19–31). NEVER đọc tuyến tính từ đầu tới cuối. NEVER chép nội dung convention chung, phụ lục anti-pattern, hoặc checklist gate của nó vào AGENTS.md.
+
+L0, mọi task code hoặc review: Chỉ mục đọc + mục 0.1–0.5. Thân quy trình 0.5 chỉ đọc trọn khi human yêu cầu digest một PITFALL (điều kiện kích hoạt 0.5.1). Sau L0, đặt task vào một hoặc tối đa hai hàng của bảng định tuyến, đọc cột "Đọc bắt buộc", rồi đọc cột "Đọc thêm khi" và bảng tín hiệu mở rộng chỉ khi điều kiện khớp. Ngoài L0, L1, L2 thì dừng. Vượt ngân sách đọc (XS/S/M/L trong cùng Chỉ mục) thì ghi mục đã đọc thêm và tín hiệu bắt đọc thêm khi giao.
+
+Khi giao code chạm plugin, block, CSS, PHP hoặc review: ghi khối "Đã đọc" theo mẫu ở Chỉ mục đọc của `.context/CONVENTION.md`. Thiếu khối đó là chưa đọc.
+
+Nhãn mọi nhận định mới ghi vào AGENTS.md: quan sát (thấy trực tiếp trong repo), suy luận (rút từ nhiều chỗ, chưa ai xác nhận), chưa biết (chưa có bằng chứng). Luật suy luận chỉ nằm ở mục chờ xác nhận bên dưới. Chưa biết thì để trống, ghi câu hỏi, không bịa luật.
+
+Thứ tự khi các nguồn mâu thuẫn, áp cho lần đọc và lần ghi luật:
+
+1. Bảo mật và tài liệu gốc của WordPress.
+2. Luật nhãn quan sát trong AGENTS.md, trong phạm vi dự án này, với điều kiện xung đột đã được ghi ở mục xung đột bên dưới.
+3. `.context/CONVENTION.md`.
+4. Suy luận của agent không thắng ba nguồn trên.
+
+Thứ tự kỹ thuật khi hai cách code đều chạy (bảo mật, cơ chế gốc WordPress, dữ liệu đã lưu, tương thích ngược, hiệu năng đo được) nằm ở mục 0.1 của convention chung. Không chép lại vào đây.
+
+Đề xuất đưa bài học của repo này lên convention chung chỉ khi đủ ba điều kiện ở 0.5.4 (đã xảy ra thật, nguyên tắc bỏ được số đo riêng, chưa có luật tương đương). Định dạng hồ sơ là định dạng ở 0.5.5 / Phần E. Khi đang làm task trong repo này, dừng ở đề xuất để human duyệt. NEVER tự ghi vào `.context/CONVENTION.md` nếu human chưa yêu cầu sửa chính file đó.
+
+### Xung đột với convention chung
+
+- Đọc hết `.context/CONVENTION.md` mỗi task (bước 6 cũ của file này) lệch Chỉ mục đọc (dòng 15, 19–31). Phạm vi: mọi task. Phía thắng: chỉ mục. Bước 1–5 vẫn đọc đủ vì đó là context dự án, không phải convention chung.
+- Số đo riêng của repo — specificity tối thiểu `(0,3,1)` và cách neutralize GeneratePress `.alignfull` — ở mục Marine Blocks phía trên (human 2026-11-19), pitfall DP-12, và `docs/standards/css-layout-safety-contract.md`. Nguyên tắc "plugin đúng khi chỉ cài plugin" nằm ở A9 của convention chung. Phạm vi ngoại lệ: số đo không thành luật chung. Trong repo này, hợp đồng CSS của dự án giữ số đo; A9 giữ nguyên tắc.
+
+### Pitfall
+
+Nội dung pitfall nằm ở `.context/PITFALLS.md`. Casebook được entry trỏ tới thì đọc thêm `docs/debug-casebook/PITFALLS.md`. NEVER chép pitfall vào AGENTS.md. NEVER đọc hết file pitfall mỗi task; đọc đúng entry của triệu chứng đang đụng. Bản có dấu [CORRECTED] thắng bản quy nhầm (mẫu: DP-06, tiêu đề và lưu ý 2026-11-10 trong `.context/PITFALLS.md`).
+
+Khi ghi pitfall mới: ghi root cause kèm bằng chứng kiểm chứng (file, số đo, hoặc runtime). Chưa kiểm chứng thì ghi nhãn suy luận, không ghi thành nguyên nhân đã chốt. Đính chính thì giữ dòng cũ có đánh dấu, không ghi đè lặng lẽ. Header `.context/PITFALLS.md` đã cấm xóa entry; chỉ thêm `Fixed:` khi đã có giải pháp kiến trúc lâu dài.
+
+### Luật chờ xác nhận
+
+Năm hàng định tuyến dưới đây là suy luận: rút từ các lệnh đọc bắt buộc đã có ở mục CSS layout, Marine Blocks và self-check, chưa đếm tần suất commit. Câu hỏi để thành luật: đây có phải năm việc làm nhiều nhất không, và có thêm hoặc bớt hàng InnerBlocks, Settings, hoặc review bảo mật C3 không? Default tới khi human trả lời: dùng bảng này để chọn hàng định tuyến.
+
+| Việc hay gặp trong repo này | Hàng trong bảng định tuyến | Đọc bắt buộc |
+|---|---|---|
+| CSS layout, width, alignfull | CSS frontend, responsive | A1, A2, A3; tín hiệu alignfull thì thêm A9.3, A2 |
+| Block phải đúng khi chỉ cài plugin, hoặc live lệch local | Kiểm tra độc lập theme–plugin, width và deploy | A9, A3; live lệch local thì A9.2 |
+| Inspector, attribute optional, `SelectControl`, `wp.components` | Self-check attribute `undefined` và pattern của control trước commit | A5.11; đổi attribute thì A5.10 |
+| Sửa block đã nằm trong nội dung đã lưu | Sửa block đã phát hành | A5.2, A5.10; đổi tên hoặc kiểu thì C12 |
+| Setting màu, chữ, khoảng cách | Thêm setting màu, chữ, khoảng cách | A5.4, A5.5, A6 |
+
+### Điều cấm khi đọc và ghi convention
+
+- NEVER đọc hết `.context/CONVENTION.md` cho một task.
+- NEVER chép convention chung hoặc checklist của nó vào AGENTS.md.
+- NEVER ghi suy luận hoặc chưa biết thành luật quan sát.
+- NEVER digest PITFALL khi human chưa yêu cầu (0.5.1).
+- NEVER tự viết luật mới vào `.context/CONVENTION.md` trong task dự án; giao đề xuất theo 0.5.5.
 
 Nếu `[manual]` section trong module file còn template placeholder (`<!-- Viết tại đây -->`) → **DỪNG, báo lại**, không tự điền assumption.
 
@@ -634,6 +686,8 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 ## 8. Self-Check Trước Khi Submit
 
 ```
+[ ] Task chạm plugin, block, CSS, PHP hoặc review: đã đọc L0 + đúng hàng định tuyến của `.context/CONVENTION.md`, đã ghi khối "Đã đọc"; không đọc hết file đó
+[ ] Luật mới ghi vào AGENTS.md có bằng chứng; suy luận chỉ ở mục "Luật chờ xác nhận"
 [ ] Không sửa themes/generatepress/
 [ ] Không rename namespace/prefix ngoài migration đã duyệt; theme identity giữ nguyên
 [ ] Không đặt block logic trong theme
@@ -711,6 +765,7 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 | 1.3.22 | Product Page Basic Design Controls + PDP Related plan076/077 — DONE_WITH_CARRY_OVER (tạm PASS theo human 2026-11-16; rework 1.4.x) |
 | 1.3.23 | Post Page Basic Design Controls — **deferred → 1.4.x stockpile** (boundary plan 078) |
 | 1.3.24 | Fullscreen Step Slider — **current pointer** (PLANNED, chưa start) |
+| 1.3.25 | Plugin convention gap (DP-12 / A9 / A5.11) — SemVer đề xuất 2026-11-19, chưa start, không phải current |
 | 1.4.1 | SKVN Theme Init Setup UI |
 | 1.4.2 | Layout Blocks Validation & Quote Evaluation |
 | 1.5.0 | Woo Catalog Plugin |

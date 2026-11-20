@@ -530,3 +530,30 @@ Xem DP-01. Nếu `view.ts` cần đọc 1 attribute, attribute đó phải có t
 
 - **Fixed (source 2026-11-19):** plugin Step Slider reset; GLOBAL A13; AGENTS.md Marine Blocks; CONVENTION; canvas decision amendment; css-layout-safety. **Chưa runtime PASS.** Cần `npm run build` plugin rồi upload **plugin** (không cần chờ theme cho overflow block này).
 - **Casebook:** `docs/debug-casebook/PITFALLS.md` Pitfall 13.
+
+### DP-13 — Step Slider 100svh bắt đầu dưới header sticky, thanh bước rơi khỏi màn đầu [2026-11-19] [CORRECTED 2026-11-19]
+
+Đính chính: đoạn số đo bên dưới là **một lần tải** (CSS `?ver=1795044073`, viewport 1920×1080, scroll 0). Không phải nguyên nhân đã khóa. Audit `docs/testing/test-page-2-css-audit.md` (15:09–15:50, CSS `?ver=1795074897`, file CSS không đổi giữa 15:36 và 15:50) ghi chiều cao slider **không ổn định**:
+
+- 15:09, viewport 1920×903: mặt slide ~780px, tab dưới nếp — khớp luật `min-height: 100svh`.
+- 15:47–15:50, viewport 1920×959, một slider: tab nằm **trong** viewport (y 490–610), slider chỉ cao ~522px, còn khoảng trắng ~115px giữa mặt tối và thanh tab, H2 chui lên dưới header. `data-height-mode="viewport"` không đổi.
+
+Luật trong file build (audit §3.2) là `min-height: 100svh` trên vỏ và `min-height: calc(100svh - tab)` trên `.swiper` khi có `.is-ready`. Với viewport 959 và tab 120px, tab phải ở y 927–1047, ngoài viewport. Lần 15:47 không ra số đó. Nghi phạm trong audit, chưa xác minh: `.is-ready` không được gắn vì `try/catch` rỗng nuốt lỗi khởi tạo, hoặc cache CSS cũ (cùng `?ver=`). Chưa kiểm class `is-ready` và computed height sau hard reload thì **không** kết luận header sticky là nguyên nhân ổn định, và không sửa khoảng trắng / chữ bị che.
+
+Việc audit đã chứng minh, lần ghi DP-13 bỏ sót:
+
+1. Hai vạch trắng dọc = bậc nền tab active `hsla(0,0%,100%,.09)` với tab kề `transparent`. Bấm đổi tab thì vạch chạy theo. Không có border dọc.
+2. Vạch trắng ngang = `border-top` 1px của `.skvn-step-slider__tabs` cộng `border-top` 2px của `.skvn-step-slider__tab`.
+3. Vệt trắng hai đầu = `mask-image` mờ 0.75rem khi 4 tab không tràn.
+4. Nền lệch: ảnh 3840×2160 `object-fit: cover` cắt khác mỗi viewport; slide 1 và 4 là gradient tâm sáng ở hai góc đối nhau; focal đang 50%/50%.
+
+Cấm 6 vẫn cấm trừ header cho đến khi human chọn phương án A hoặc B trong audit §3.4. Bước 1 của audit là chẩn đoán `.is-ready`, trước mọi sửa chiều cao.
+
+- **Case:** `https://minhhaifishery.com/test-page-2/`, viewport 1920×1080, scroll 0. Ảnh và chữ thấy được. Số bước và nhãn (`01 SOURCING` …) không có trên màn đầu. Artifact (`step-slider-prototype.html`) không có header site, thanh bước dính đáy đúng khung nhìn.
+- **Số đo (scroll 0):** `.site-header.has-inline-mobile-toggle` `position: sticky`, cao 88px, vẫn chiếm flow. `.skvn-step-slider` top 88, cao 1080, đáy 1168 (dưới nếp 88px). `.skvn-step-slider__tabs` `position: absolute; bottom: 0`, top 1047, cao 121. Số bước top 1094, nhãn top 1109 — cả hai dưới 1080. Phần thanh còn trong màn ≈ 33px. Inline trên root: `--skvn-step-slider-tab-height:120px; --skvn-step-slider-progress-color:#7ec8e3`. CSS live `style-frontend.ts.css?ver=1795044073`.
+- **Sau khi cuộn đúng 88px:** thanh nằm sát đáy viewport (top 959, bottom 1080), nhãn đọc được. Lệch là màn đầu, không phải thanh không tồn tại.
+- **Lệch plan 081 §9:** viewport phải là `min-height: 100svh` trên **vỏ** `.skvn-step-slider`, tab **in-flow**, stage = `100svh − tab height`. Live: `min-height` của vỏ là `0px`, vỏ không phải flex, tab absolute đè lên `.swiper` cao 1080. DOM swiper có class `swiper-autoheight`. Source `frontend.ts` đang ghi `autoHeight: false` — bundle trên site không phải file source đó.
+- **Vì sao “đúng câu plan” vẫn không ra ảnh artifact:** Cấm 6 cấm trừ header. Header sticky vẫn chiếm 88px flow, nên hộp `100svh` luôn kết thúc thấp hơn màn đầu đúng bằng header. Tab 54px (default plan) sẽ khuất hết (54 < 88). Tab 120px (attribute đang lưu) chỉ ló ~33px, không đủ tới dòng số và nhãn. Agent các lượt 081/085 đối chiếu checklist source với câu plan, không đo scroll 0 trên trang có header.
+- **Không phải:** progress `#7ec8e3` thay `#3ddc84`, nút Play ẩn, không có counter `01/04`. Plan 081 Cấm 3 và Cấm 4 khóa những chỗ đó. Không phải DP-12 (lần đo này slider rộng 1905, left 0).
+- **Chưa sửa.** Source working tree đã chuyển tab sang `position: relative` trong cột flex và `min-height` swiper `calc(100svh - tab)`. Cách đó gần §9 hơn bundle đang live, và vẫn không kéo thanh lên màn đầu chừng nào vỏ còn `100svh` dưới header. Chưa runtime PASS.
+- **Casebook:** `docs/debug-casebook/PITFALLS.md` Pitfall 14.

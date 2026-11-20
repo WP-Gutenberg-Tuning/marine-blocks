@@ -455,6 +455,31 @@ Delta:             neutralize nằm theme, không có trong zip plugin
 
 Chi tiết: [DP-12](../../.context/PITFALLS.md#dp-12--npm-run-build--zip-plugin--theme-stylecss-gp-alignfull-bleed-còn-khi-reset-chỉ-nằm-theme-2026-11-19).
 
+## Pitfall 14 — Thanh bước Step Slider khuất ở màn đầu vì 100svh nằm dưới header [CORRECTED 2026-11-19]
+
+Đính chính: một lần đo (CSS `?ver=1795044073`) thấy tab dưới nếp. Audit `docs/testing/test-page-2-css-audit.md` trên CSS mới hơn (`?ver=1795074897`, file không đổi) thấy lúc 15:09 tab dưới nếp, lúc 15:47 tab **trong** viewport và slider chỉ cao ~522px. Chiều cao không ổn định. Chưa kiểm `.is-ready` thì không khóa nguyên nhân là header. Vạch trắng dọc/ngang và `mask-image` là việc đã chứng minh trong audit §1, không nằm ở pitfall này lúc mới ghi.
+
+**Xảy ra 2026-11-19.** `https://minhhaifishery.com/test-page-2/`, 1920×1080, scroll 0. Ảnh và heading hiện. Thanh `01 SOURCING` … không hiện cho đến khi cuộn khoảng cao header.
+
+**State delta:**
+
+```text
+State A (artifact): không header site; thanh bước dính đáy khung nhìn
+State B (scroll 0): header sticky 88px vẫn chiếm flow; slider top 88, cao 1080, đáy 1168
+Delta:              số bước top 1094 và nhãn top 1109, cả hai dưới viewport 1080
+```
+
+**Case này do gì:**
+
+1. Plan 081 §9: vỏ `.skvn-step-slider` là `min-height: 100svh`, tab in-flow, stage = `100svh − tab height`, và Cấm 6 cấm trừ header.
+2. Bundle live (`style-frontend.ts.css?ver=1795044073`) không làm §9: vỏ `min-height: 0`, tab `position: absolute; bottom: 0`, swiper cao đúng 1080 và có class `swiper-autoheight`.
+3. Kể cả khi làm đúng §9, hộp 100svh bắt đầu sau 88px header nên đáy hộp vẫn thấp hơn màn đầu 88px. Tab default 54px khuất hết. Tab đang lưu 120px chỉ ló ~33px, chưa tới chữ.
+4. Cuộn đúng 88px thì thanh nằm sát đáy và nhãn đọc được. Lỗi là màn đầu.
+
+**Đừng làm:** coi checklist source là ảnh đã khớp artifact. Đừng trừ header để “vá” khi Cấm 6 còn hiệu lực — đó là xung đột plan với trang có header, cần human chốt. Đừng đổ cho màu progress hay nút Play (Cấm 3, Cấm 4).
+
+Chi tiết: [DP-13](../../.context/PITFALLS.md#dp-13--step-slider-100svh-bắt-đầu-dưới-header-sticky-thanh-bước-rơi-khỏi-màn-đầu-2026-11-19).
+
 ## Related
 
 - `.agents/skills/ui-debug/SKILL.md` — State Delta framework

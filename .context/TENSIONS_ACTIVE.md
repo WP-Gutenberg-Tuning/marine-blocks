@@ -1,5 +1,35 @@
 # Tensions — Active
 
+## [2026-11-17 15:43] | slider, theme
+Tension:    Đo chiều cao header để trừ viewport hiện chỉ Slider thường có (`syncViewportHeight`, preset Viewport below header). Lần thứ hai cần tính năng tương tự phải báo human trước khi code.
+Context:    Human 2026-11-17 chốt Step Slider giữ `100svh` (O02-H). Đánh giá tách hàm dùng chung: chưa có lần lặp, selector `#masthead` buộc GeneratePress, tách shared lúc này là sớm.
+Constraint: O02-H: đồng bộ header với Step làm sau khi theme tách khỏi GeneratePress. Không sửa `themes/generatepress/`.
+Severity:   high
+Tags:       slider, theme, agent
+Milestone:  V1 / 1.3.24
+Evidence:   `src/slider/view.ts` `syncViewportHeight`. Step slider `frontend.ts` `syncShellOffset` đo `getBoundingClientRect().top + scrollY` của chính block, ghi `--skvn-step-slider-offset`.
+Default:    DỪNG nếu task sửa `.site-header` để phủ hero, hoặc copy `syncViewportHeight` / selector GeneratePress sang Step Slider.
+Status:     RESOLVED_ACTIVE
+Resolved:   2026-11-19
+Decision:   Human 2026-11-19: header là của cả site và còn GeneratePress, không phủ lên hero. Hero nằm dưới header trắng. Step slider tự đo offset của chính nó. Không copy hàm Slider, không selector `#masthead` / `.site-header`.
+
+## [2026-11-18 13:36] | slider, editor-governance
+Tension:    Step Slider cần hex cho màu progress và màu nền không ảnh, trong khi editor control cấm raw hex cho người dùng marketing.
+Context:    Human 2026-11-18: mỗi trang một palette. Giữ 4 palette cố định từ artifact. Hai màu kia chỉnh hex cho nhanh.
+Constraint: AGENTS.md SKVN Editor Controls: không bắt người dùng nhập raw hex/rgb/hsl. Plan 081 từng ghi không thêm màu raw.
+Severity:   low
+Tags:       slider, editor-governance, blocks
+Milestone:  V1 / 1.3.24
+Evidence:   Plan 081 mục màu 2026-11-18. Artifact bốn nền đã đo ở delta, mục brave 23:29.
+Default:    DỪNG nếu task mở hex parent cho nền không ảnh, mở hex/custom cho màu ngoài progress, đổi default `#7ec8e3`, đổi tên hoặc migrate `progressColor`, hay gỡ custom picker của progress vì `color.custom: false`.
+Status:     RESOLVED_ACTIVE
+Resolved:   2026-11-18
+Decision:   Human 2026-11-18 sáng: hex tùy chọn trên progress và nền không ảnh; bốn palette cố định; sanitize; không mở raw hex cho màu khác.
+            Amended 2026-11-18 muộn — plan 083 §13, SS-DS-01. Phần còn hiệu lực:
+            - Progress: giữ quyền màu tùy chọn. UI là palette slug + color picker, không TextControl “Hex only”. Attribute giữ tên `progressColor`, default `#7ec8e3`. Giá trị là slug palette hoặc hex `#RGB` / `#RRGGBB`. Picker custom của riêng control này bỏ qua `theme.json` `color.custom: false`. Không đổi tên attribute, không migrate bài đã lưu, không đổi default sang slug.
+            - Nền không ảnh: không còn ngoại lệ hex trên slider cha. COL-02 (B) đóng hex parent. Nền không ảnh chỉ per-step (4 gradient default + custom fill trên step-slide). Không mở lại ô hex nền cha từ tension này.
+            - Không supersede tension này thành “cấm hex progress”. Không áp bypass `color.custom` cho fill, overlay, hay màu khác.
+
 > Chỉ chứa `Status: RESOLVED_ACTIVE` entries của milestone hiện tại.
 > Agent đọc file này mỗi task, nhưng dùng tag filter để tập trung vào entries liên quan.
 > Move sang `TENSIONS_HISTORY.md` chỉ khi human approve milestone transition.
