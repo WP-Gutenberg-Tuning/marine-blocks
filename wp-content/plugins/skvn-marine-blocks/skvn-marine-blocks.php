@@ -19,6 +19,7 @@ require_once __DIR__ . '/modules/collection-render/collection-render.php';
 require_once __DIR__ . '/modules/category-grid/category-grid.php';
 require_once __DIR__ . '/modules/slider-render/slider-render.php';
 require_once __DIR__ . '/modules/step-slider-render/step-slider-render.php';
+require_once __DIR__ . '/modules/step-fill-presets/step-fill-presets.php';
 require_once __DIR__ . '/modules/feature-showcase-render/feature-showcase-render.php';
 require_once __DIR__ . '/modules/typography-settings/typography-settings.php';
 require_once __DIR__ . '/modules/product-design/product-design.php';

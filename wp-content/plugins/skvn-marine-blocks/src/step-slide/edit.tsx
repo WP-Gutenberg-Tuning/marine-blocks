@@ -2,9 +2,10 @@ import {
 	FocalPointPicker,
 	InnerBlocks,
 	InspectorControls,
+	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
-	PanelColorGradientSettings,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
 	store as blockEditorStore,
 	useBlockProps,
@@ -15,6 +16,8 @@ import {
 	PanelBody,
 	RadioControl,
 	RangeControl,
+	TextControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -31,6 +34,8 @@ import {
 	resolveCustomFillBackground,
 	type SlideFillAttributes,
 } from '../slide/fill';
+import { resolveStepFillPresetFill, stepFillPresetFillsFor } from './fill-preset';
+import { useStepFillPresets } from '../design-sidebar/step-fill-presets';
 
 import '../step-slider/editor.css';
 
@@ -44,16 +49,6 @@ const ALLOWED_CONTENT_BLOCKS = [
 const TEMPLATE = [
 	[ 'core/heading', { level: 2, placeholder: 'Step heading' } ],
 	[ 'core/paragraph', { placeholder: 'Step copy' } ],
-];
-
-const STEP_OVERLAY_BACKGROUND =
-	'linear-gradient(0deg, rgba(4, 12, 20, 0.6) 0%, rgba(4, 12, 20, 0) 26%), linear-gradient(90deg, rgba(4, 12, 20, 0.84) 0%, rgba(4, 12, 20, 0.42) 44%, rgba(4, 12, 20, 0) 70%)';
-
-const STEP_DEFAULT_FILLS = [
-	'radial-gradient(110% 80% at 18% 8%,  #2a7f9e 0%, #0f4266 42%, #071c33 100%)',
-	'radial-gradient(110% 80% at 82% 12%, #2f8f83 0%, #14524b 46%, #0a2422 100%)',
-	'radial-gradient(110% 80% at 20% 85%, #b97a2a 0%, #5c3a17 45%, #1d130a 100%)',
-	'radial-gradient(110% 80% at 80% 88%, #5b5bd6 0%, #2c2c6e 48%, #101024 100%)',
 ];
 
 type StepSlideAttributes = SlideFillAttributes & {
@@ -72,11 +67,17 @@ type SelectedImage = {
 	id: number;
 	url: string;
 	alt?: string;
+	alt_text?: string;
+};
+
+type StepSlideReadOnlyContext = {
+	'skvn-marine/stepFillPreset'?: string;
 };
 
 type StepSlideEditProps = {
 	attributes: StepSlideAttributes;
 	clientId: string;
+	context?: StepSlideReadOnlyContext;
 	setAttributes: ( attributes: Partial< StepSlideAttributes > ) => void;
 };
 
@@ -88,7 +89,7 @@ function normalizeTextPosition( value: string ): string {
 		: 'left';
 }
 
-export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProps ) {
+export function Edit( { attributes, clientId, context, setAttributes }: StepSlideEditProps ) {
 	const hasImage = Boolean( attributes.backgroundImageUrl );
 	const fillMode = normalizeFillMode( attributes.backgroundFillMode );
 	const focalPoint = normalizeFocalPoint(
@@ -114,6 +115,9 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 		[ clientId ]
 	);
 
+	// Guest fill presets live in the plugin option; the editor never re-sanitizes them.
+	const presetsModel = useStepFillPresets();
+
 	const positionClass = `is-position-${ normalizeTextPosition(
 		attributes.textPosition
 	) }`;
@@ -131,8 +135,16 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 		const customBg = resolveCustomFillBackground( attributes );
 		slideBackground = customBg ? { background: customBg } : undefined;
 	} else {
+		const fillPreset =
+			context && typeof context[ 'skvn-marine/stepFillPreset' ] === 'string'
+				? context[ 'skvn-marine/stepFillPreset' ]
+				: '';
+		const presetFills = stepFillPresetFillsFor( presetsModel.snapshot?.presets, fillPreset );
 		slideBackground = {
-			background: STEP_DEFAULT_FILLS[ stepIndex % 4 ],
+			background: resolveStepFillPresetFill(
+				presetFills,
+				Number.isFinite( stepIndex ) && stepIndex >= 0 ? stepIndex : 0
+			),
 		};
 	}
 
@@ -143,10 +155,30 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 		style: slideBackground,
 	} );
 
+	const attachmentAlt = useSelect(
+		( select ) => {
+			const imageId = attributes.backgroundImageId;
+			if ( ! imageId ) {
+				return '';
+			}
+			const media = (
+				select( 'core' ) as {
+					getMedia: ( id: number ) => { alt_text?: string } | undefined;
+				}
+			).getMedia( imageId );
+			return typeof media?.alt_text === 'string' ? media.alt_text : '';
+		},
+		[ attributes.backgroundImageId ]
+	);
+
 	const selectImage = useMemo(
 		() => ( image: SelectedImage ) => {
+			const attachmentText =
+				( typeof image.alt === 'string' && image.alt.trim() ) ||
+				( typeof image.alt_text === 'string' && image.alt_text.trim() ) ||
+				'';
 			setAttributes( {
-				backgroundImageAlt: image.alt || '',
+				backgroundImageAlt: attachmentText,
 				backgroundImageId: image.id,
 				backgroundImageUrl: image.url,
 			} );
@@ -243,6 +275,7 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 						</Notice>
 					) }
 					<RangeControl
+						allowReset
 						help={ __(
 							'0 hides the gradient overlay.',
 							'skvn-marine-blocks'
@@ -253,11 +286,66 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 						onChange={ ( value ) =>
 							setAttributes( {
 								overlayOpacity:
-									typeof value === 'number' ? value : 0,
+									typeof value === 'number'
+										? Math.min( 100, Math.max( 0, value ) )
+										: 100,
 							} )
 						}
 						step={ 1 }
 						value={ overlayOpacity }
+					/>
+					<TextControl
+						help={ __(
+							'Describes the background image. Leave empty to use the attachment alt.',
+							'skvn-marine-blocks'
+						) }
+						label={ __(
+							'Background image alt text',
+							'skvn-marine-blocks'
+						) }
+						onChange={ ( value: string ) =>
+							setAttributes( { backgroundImageAlt: value } )
+						}
+						placeholder={ attachmentAlt }
+						value={ attributes.backgroundImageAlt || '' }
+					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Step layout', 'skvn-marine-blocks' ) }>
+					<RadioControl
+						label={ __( 'Text position', 'skvn-marine-blocks' ) }
+						onChange={ ( value: string ) =>
+							setAttributes( {
+								textPosition: normalizeTextPosition( value ),
+							} )
+						}
+						options={ [
+							{
+								label: __( 'Left', 'skvn-marine-blocks' ),
+								value: 'left',
+							},
+							{
+								label: __( 'Center', 'skvn-marine-blocks' ),
+								value: 'center',
+							},
+							{
+								label: __( 'Right', 'skvn-marine-blocks' ),
+								value: 'right',
+							},
+						] }
+						selected={ normalizeTextPosition(
+							attributes.textPosition
+						) }
+					/>
+					<ToggleControl
+						checked={ Boolean( attributes.textSurface ) }
+						help={ __(
+							'Show a frosted background behind the text column.',
+							'skvn-marine-blocks'
+						) }
+						label={ __( 'Text surface', 'skvn-marine-blocks' ) }
+						onChange={ ( value: boolean ) =>
+							setAttributes( { textSurface: value } )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -290,7 +378,6 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 								aria-hidden="true"
 								className="skvn-step-slide__overlay"
 								style={ {
-									background: STEP_OVERLAY_BACKGROUND,
 									opacity: overlayOpacity / 100,
 								} }
 							/>
@@ -374,28 +461,20 @@ export function Edit( { attributes, clientId, setAttributes }: StepSlideEditProp
 								aria-hidden="true"
 								className="skvn-step-slide__overlay"
 								style={ {
-									background: STEP_OVERLAY_BACKGROUND,
 									opacity: overlayOpacity / 100,
 								} }
 							/>
 						) }
 						<MediaUploadCheck>
-							<MediaUpload
+							<MediaPlaceholder
 								allowedTypes={ [ 'image' ] }
+								labels={ {
+									title: __(
+										'Background image',
+										'skvn-marine-blocks'
+									),
+								} }
 								onSelect={ selectImage }
-								render={ ( { open } ) => (
-									<Button
-										className="skvn-step-slide__choose-image"
-										onClick={ open }
-										variant="secondary"
-									>
-										{ __(
-											'Choose background image',
-											'skvn-marine-blocks'
-										) }
-									</Button>
-								) }
-								value={ attributes.backgroundImageId }
 							/>
 						</MediaUploadCheck>
 					</>

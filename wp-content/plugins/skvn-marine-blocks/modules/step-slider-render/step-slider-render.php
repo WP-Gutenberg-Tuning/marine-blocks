@@ -17,21 +17,122 @@ function skvn_marine_blocks_step_slider_default_progress_color() {
 }
 
 /**
- * Sanitize step-slider progress color (hex only).
+ * Slugs in the active color palette (theme, default when enabled, custom).
+ *
+ * @return string[]
+ */
+function skvn_marine_blocks_step_slider_palette_slugs() {
+	if ( ! function_exists( 'wp_get_global_settings' ) ) {
+		return array();
+	}
+
+	$settings = wp_get_global_settings();
+	if ( ! is_array( $settings ) ) {
+		return array();
+	}
+
+	$color_settings = isset( $settings['color'] ) && is_array( $settings['color'] ) ? $settings['color'] : array();
+	$palette        = isset( $color_settings['palette'] ) && is_array( $color_settings['palette'] ) ? $color_settings['palette'] : array();
+	$use_default    = ! isset( $color_settings['defaultPalette'] ) || ! empty( $color_settings['defaultPalette'] );
+
+	$groups      = array();
+	$has_origins = isset( $palette['theme'] ) || isset( $palette['default'] ) || isset( $palette['custom'] );
+	if ( $has_origins ) {
+		if ( isset( $palette['theme'] ) && is_array( $palette['theme'] ) ) {
+			$groups[] = $palette['theme'];
+		}
+		if ( $use_default && isset( $palette['default'] ) && is_array( $palette['default'] ) ) {
+			$groups[] = $palette['default'];
+		}
+		if ( isset( $palette['custom'] ) && is_array( $palette['custom'] ) ) {
+			$groups[] = $palette['custom'];
+		}
+	} else {
+		$groups[] = $palette;
+	}
+
+	$slugs = array();
+	foreach ( $groups as $colors ) {
+		foreach ( $colors as $color ) {
+			if ( ! is_array( $color ) || ! isset( $color['slug'] ) || ! is_string( $color['slug'] ) ) {
+				continue;
+			}
+			if ( preg_match( '/\A[a-z0-9-]+\z/', $color['slug'] ) ) {
+				$slugs[ $color['slug'] ] = true;
+			}
+		}
+	}
+
+	return array_keys( $slugs );
+}
+
+/**
+ * Sanitize step-slider progress color.
+ *
+ * Accepts a palette slug or #RGB / #RRGGBB. Anything else becomes the default hex.
+ * Plan 083 §13.1. This does not migrate stored values.
  *
  * @param mixed $value Raw attribute.
- * @return string
+ * @return string Slug or hex.
  */
 function skvn_marine_blocks_sanitize_step_progress_color( $value ) {
 	$default = skvn_marine_blocks_step_slider_default_progress_color();
 
-	if ( ! is_string( $value ) || '' === $value ) {
+	if ( ! is_string( $value ) ) {
+		return $default;
+	}
+
+	$value = trim( $value );
+	if ( '' === $value ) {
 		return $default;
 	}
 
 	$hex = sanitize_hex_color( $value );
+	if ( $hex ) {
+		return $hex;
+	}
 
-	return $hex ? $hex : $default;
+	if ( ! preg_match( '/\A[a-z0-9-]+\z/', $value ) ) {
+		return $default;
+	}
+
+	if ( ! in_array( $value, skvn_marine_blocks_step_slider_palette_slugs(), true ) ) {
+		return $default;
+	}
+
+	return $value;
+}
+
+/**
+ * CSS value for --skvn-step-slider-progress-color.
+ *
+ * Hex stays hex. An allowlisted slug becomes a preset variable with a hex fallback.
+ *
+ * @param mixed $value Raw attribute.
+ * @return string
+ */
+function skvn_marine_blocks_step_slider_progress_color_css( $value ) {
+	$default   = skvn_marine_blocks_step_slider_default_progress_color();
+	$sanitized = skvn_marine_blocks_sanitize_step_progress_color( $value );
+
+	if ( '' !== $sanitized && '#' === $sanitized[0] ) {
+		return $sanitized;
+	}
+
+	return 'var(--wp--preset--color--' . $sanitized . ',' . $default . ')';
+}
+
+/**
+ * Normalize step-slider text animation.
+ *
+ * Only the exact string "rise" selects preset B. Missing or unknown values
+ * stay on preset A ("slide"). No migration.
+ *
+ * @param mixed $value Raw attribute.
+ * @return string slide|rise
+ */
+function skvn_marine_blocks_normalize_step_text_animation( $value ) {
+	return ( is_string( $value ) && 'rise' === $value ) ? 'rise' : 'slide';
 }
 
 /**
@@ -45,7 +146,40 @@ function skvn_marine_blocks_normalize_step_height_mode( $value ) {
 }
 
 /**
+ * Normalize bottom step-tab height in pixels.
+ *
+ * Artifact min-height is 54px. Bounds keep two-line labels usable.
+ *
+ * @param mixed $value Raw attribute.
+ * @return int 40–120, default 54.
+ */
+function skvn_marine_blocks_normalize_step_tab_height( $value ) {
+	$default = 54;
+	$min     = 40;
+	$max     = 120;
+
+	if ( ! is_numeric( $value ) ) {
+		return $default;
+	}
+
+	$height = (int) round( (float) $value );
+
+	if ( $height < $min ) {
+		return $min;
+	}
+
+	if ( $height > $max ) {
+		return $max;
+	}
+
+	return $height;
+}
+
+/**
  * Default fill gradients for steps without an image (index % 4).
+ *
+ * Frontend source of the four radial strings. The editor copy is
+ * src/step-slide/default-fills.ts — keep those four strings identical.
  *
  * @param int $index Zero-based step index.
  * @return string CSS background value.
@@ -61,6 +195,65 @@ function skvn_marine_blocks_get_step_default_fill_gradient( $index ) {
 	$slot = ( (int) $index ) % 4;
 
 	return $gradients[ $slot ];
+}
+
+/**
+ * Resolve the preset-based default fill for a step.
+ *
+ * One rule for both PHP and TS (src/step-slide/fill-preset.ts):
+ * L = stored slot count (1–8); the slide at zero-based index takes slot
+ * index % L. An empty slot falls back to Deep Marine at index % 4 — never the
+ * tab strip grey. Unknown or missing slugs, a deleted preset and a broken
+ * option all resolve to Deep Marine.
+ *
+ * @param mixed $preset_slug fillPreset attribute or block context value.
+ * @param int   $index       Zero-based step index.
+ * @return string CSS background value.
+ */
+function skvn_marine_blocks_resolve_step_fill_preset_fill( $preset_slug, $index ) {
+	$index = max( 0, (int) $index );
+	$slug  = is_string( $preset_slug ) ? sanitize_title( trim( $preset_slug ) ) : '';
+
+	if ( '' !== $slug && 'deep-marine' !== $slug ) {
+		$preset = skvn_marine_blocks_get_step_fill_preset_by_slug( $slug );
+		if ( is_array( $preset ) && ! empty( $preset['fills'] ) ) {
+			$count = count( $preset['fills'] );
+			$slot  = $preset['fills'][ $index % $count ];
+			if ( is_string( $slot ) && '' !== $slot ) {
+				return $slot; // Already sanitized on read (skvn_marine_blocks_sanitize_slide_fill_background).
+			}
+		}
+	}
+
+	return skvn_marine_blocks_get_step_default_fill_gradient( $index );
+}
+
+/**
+ * Background for one step tab.
+ *
+ * The slide image stays on the slide. It does not remove the tab fill.
+ * Human 2026-11-20: a step with an image still takes the preset (or its
+ * custom fill) on the tab. Transparent is the only mode that leaves the
+ * dark strip.
+ *
+ * @param array  $attributes  Step attributes.
+ * @param int    $index       Zero-based step index.
+ * @param string $fill_preset Fill preset slug from the parent slider (default deep-marine).
+ * @return string CSS background value, or empty when the step fill is transparent.
+ */
+function skvn_marine_blocks_step_tab_fill_background( $attributes, $index, $fill_preset = 'deep-marine' ) {
+	$attributes = is_array( $attributes ) ? $attributes : array();
+	$fill_mode  = skvn_marine_blocks_normalize_slide_fill_mode( $attributes['backgroundFillMode'] ?? '' );
+
+	if ( 'transparent' === $fill_mode ) {
+		return '';
+	}
+
+	if ( 'custom' === $fill_mode ) {
+		return skvn_marine_blocks_resolve_slide_fill_background( $attributes );
+	}
+
+	return skvn_marine_blocks_resolve_step_fill_preset_fill( $fill_preset, $index );
 }
 
 /**
@@ -96,7 +289,7 @@ function skvn_marine_blocks_normalize_step_text_position( $value ) {
 function skvn_marine_blocks_normalize_step_tab_label( $value ) {
 	$label = is_string( $value ) ? sanitize_text_field( $value ) : '';
 
-	return '' !== $label ? $label : 'Step';
+	return '' !== $label ? $label : __( 'Step', 'skvn-marine-blocks' );
 }
 
 /**
@@ -154,20 +347,58 @@ function skvn_marine_blocks_render_step_slide( $attributes, $content, $block ) {
 	$step_index  = isset( $GLOBALS['skvn_marine_blocks_step_slide_index'] )
 		? (int) $GLOBALS['skvn_marine_blocks_step_slide_index']
 		: 0;
-	$image_id    = isset( $attributes['backgroundImageId'] ) ? absint( $attributes['backgroundImageId'] ) : 0;
-	$legacy_url  = isset( $attributes['backgroundImageUrl'] ) && is_string( $attributes['backgroundImageUrl'] )
+	$fill_preset = 'deep-marine';
+	if ( $block instanceof WP_Block && isset( $block->context['skvn-marine/stepFillPreset'] ) && is_string( $block->context['skvn-marine/stepFillPreset'] ) ) {
+		$fill_preset = $block->context['skvn-marine/stepFillPreset'];
+	}
+	$image_id   = isset( $attributes['backgroundImageId'] ) ? absint( $attributes['backgroundImageId'] ) : 0;
+	$legacy_url = isset( $attributes['backgroundImageUrl'] ) && is_string( $attributes['backgroundImageUrl'] )
 		? esc_url_raw( $attributes['backgroundImageUrl'] )
 		: '';
-	$image_url   = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : '';
-	$image_url   = is_string( $image_url ) && '' !== $image_url ? $image_url : $legacy_url;
-	$has_image   = '' !== $image_url;
-	$image_alt   = isset( $attributes['backgroundImageAlt'] ) && is_string( $attributes['backgroundImageAlt'] )
+	$image_alt  = isset( $attributes['backgroundImageAlt'] ) && is_string( $attributes['backgroundImageAlt'] )
 		? sanitize_text_field( $attributes['backgroundImageAlt'] )
 		: '';
 
 	if ( '' === $image_alt && $image_id ) {
-		$image_alt = sanitize_text_field( get_post_meta( $image_id, '_wp_attachment_image_alt', true ) );
+		$stored_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+		$image_alt  = is_string( $stored_alt ) ? sanitize_text_field( $stored_alt ) : '';
 	}
+
+	$image_html = '';
+	if ( $image_id > 0 ) {
+		$image_attrs = array(
+			'class' => 'skvn-step-slide__image',
+			'alt'   => $image_alt,
+		);
+		if ( 0 === $step_index ) {
+			$image_attrs['loading']       = false;
+			$image_attrs['fetchpriority'] = 'high';
+		} else {
+			$image_attrs['loading'] = 'lazy';
+		}
+		$generated  = wp_get_attachment_image( $image_id, 'full', false, $image_attrs );
+		$image_html = is_string( $generated ) ? $generated : '';
+	} elseif ( '' !== $legacy_url ) {
+		$dimension_attr = '';
+		$legacy_id      = attachment_url_to_postid( $legacy_url );
+		if ( $legacy_id ) {
+			$metadata = wp_get_attachment_metadata( $legacy_id );
+			$width    = is_array( $metadata ) && isset( $metadata['width'] ) ? (int) $metadata['width'] : 0;
+			$height   = is_array( $metadata ) && isset( $metadata['height'] ) ? (int) $metadata['height'] : 0;
+			if ( $width > 0 && $height > 0 ) {
+				$dimension_attr = sprintf( ' width="%1$d" height="%2$d"', $width, $height );
+			}
+		}
+		$loading_attr = 0 === $step_index ? '' : ' loading="lazy"';
+		$image_html   = sprintf(
+			'<img alt="%1$s" class="skvn-step-slide__image" src="%2$s"%3$s%4$s />',
+			esc_attr( $image_alt ),
+			esc_url( $legacy_url ),
+			$dimension_attr,
+			$loading_attr
+		);
+	}
+	$has_image = '' !== $image_html;
 
 	$overlay_opacity = skvn_marine_blocks_normalize_slider_integer(
 		$attributes['overlayOpacity'] ?? 100,
@@ -201,7 +432,7 @@ function skvn_marine_blocks_render_step_slide( $attributes, $content, $block ) {
 			$wrapper_style = 'background:' . $fill_background . ';';
 		}
 	} else {
-		$wrapper_style = 'background:' . skvn_marine_blocks_get_step_default_fill_gradient( $step_index ) . ';';
+		$wrapper_style = 'background:' . skvn_marine_blocks_resolve_step_fill_preset_fill( $fill_preset, $step_index ) . ';';
 	}
 
 	$content_class = 'skvn-step-slide__content is-position-' . $text_position;
@@ -220,12 +451,8 @@ function skvn_marine_blocks_render_step_slide( $attributes, $content, $block ) {
 	$output  = '<div ' . $wrapper_attributes . '>';
 	$output .= '<div class="skvn-step-slide__media">';
 
-	if ( $has_image ) {
-		$output .= sprintf(
-			'<img alt="%1$s" class="skvn-step-slide__image" src="%2$s" />',
-			esc_attr( $image_alt ),
-			esc_url( $image_url )
-		);
+	if ( '' !== $image_html ) {
+		$output .= $image_html;
 	}
 
 	if ( $overlay_opacity > 0 ) {
@@ -258,24 +485,32 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 	$autoplay       = ! empty( $attributes['autoplay'] );
 	$loop           = ! empty( $attributes['loop'] );
 	$pause_on_hover = ! isset( $attributes['pauseOnHover'] ) || ! empty( $attributes['pauseOnHover'] );
+	$show_play      = ! isset( $attributes['showPlayButton'] ) || ! empty( $attributes['showPlayButton'] );
 
 	$dwell_preset = isset( $attributes['dwellPreset'] ) && is_string( $attributes['dwellPreset'] )
 		? $attributes['dwellPreset']
 		: '8';
 	$dwell_preset = in_array( $dwell_preset, array( '5', '8', '10' ), true ) ? $dwell_preset : '8';
 
-	$height_mode    = skvn_marine_blocks_normalize_step_height_mode( $attributes['heightMode'] ?? '' );
-	$progress_color = skvn_marine_blocks_sanitize_step_progress_color( $attributes['progressColor'] ?? '' );
+	$height_mode     = skvn_marine_blocks_normalize_step_height_mode( $attributes['heightMode'] ?? '' );
+	$tab_height      = skvn_marine_blocks_normalize_step_tab_height( $attributes['tabHeight'] ?? null );
+	$progress_color  = skvn_marine_blocks_step_slider_progress_color_css( $attributes['progressColor'] ?? '' );
+	$text_animation  = skvn_marine_blocks_normalize_step_text_animation( $attributes['textAnimation'] ?? '' );
+	$fill_preset     = isset( $attributes['fillPreset'] ) && is_string( $attributes['fillPreset'] )
+		? $attributes['fillPreset']
+		: 'deep-marine';
 
-	$labels = array();
+	$labels    = array();
+	$tab_fills = array();
 
 	if ( $block instanceof WP_Block ) {
 		foreach ( $block->inner_blocks as $inner_block ) {
-			$parsed   = isset( $inner_block->parsed_block ) && is_array( $inner_block->parsed_block )
+			$parsed      = isset( $inner_block->parsed_block ) && is_array( $inner_block->parsed_block )
 				? $inner_block->parsed_block
 				: array();
-			$attrs    = isset( $parsed['attrs'] ) && is_array( $parsed['attrs'] ) ? $parsed['attrs'] : array();
-			$labels[] = skvn_marine_blocks_normalize_step_tab_label( $attrs['tabLabel'] ?? 'Step' );
+			$attrs       = isset( $parsed['attrs'] ) && is_array( $parsed['attrs'] ) ? $parsed['attrs'] : array();
+			$labels[]    = skvn_marine_blocks_normalize_step_tab_label( $attrs['tabLabel'] ?? '' );
+			$tab_fills[] = skvn_marine_blocks_step_tab_fill_background( $attrs, count( $labels ) - 1, $fill_preset );
 		}
 	}
 
@@ -286,7 +521,8 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 		$class_name .= ' skvn-step-slider--height-content';
 	}
 
-	$wrapper_style = '--skvn-step-slider-progress-color:' . $progress_color . ';';
+	$wrapper_style  = '--skvn-step-slider-progress-color:' . $progress_color . ';';
+	$wrapper_style .= '--skvn-step-slider-tab-height:' . $tab_height . 'px;';
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -296,7 +532,8 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 			'data-pause-hover' => $pause_on_hover ? '1' : '0',
 			'data-dwell'       => $dwell_preset,
 			'data-loop'        => $loop ? '1' : '0',
-			'data-height-mode' => $height_mode,
+			'data-height-mode'     => $height_mode,
+			'data-text-animation'  => $text_animation,
 		)
 	);
 
@@ -305,13 +542,16 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 	$output .= '<div class="swiper-wrapper">' . $slides . '</div>';
 	$output .= '</div>';
 
-	$output .= '<div class="skvn-step-slider__tabs">';
+	$output .= '<div class="skvn-step-slider__tabs" tabindex="0" aria-label="' . esc_attr__( 'Steps', 'skvn-marine-blocks' ) . '">';
 	foreach ( $labels as $index => $label ) {
 		$number = str_pad( (string) ( $index + 1 ), 2, '0', STR_PAD_LEFT );
+		$fill   = isset( $tab_fills[ $index ] ) ? $tab_fills[ $index ] : '';
+		$style  = '' !== $fill ? ' style="background:' . esc_attr( $fill ) . '"' : '';
 		$output .= sprintf(
-			'<button type="button" class="skvn-step-slider__tab" data-skvn-step-index="%1$d"%2$s><span aria-hidden="true" class="skvn-step-slider__tab-progress"></span><span class="skvn-step-slider__tab-number">%3$s</span><span class="skvn-step-slider__tab-label">%4$s</span></button>',
+			'<button type="button" class="skvn-step-slider__tab" data-skvn-step-index="%1$d"%2$s%3$s><span aria-hidden="true" class="skvn-step-slider__tab-progress"></span><span class="skvn-step-slider__tab-number">%4$s</span><span class="skvn-step-slider__tab-label">%5$s</span></button>',
 			(int) $index,
 			0 === $index ? ' aria-current="true"' : '',
+			$style,
 			esc_html( $number ),
 			esc_html( $label )
 		);
@@ -320,7 +560,9 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 
 	$output .= '<button type="button" class="skvn-step-slider__arrow skvn-step-slider__arrow--prev" data-skvn-step-dir="prev" aria-label="' . esc_attr__( 'Previous step', 'skvn-marine-blocks' ) . '">' . skvn_marine_blocks_step_slider_arrow_icon( 'prev' ) . '</button>';
 	$output .= '<button type="button" class="skvn-step-slider__arrow skvn-step-slider__arrow--next" data-skvn-step-dir="next" aria-label="' . esc_attr__( 'Next step', 'skvn-marine-blocks' ) . '">' . skvn_marine_blocks_step_slider_arrow_icon( 'next' ) . '</button>';
-	$output .= '<button type="button" class="skvn-step-slider__play" hidden>' . esc_html__( 'Play', 'skvn-marine-blocks' ) . '</button>';
+	if ( $show_play ) {
+		$output .= '<button type="button" class="skvn-step-slider__play" hidden>' . esc_html__( 'Play', 'skvn-marine-blocks' ) . '</button>';
+	}
 	$output .= '</div>';
 
 	return $output;
