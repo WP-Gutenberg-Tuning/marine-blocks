@@ -6,7 +6,9 @@ Status: **giai đoạn 1 có source, §9a đã sửa. Fork giai đoạn 2 khóa 
 
 Chưa phải lệnh bump, build hay release. Lệnh code giai đoạn 1 là prompt `docs/workflows/prompts/step-slider-1.3.24-phase1-ink-handoff.md`. Prototype HTML, technical report và `docs/demo-prep/05-step-slider-mvp-cut.md` không phải nguồn implement. Bốn draft trong `docs/ideations/step-slider-phase1/` là phiếu review, không phải nguồn code.
 
-Agent giai đoạn 1 làm §7, §8, §8a, §9 và §9a. Agent giai đoạn 2 chỉ làm §10 và §10a sau lệnh human. Không mở plan018 §5–§14, không đọc prototype, không chọn lại fork §8a, không đổi số §8, không đổi tên file. Thiếu file trong danh sách đọc, hoặc cần một hành vi không có trong §2, §8 và §8a: dừng và hỏi human.
+Agent giai đoạn 1 làm §7, §8, §8a, §9 và §9a. Agent giai đoạn 2 chỉ làm §10 và §10a sau lệnh human. Không mở plan018 §5–§14, không đọc prototype để bịa thêm hành vi, không chọn lại fork §8a, không đổi số §8, không đổi tên file. Thiếu file trong danh sách đọc, hoặc cần một hành vi không có trong §2, §8 và §8a: dừng và hỏi human.
+
+**Sơn giao diện không nằm trong §9.** Câu “không Inspector cho focal” và “chỉ sửa style.css” trong các ghi chú cũ đã bị plan [081](081_VER_1_3_24_STEP_SLIDER_FRONTEND_VISUAL_PLAN.md) thay. Agent sơn phải đọc hết 081, kể cả mục Cấm. Không lấy prototype làm nguồn thứ hai để thêm counter, màu `#3ddc84`, hay nút Tạm dừng.
 
 ## 1. Hai giai đoạn
 

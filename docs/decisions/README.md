@@ -54,6 +54,8 @@ docs/decisions/.assets/  hình minh hoạ
 | [`slider-parallax-both-1.3.8.md`](slider-parallax-both-1.3.8.md) | V1 / 1.3.8 | Rev 1.1 parallax contract |
 | [`swiper-architecture.md`](swiper-architecture.md) | none | Runtime usage map (2 consumer) + loopFix invariant |
 | [`fullscreen-step-slider-1.3.10.md`](sliders/step-slider/fullscreen-step-slider-1.3.10.md) | V1 / 1.3.24 (origin 1.3.10) | PLANNED, chưa start; product contract 2026-11-09 |
+| [`step-slider-text-animation-1.3.24.md`](sliders/step-slider/step-slider-text-animation-1.3.24.md) | V1 / 1.3.24 | Hai preset `slide` / `rise`; default `slide`; chốt 2026-11-19 từ RevSlider; source implement 2026-11-19 |
+| [`step-slider-fill-preset-1.3.24.md`](sliders/step-slider/step-slider-fill-preset-1.3.24.md) | V1 / 1.3.24 | SS-SET-07: Deep Marine 4 màu lặp `index % n`; preset khách 1–8 trong option; source implement 2026-11-19 |
 | [`2-side-product-slider.md`](sliders/2-side-product-slider/2-side-product-slider.md) | Chưa gán | Product direction đã chốt, chưa start |
 
 ### Collections & WooCommerce
