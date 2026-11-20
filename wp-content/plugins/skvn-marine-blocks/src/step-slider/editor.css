@@ -101,3 +101,9 @@
 .skvn-step-slide--editor * {
 	opacity: 1;
 }
+
+.skvn-step-slider-progress-color__help {
+	margin: 0 16px 16px;
+	color: #757575;
+	font-size: 12px;
+}
