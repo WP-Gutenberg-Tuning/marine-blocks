@@ -16,7 +16,7 @@ Human đồng ý các hàng dưới, trừ Progress color: hàng đó được h
 | `overlayPreset` legacy | **(B)** Giữ attribute, không UI; chỉ `overlayOpacity` + overlay gradient 081 | SS-SET-02 |
 | Progress color | Giữ attribute `progressColor`. Giá trị là **slug palette hoặc hex**. UI là palette + color picker, không ô gõ hex. Picker custom của riêng control này **bỏ qua** `theme.json` `color.custom: false`. Default giữ `#7ec8e3`. Không migrate, không đổi tên attribute, không cấm hex progress. Spec §13 | SS-SET-03 / SS-DS-01 |
 | Focal | **(B)** Ưu tiên stage 082; sidebar chỉ khi cần a11y | SS-SET-04 |
-| Thứ tự lượt code | **1 → 081** (frontend visual) **→ 2 → Phase A** (inspector) **→ 3 → 082** (editor rail) | SS-SEQ-01 |
+| Thứ tự lượt code | **1 → 081** (frontend visual) **→ 2 → Phase A** (inspector) **→ 3 → 082** (editor stage). Human 2026-11-20: dải step dưới khung 16:9, không rail trái | SS-SEQ-01 |
 | Chiều cao `content` giữa các tab | **San đều** = bước cao nhất. Đổi tab không đổi height hộp. `autoHeight` per-slide **không** phải spec. Source: `autoHeight: false` + `equalizeContentHeights` (chưa runtime PASS). Tab height 54px là control riêng. Spec 081 §9. | SS-ISS-HGT-01 |
 
 Geo (a) **không** đóng tension OPEN 15:43; vẫn DỪNG nếu task khác đòi đo header cho Step.
@@ -201,7 +201,7 @@ Không sửa `theme.json`. Không sửa `src/step-slide/edit.tsx` phần fill đ
 
 **Phase C — Editor chrome (082)**
 
-- Playback panel gộp `pauseOnHover` (đã có); badge dwell; rail đọc `tabLabel` + thumb.
+- Playback panel gộp `pauseOnHover` (đã có); badge dwell; dải step dưới stage đọc `tabLabel`. Human 2026-11-20 bỏ rail và thumbnail.
 - Không import Slider panels.
 
 **Không đưa vào Step Slider (chốt trong plan này):**
@@ -243,7 +243,7 @@ Evidence cập nhật: append mục vào `docs/testing/step-slider-frontend-visu
 - Milestone pointer: **1.3.24** Fullscreen Step Slider (PLANNED).
 - **O02-H:** không viewport-below-header từ Slider — plan này **không** đề xuất import.
 - Tension OPEN 2026-11-17 15:43 (header offset): **không** giải bằng setting Slider; chờ theme tách GP.
-- 082: editor UI độc lập; plan này **bổ sung** panel child thiếu, không thay khung rail.
+- 082: editor UI độc lập; plan này **bổ sung** panel child thiếu. Khung canvas theo decision 2026-11-20: dải step dưới stage 16:9, không rail trái.
 
 ---
 

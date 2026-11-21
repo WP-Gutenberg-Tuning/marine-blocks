@@ -32,6 +32,8 @@ When working inside `D:\Github\skvn-marine`, load these before acting:
 
 Read `docs/workflows/html-2-gutenberg-workflow.md`.
 
+When the artifact is a how-it-works or process spotlight section, also read `docs/workflows/step-slider-demo-usage.md` and use the existing Step Slider. Do not invent a feature-tabs block; that candidate is `.context/planning/087_FUTURE_CANDIDATE_FEATURE_TABS_PLANNING.md`.
+
 For another WordPress project, first discover the project contract instead of assuming SKVN paths or classes. Find the local agent/project instructions, theme root, custom plugin root, CSS prefix, theme CSS files, `theme.json`, block style registrations, and pattern files before translating.
 
 ## Translation Workflow

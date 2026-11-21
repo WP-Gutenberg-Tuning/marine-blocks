@@ -204,3 +204,6 @@ docs/artifacts/*
 docs/artifacts/editor-ui/*
 !docs/artifacts/editor-ui/slider-editor-redesign-prototype.html
 !docs/artifacts/editor-ui/slider-editor-redesign-prototype.md
+!docs/artifacts/editor-ui/step-slider-editor-stage-prototype.html
+!docs/artifacts/editor-ui/step-slider-editor-stage-prototype.css
+!docs/artifacts/editor-ui/step-slider-editor-stage-prototype.md

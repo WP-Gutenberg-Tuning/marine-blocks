@@ -33,8 +33,12 @@
  * Viewport shell is the slide plus the step bar. The site header stays
  * in normal flow. --skvn-step-slider-offset is this block's document top,
  * measured in frontend.ts, so the shell fills the viewport under the header.
+ * :not(--editor) keeps this off the editor card. That class exists only on
+ * useBlockProps. An editor min-height reset can tie this rule once the
+ * canvas scopes both sheets, and the card then stays one viewport tall
+ * while the 16:9 stage shrinks. See DP-15.
  */
-.skvn-step-slider:not(.skvn-step-slider--height-content) {
+.skvn-step-slider:not(.skvn-step-slider--height-content):not(.skvn-step-slider--editor) {
 	min-height: 100svh;
 }
 
@@ -67,8 +71,8 @@
 	overflow: hidden;
 }
 
-.skvn-step-slider:not(.skvn-step-slider--height-content).is-ready .swiper-slide,
-.skvn-step-slider:not(.skvn-step-slider--height-content) .skvn-step-slide {
+.skvn-step-slider:not(.skvn-step-slider--height-content):not(.skvn-step-slider--editor).is-ready .swiper-slide,
+.skvn-step-slider:not(.skvn-step-slider--height-content):not(.skvn-step-slider--editor) .skvn-step-slide {
 	height: 100%;
 	min-height: 100%;
 }

@@ -1,25 +1,26 @@
 import {
-	FocalPointPicker,
+	BlockControls,
 	InnerBlocks,
 	InspectorControls,
-	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	RichText,
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
 	Button,
+	FocalPointPicker,
 	Notice,
 	PanelBody,
 	RadioControl,
 	RangeControl,
 	TextControl,
 	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -36,6 +37,7 @@ import {
 } from '../slide/fill';
 import { resolveStepFillPresetFill, stepFillPresetFillsFor } from './fill-preset';
 import { useStepFillPresets } from '../design-sidebar/step-fill-presets';
+import { StepSliderEditorFocusContext } from '../step-slider/editor-focus';
 
 import '../step-slider/editor.css';
 
@@ -65,10 +67,27 @@ type StepSlideAttributes = SlideFillAttributes & {
 
 type SelectedImage = {
 	id: number;
-	url: string;
+	url?: string;
+	source_url?: string;
 	alt?: string;
 	alt_text?: string;
+	sizes?: {
+		full?: {
+			url?: string;
+		};
+	};
 };
+
+function imageUrlFromSelection( image: SelectedImage ): string {
+	if ( typeof image.url === 'string' && image.url ) {
+		return image.url;
+	}
+	if ( typeof image.source_url === 'string' && image.source_url ) {
+		return image.source_url;
+	}
+	const fullUrl = image.sizes?.full?.url;
+	return typeof fullUrl === 'string' ? fullUrl : '';
+}
 
 type StepSlideReadOnlyContext = {
 	'skvn-marine/stepFillPreset'?: string;
@@ -90,7 +109,29 @@ function normalizeTextPosition( value: string ): string {
 }
 
 export function Edit( { attributes, clientId, context, setAttributes }: StepSlideEditProps ) {
-	const hasImage = Boolean( attributes.backgroundImageUrl );
+	const focus = useContext( StepSliderEditorFocusContext );
+	const attachment = useSelect(
+		( select ) => {
+			const imageId = attributes.backgroundImageId;
+			if ( ! imageId ) {
+				return undefined;
+			}
+			return select( 'core' ).getEntityRecord(
+				'postType',
+				'attachment',
+				imageId
+			) as { alt_text?: string; source_url?: string } | undefined;
+		},
+		[ attributes.backgroundImageId ]
+	);
+	const attachmentAlt =
+		typeof attachment?.alt_text === 'string' ? attachment.alt_text : '';
+	const imageUrl =
+		attributes.backgroundImageUrl ||
+		( typeof attachment?.source_url === 'string'
+			? attachment.source_url
+			: '' );
+	const hasImage = Boolean( imageUrl );
 	const fillMode = normalizeFillMode( attributes.backgroundFillMode );
 	const focalPoint = normalizeFocalPoint(
 		attributes.backgroundImageFocalPoint
@@ -118,6 +159,23 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 	// Guest fill presets live in the plugin option; the editor never re-sanitizes them.
 	const presetsModel = useStepFillPresets();
 
+	const parentClientId = useSelect(
+		( select ) => {
+			if ( ! focus ) {
+				return null;
+			}
+			const editor = select( blockEditorStore ) as {
+				getBlockRootClientId: ( id: string ) => string | null;
+			};
+			return editor.getBlockRootClientId( clientId );
+		},
+		[ clientId, focus?.rootClientId ]
+	);
+	const isInactiveInEditor =
+		focus &&
+		parentClientId === focus.rootClientId &&
+		focus.activeClientId !== clientId;
+
 	const positionClass = `is-position-${ normalizeTextPosition(
 		attributes.textPosition
 	) }`;
@@ -125,11 +183,11 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 		attributes.textSurface ? ' skvn-step-slide__content--surface' : ''
 	}`;
 
+	// The fill stays on the root even when an image is set, so removing the
+	// image keeps the step background. Focal only contributes CSS variables.
 	let slideBackground: Record< string, string > | undefined;
 
-	if ( hasImage ) {
-		slideBackground = focalPointToWrapperStyle( focalPoint );
-	} else if ( fillMode === 'transparent' ) {
+	if ( fillMode === 'transparent' ) {
 		slideBackground = undefined;
 	} else if ( fillMode === 'custom' ) {
 		const customBg = resolveCustomFillBackground( attributes );
@@ -148,31 +206,29 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 		};
 	}
 
+	if ( hasImage ) {
+		slideBackground = {
+			...( slideBackground || {} ),
+			...focalPointToWrapperStyle( focalPoint ),
+		};
+	}
+
 	const blockProps = useBlockProps( {
 		className: `skvn-step-slide skvn-step-slide--editor${
 			hasImage ? ' skvn-step-slide--has-background' : ''
 		}${ fillMode === 'transparent' && ! hasImage ? ' skvn-step-slide--fill-transparent' : '' }`,
-		style: slideBackground,
-	} );
-
-	const attachmentAlt = useSelect(
-		( select ) => {
-			const imageId = attributes.backgroundImageId;
-			if ( ! imageId ) {
-				return '';
-			}
-			const media = (
-				select( 'core' ) as {
-					getMedia: ( id: number ) => { alt_text?: string } | undefined;
-				}
-			).getMedia( imageId );
-			return typeof media?.alt_text === 'string' ? media.alt_text : '';
+		style: {
+			...( slideBackground || {} ),
+			...( isInactiveInEditor ? { display: 'none' } : {} ),
 		},
-		[ attributes.backgroundImageId ]
-	);
+	} );
 
 	const selectImage = useMemo(
 		() => ( image: SelectedImage ) => {
+			const url = imageUrlFromSelection( image );
+			if ( ! image?.id || ! url ) {
+				return;
+			}
 			const attachmentText =
 				( typeof image.alt === 'string' && image.alt.trim() ) ||
 				( typeof image.alt_text === 'string' && image.alt_text.trim() ) ||
@@ -180,7 +236,7 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 			setAttributes( {
 				backgroundImageAlt: attachmentText,
 				backgroundImageId: image.id,
-				backgroundImageUrl: image.url,
+				backgroundImageUrl: url,
 			} );
 		},
 		[ setAttributes ]
@@ -199,6 +255,39 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 
 	return (
 		<div { ...blockProps }>
+			<BlockControls>
+				<ToolbarGroup>
+					<MediaUploadCheck>
+						<MediaUpload
+							allowedTypes={ [ 'image' ] }
+							onSelect={ selectImage }
+							render={ ( { open } ) => (
+								<ToolbarButton onClick={ open }>
+									{ hasImage
+										? __(
+												'Replace image',
+												'skvn-marine-blocks'
+										  )
+										: __(
+												'Choose image',
+												'skvn-marine-blocks'
+										  ) }
+								</ToolbarButton>
+							) }
+							value={
+								attributes.backgroundImageId > 0
+									? attributes.backgroundImageId
+									: undefined
+							}
+						/>
+					</MediaUploadCheck>
+					{ hasImage && (
+						<ToolbarButton onClick={ removeImage }>
+							{ __( 'Remove image', 'skvn-marine-blocks' ) }
+						</ToolbarButton>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					initialOpen
@@ -309,106 +398,7 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 						placeholder={ attachmentAlt }
 						value={ attributes.backgroundImageAlt || '' }
 					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Step layout', 'skvn-marine-blocks' ) }>
-					<RadioControl
-						label={ __( 'Text position', 'skvn-marine-blocks' ) }
-						onChange={ ( value: string ) =>
-							setAttributes( {
-								textPosition: normalizeTextPosition( value ),
-							} )
-						}
-						options={ [
-							{
-								label: __( 'Left', 'skvn-marine-blocks' ),
-								value: 'left',
-							},
-							{
-								label: __( 'Center', 'skvn-marine-blocks' ),
-								value: 'center',
-							},
-							{
-								label: __( 'Right', 'skvn-marine-blocks' ),
-								value: 'right',
-							},
-						] }
-						selected={ normalizeTextPosition(
-							attributes.textPosition
-						) }
-					/>
-					<ToggleControl
-						checked={ Boolean( attributes.textSurface ) }
-						help={ __(
-							'Show a frosted background behind the text column.',
-							'skvn-marine-blocks'
-						) }
-						label={ __( 'Text surface', 'skvn-marine-blocks' ) }
-						onChange={ ( value: boolean ) =>
-							setAttributes( { textSurface: value } )
-						}
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<div className="skvn-step-slide__header">
-				<span
-					aria-hidden="true"
-					className="skvn-step-slide__header-label"
-				>
-					{ __( 'Tab', 'skvn-marine-blocks' ) }
-				</span>
-				<RichText
-					allowedFormats={ [] }
-					className="skvn-step-slide__tab-label"
-					onChange={ ( tabLabel ) => setAttributes( { tabLabel } ) }
-					placeholder={ __( 'Step', 'skvn-marine-blocks' ) }
-					tagName="span"
-					value={ attributes.tabLabel }
-				/>
-			</div>
-			<div className="skvn-step-slide__media">
-				{ hasImage && (
-					<>
-						<img
-							alt={ attributes.backgroundImageAlt }
-							className="skvn-step-slide__image"
-							src={ attributes.backgroundImageUrl }
-						/>
-						{ overlayOpacity > 0 && (
-							<span
-								aria-hidden="true"
-								className="skvn-step-slide__overlay"
-								style={ {
-									opacity: overlayOpacity / 100,
-								} }
-							/>
-						) }
-						<div className="skvn-step-slide__media-actions">
-							<MediaUploadCheck>
-								<MediaUpload
-									allowedTypes={ [ 'image' ] }
-									onSelect={ selectImage }
-									render={ ( { open } ) => (
-										<Button onClick={ open } variant="secondary">
-											{ __(
-												'Replace image',
-												'skvn-marine-blocks'
-											) }
-										</Button>
-									) }
-									value={ attributes.backgroundImageId }
-								/>
-							</MediaUploadCheck>
-							<Button
-								isDestructive
-								onClick={ removeImage }
-								variant="link"
-							>
-								{ __(
-									'Remove image',
-									'skvn-marine-blocks'
-								) }
-							</Button>
-						</div>
+					{ hasImage && (
 						<div className="skvn-step-slide__focal-panel">
 							<p className="skvn-slide-focal__label">
 								{ __(
@@ -452,34 +442,65 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 								) }
 							</p>
 						</div>
-					</>
-				) }
-				{ ! hasImage && (
-					<>
-						{ overlayOpacity > 0 && (
-							<span
-								aria-hidden="true"
-								className="skvn-step-slide__overlay"
-								style={ {
-									opacity: overlayOpacity / 100,
-								} }
-							/>
+					) }
+				</PanelBody>
+				<PanelBody title={ __( 'Step layout', 'skvn-marine-blocks' ) }>
+					<RadioControl
+						label={ __( 'Text position', 'skvn-marine-blocks' ) }
+						onChange={ ( value: string ) =>
+							setAttributes( {
+								textPosition: normalizeTextPosition( value ),
+							} )
+						}
+						options={ [
+							{
+								label: __( 'Left', 'skvn-marine-blocks' ),
+								value: 'left',
+							},
+							{
+								label: __( 'Center', 'skvn-marine-blocks' ),
+								value: 'center',
+							},
+							{
+								label: __( 'Right', 'skvn-marine-blocks' ),
+								value: 'right',
+							},
+						] }
+						selected={ normalizeTextPosition(
+							attributes.textPosition
 						) }
-						<MediaUploadCheck>
-							<MediaPlaceholder
-								allowedTypes={ [ 'image' ] }
-								labels={ {
-									title: __(
-										'Background image',
-										'skvn-marine-blocks'
-									),
-								} }
-								onSelect={ selectImage }
-							/>
-						</MediaUploadCheck>
-					</>
-				) }
-			</div>
+					/>
+					<ToggleControl
+						checked={ Boolean( attributes.textSurface ) }
+						help={ __(
+							'Show a frosted background behind the text column.',
+							'skvn-marine-blocks'
+						) }
+						label={ __( 'Text surface', 'skvn-marine-blocks' ) }
+						onChange={ ( value: boolean ) =>
+							setAttributes( { textSurface: value } )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
+			{ hasImage && (
+				<div className="skvn-step-slide__media">
+					<img
+						alt={ attributes.backgroundImageAlt }
+						className="skvn-step-slide__image"
+						src={ imageUrl }
+					/>
+					{ overlayOpacity > 0 && (
+						<span
+							aria-hidden="true"
+							className="skvn-step-slide__overlay"
+							style={ {
+								opacity: overlayOpacity / 100,
+							} }
+						/>
+					) }
+				</div>
+			) }
 			<div className={ contentClass }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_CONTENT_BLOCKS }

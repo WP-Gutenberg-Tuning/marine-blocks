@@ -415,6 +415,8 @@ Do not create a custom block unless at least one condition is true:
 
 If custom block need is uncertain, record it in `not_translated` or `risks` first. Do not implement the block during translation.
 
+When the artifact is a how-it-works or process spotlight section, follow `docs/workflows/step-slider-demo-usage.md` and use the existing Step Slider. Feature tabs are a future candidate in `.context/planning/087_FUTURE_CANDIDATE_FEATURE_TABS_PLANNING.md`, not a block to create during translation.
+
 ## Publisher Decision Gate
 
 Creating a WordPress page from translated output is a separate feature from HTML-2-Gutenberg translation.

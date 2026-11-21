@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marine Blocks — Step Slider editor stage</title>
+<link rel="stylesheet" href="step-slider-editor-stage-prototype.css">
+</head>
+<body>
+<main class="review-page">
+	<header class="review-header">
+		<h1>Step Slider editor</h1>
+		<div class="concept">Stage 16:9 · steps below · review only</div>
+	</header>
+	<div class="editor-shell">
+		<section class="editor-frame" aria-label="Step Slider canvas">
+			<div class="frame-header">
+				<span class="block-mark" aria-hidden="true">▥</span>
+				<span class="block-label">STEP SLIDER</span>
+				<span class="badge" id="badge">Autoplay on</span>
+				<span class="frame-count" id="count">4 steps</span>
+			</div>
+			<div class="stage" id="stage" role="tabpanel">
+				<div class="stage-bg" id="stage-bg"></div>
+				<img class="stage-image" id="stage-image" alt="" hidden>
+				<div class="stage-scrim" aria-hidden="true"></div>
+				<p class="stage-empty" id="stage-empty">Add a step to start editing.</p>
+				<div class="stage-copy" id="stage-copy">
+					<h2 id="heading" contenteditable="true" spellcheck="false" aria-label="Heading"></h2>
+					<p id="paragraph" contenteditable="true" spellcheck="false" aria-label="Paragraph"></p>
+					<ul id="list"></ul>
+					<span class="stage-button" id="button" contenteditable="true" spellcheck="false" role="textbox" aria-label="Button label"></span>
+				</div>
+				<div class="stage-actions" id="stage-actions">
+					<button type="button" id="choose-image">Choose image</button>
+					<button type="button" id="remove-image" hidden>Remove image</button>
+					<input id="image-file" type="file" accept="image/*" hidden>
+				</div>
+			</div>
+			<div class="steps" id="steps" role="tablist" aria-label="Steps"></div>
+			<div class="step-footer">
+				<p class="status" id="status"></p>
+				<button type="button" class="add-step" id="add-step">Add step</button>
+			</div>
+		</section>
+		<aside class="playback" aria-label="Playback">
+			<h2>Playback</h2>
+			<label class="field"><input id="autoplay" type="checkbox" checked> Autoplay</label>
+			<fieldset class="dwell">
+				<legend>Dwell</legend>
+				<label><input type="radio" name="dwell" value="5"> 5 seconds</label>
+				<label><input type="radio" name="dwell" value="8" checked> 8 seconds</label>
+				<label><input type="radio" name="dwell" value="10"> 10 seconds</label>
+			</fieldset>
+			<label class="field"><input id="loop" type="checkbox" checked> Loop</label>
+			<label class="field"><input id="pause-on-hover" type="checkbox" checked> Pause on hover</label>
+			<label class="field"><input id="show-play-button" type="checkbox" checked> Show play button</label>
+		</aside>
+	</div>
+	<p class="review-note">Review layout only. Edits stay in this page until reload. The 16:9 frame is the editing stage, not a preview of the frontend slide. The photo is an img covering the frame. The step strip is a tablist. Pause on hover and Show play button stay in Playback and do not change the badge.</p>
+</main>
+<script>
+const FILLS = [
+	'radial-gradient(110% 80% at 18% 8%, #2a7f9e 0%, #0f4266 42%, #071c33 100%)',
+	'radial-gradient(110% 80% at 82% 12%, #2f8f83 0%, #14524b 46%, #0a2422 100%)',
+	'radial-gradient(110% 80% at 20% 85%, #b97a2a 0%, #5c3a17 45%, #1d130a 100%)',
+	'radial-gradient(110% 80% at 80% 88%, #5b5bd6 0%, #2c2c6e 48%, #101024 100%)'
+];
+const MAX_STEPS = 8;
+
+const steps = [
+	{ label: 'Receiving', heading: 'Receiving', paragraph: 'Fresh catch comes in from the boat.', items: [ 'Graded on arrival', 'Cold chain starts here' ], button: 'Request a quote', image: '' },
+	{ label: 'Processing', heading: 'Processing', paragraph: 'Fish is cleaned and portioned.', items: [ 'Trim and grade', 'Pack for freezing' ], button: 'Request a quote', image: '' },
+	{ label: 'IQF freezing', heading: 'IQF freezing', paragraph: 'Each piece is frozen separately.', items: [ 'Lock texture', 'Hold peak quality' ], button: 'Request a quote', image: '' },
+	{ label: 'Packing', heading: 'Packing', paragraph: 'Cartons leave on the cold chain.', items: [ 'Label and seal', 'Ready to ship' ], button: 'Request a quote', image: '' }
+];
+
+let active = 0;
+const stage = document.getElementById('stage');
+const stageBg = document.getElementById('stage-bg');
+const stageImage = document.getElementById('stage-image');
+const stageCopy = document.getElementById('stage-copy');
+const stageActions = document.getElementById('stage-actions');
+const stageEmpty = document.getElementById('stage-empty');
+const heading = document.getElementById('heading');
+const paragraph = document.getElementById('paragraph');
+const list = document.getElementById('list');
+const button = document.getElementById('button');
+const stepsEl = document.getElementById('steps');
+const countEl = document.getElementById('count');
+const badgeEl = document.getElementById('badge');
+const statusEl = document.getElementById('status');
+const addButton = document.getElementById('add-step');
+const chooseButton = document.getElementById('choose-image');
+const removeButton = document.getElementById('remove-image');
+const fileInput = document.getElementById('image-file');
+
+function fillFor(index) {
+	return FILLS[index % FILLS.length];
+}
+
+function pad(index) {
+	return String(index + 1).padStart(2, '0');
+}
+
+function tabId(index) {
+	return 'step-tab-' + index;
+}
+
+function readStage() {
+	const step = steps[active];
+	if (!step) {
+		return;
+	}
+	step.heading = heading.textContent;
+	step.paragraph = paragraph.textContent;
+	step.button = button.textContent;
+	step.items = Array.from(list.querySelectorAll('li')).map((item) => item.textContent);
+}
+
+function paintStage() {
+	const step = steps[active];
+	const hasStep = Boolean(step);
+	stage.classList.toggle('is-empty', !hasStep);
+	stageEmpty.hidden = hasStep;
+	stageCopy.hidden = !hasStep;
+	stageActions.hidden = !hasStep;
+	if (!hasStep) {
+		stage.removeAttribute('aria-labelledby');
+		stageImage.hidden = true;
+		stageImage.removeAttribute('src');
+		stageBg.style.backgroundImage = '';
+		return;
+	}
+	stage.setAttribute('aria-labelledby', tabId(active));
+	stageBg.style.backgroundImage = fillFor(active);
+	if (step.image) {
+		stageImage.hidden = false;
+		stageImage.src = step.image;
+		chooseButton.textContent = 'Replace image';
+	} else {
+		stageImage.hidden = true;
+		stageImage.removeAttribute('src');
+		chooseButton.textContent = 'Choose image';
+	}
+	removeButton.hidden = !step.image;
+	heading.textContent = step.heading;
+	paragraph.textContent = step.paragraph;
+	button.textContent = step.button;
+	list.replaceChildren();
+	step.items.forEach((text) => {
+		const item = document.createElement('li');
+		item.contentEditable = 'true';
+		item.spellcheck = false;
+		item.setAttribute('aria-label', 'List item');
+		item.textContent = text;
+		item.addEventListener('input', readStage);
+		list.appendChild(item);
+	});
+}
+
+function paintChrome() {
+	const autoplay = document.getElementById('autoplay').checked;
+	const loop = document.getElementById('loop').checked;
+	const dwell = document.querySelector('input[name="dwell"]:checked').value;
+	countEl.textContent = steps.length === 1 ? '1 step' : steps.length + ' steps';
+	badgeEl.textContent = autoplay ? 'Autoplay on' : 'Manual';
+	const parts = [ autoplay ? 'Autoplay on' : 'Manual', dwell + ' seconds' ];
+	if (loop) {
+		parts.push('Loop on');
+	}
+	statusEl.textContent = parts.join(' · ');
+	addButton.hidden = steps.length >= MAX_STEPS;
+}
+
+function paintSteps() {
+	stepsEl.replaceChildren();
+	steps.forEach((step, index) => {
+		const tab = document.createElement('div');
+		tab.id = tabId(index);
+		tab.className = 'step';
+		tab.setAttribute('role', 'tab');
+		tab.setAttribute('aria-controls', 'stage');
+		tab.tabIndex = index === active ? 0 : -1;
+		tab.setAttribute('aria-selected', index === active ? 'true' : 'false');
+		tab.style.background = fillFor(index);
+		const progress = document.createElement('span');
+		progress.className = 'step-progress';
+		progress.setAttribute('aria-hidden', 'true');
+		const number = document.createElement('span');
+		number.className = 'step-number';
+		number.textContent = pad(index);
+		const label = document.createElement('span');
+		label.className = 'step-label';
+		label.contentEditable = 'true';
+		label.spellcheck = false;
+		label.setAttribute('role', 'textbox');
+		label.setAttribute('aria-label', 'Step ' + pad(index) + ' label');
+		label.textContent = step.label;
+		label.addEventListener('input', () => {
+			steps[index].label = label.textContent;
+		});
+		label.addEventListener('mousedown', (event) => {
+			event.stopPropagation();
+		});
+		label.addEventListener('click', (event) => {
+			event.stopPropagation();
+			if (index !== active) {
+				selectStep(index);
+			}
+		});
+		label.addEventListener('keydown', (event) => {
+			event.stopPropagation();
+		});
+		tab.append(progress, number, label);
+		tab.addEventListener('click', () => selectStep(index));
+		tab.addEventListener('keydown', (event) => {
+			if (event.target !== tab) {
+				return;
+			}
+			if (event.key === 'ArrowRight') {
+				event.preventDefault();
+				selectStep(Math.min(steps.length - 1, index + 1), true);
+			}
+			if (event.key === 'ArrowLeft') {
+				event.preventDefault();
+				selectStep(Math.max(0, index - 1), true);
+			}
+		});
+		stepsEl.appendChild(tab);
+	});
+}
+
+function selectStep(index, focusTab) {
+	if (!steps[index] || index === active) {
+		return;
+	}
+	readStage();
+	active = index;
+	paintStage();
+	paintSteps();
+	if (focusTab) {
+		const tab = document.getElementById(tabId(index));
+		if (tab) {
+			tab.focus();
+		}
+	}
+}
+
+chooseButton.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+	const file = fileInput.files && fileInput.files[0];
+	fileInput.value = '';
+	if (!file || !steps[active]) {
+		return;
+	}
+	const reader = new FileReader();
+	reader.onload = () => {
+		steps[active].image = String(reader.result || '');
+		paintStage();
+	};
+	reader.readAsDataURL(file);
+});
+removeButton.addEventListener('click', () => {
+	if (!steps[active]) {
+		return;
+	}
+	steps[active].image = '';
+	paintStage();
+});
+addButton.addEventListener('click', (event) => {
+	event.stopPropagation();
+	if (steps.length >= MAX_STEPS) {
+		return;
+	}
+	readStage();
+	const number = pad(steps.length);
+	steps.push({
+		label: 'Step ' + number,
+		heading: 'Step ' + number,
+		paragraph: 'Step copy',
+		items: [ 'First point', 'Second point' ],
+		button: 'Request a quote',
+		image: ''
+	});
+	active = steps.length - 1;
+	paintStage();
+	paintSteps();
+	paintChrome();
+});
+
+[ 'autoplay', 'loop' ].forEach((id) => {
+	document.getElementById(id).addEventListener('change', paintChrome);
+});
+document.querySelectorAll('input[name="dwell"]').forEach((input) => {
+	input.addEventListener('change', paintChrome);
+});
+heading.addEventListener('input', readStage);
+paragraph.addEventListener('input', readStage);
+button.addEventListener('input', readStage);
+
+paintStage();
+paintSteps();
+paintChrome();
+</script>
+</body>
+</html>

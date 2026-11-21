@@ -4,6 +4,7 @@ import { Button, Notice } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select, useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { plus } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import type { SliderAttributes } from '../edit';
 import { SliderEditorFocusContext } from './context';
@@ -134,9 +135,9 @@ export function SliderEditorCanvas( { clientId, attributes }: { clientId: string
 			</div>
 			<div className="skvn-slider-editor__footer">
 				<EditorArrowPreview attributes={ attributes } index={ index } count={ count } />
-				<div className="skvn-slider-editor__add-group"><Button className="skvn-slider-editor__add" variant="secondary" icon="plus-alt2"
+				<div className="skvn-slider-editor__add-group"><Button className="skvn-slider-editor__add" variant="secondary" icon={ plus } iconSize={ 20 }
 					disabled={ Boolean( state.insertionReason ) } onClick={ ( event ) => { event.stopPropagation(); add(); } }
-					aria-describedby={ `${ pickerId }-add-hint` }>{ __( '+ Add slide', 'skvn-marine-blocks' ) }</Button>
+					aria-describedby={ `${ pickerId }-add-hint` }>{ __( 'Add slide', 'skvn-marine-blocks' ) }</Button>
 					<span id={ `${ pickerId }-add-hint` } className="skvn-slider-editor__add-hint">{ addHint }</span></div>
 				<EditorPaginationPreview attributes={ attributes } index={ index } count={ count } />
 			</div>

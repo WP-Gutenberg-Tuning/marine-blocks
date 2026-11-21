@@ -27,6 +27,7 @@ Lỗi quy trình/validation của Content Actions (review `0a53a2d`, 2026-11-05)
 | Marine Blocks không có trong sidebar editor | Page / SKVN Page Display / GeneratePress còn; Preferences → Panels chỉ WindPress | `wp_localize_script` ép boolean thành `"1"` | Pitfall 11, [DP-10](../../.context/PITFALLS.md#dp-10--wp_localize_script-biến-boolean-thành-1-sidebar-marine-blocks-không-mount-2026-11-14) |
 | PDP related panel bật, frontend không đổi | Native Woo related (placeholder + nút outline); không có `.skvn-related-shared-card` | Theme chưa cập nhật (swap ở theme); option/meta owner off; gate `assets_ready`; path Woo; spread `override` | Pitfall 12, [DP-11](../../.context/PITFALLS.md#dp-11--pdp-related-panel-editor-bật-skvn-cards-frontend-vẫn-woo-native-2026-11-15) |
 | Step Slider tràn ngang sau build plugin | `clientWidth` 1905 / `scrollWidth` 1945; slider `x=-40` width 1985 | GP `.alignfull` −40px; reset chỉ ở theme `style.css`; zip plugin không chứa theme | Pitfall 13, [DP-12](../../.context/PITFALLS.md#dp-12--npm-run-build--zip-plugin--theme-stylecss-gp-alignfull-bleed-còn-khi-reset-chỉ-nằm-theme-2026-11-19) |
+| Nút editor có `icon="plus-alt2"` nhưng không có dấu cộng | Chữ "Add slide" hiện, glyph trống | Dashicon font chỉ ở document admin; canvas iframe không có `dashicons.css` | Pitfall 15, [DP-14](../../.context/PITFALLS.md#dp-14--dashicon-string-không-vẽ-glyph-trong-canvas-iframe-2026-11-20) |
 
 ---
 
@@ -479,6 +480,32 @@ Delta:              số bước top 1094 và nhãn top 1109, cả hai dưới v
 **Đừng làm:** coi checklist source là ảnh đã khớp artifact. Đừng trừ header để “vá” khi Cấm 6 còn hiệu lực — đó là xung đột plan với trang có header, cần human chốt. Đừng đổ cho màu progress hay nút Play (Cấm 3, Cấm 4).
 
 Chi tiết: [DP-13](../../.context/PITFALLS.md#dp-13--step-slider-100svh-bắt-đầu-dưới-header-sticky-thanh-bước-rơi-khỏi-màn-đầu-2026-11-19).
+
+## Pitfall 15 — Dashicon string không vẽ glyph trong canvas iframe
+
+**Xảy ra 2026-11-20.** Nút Add slide của Slider editor. `icon="plus-alt2"` không ra dấu cộng. Nhãn nút vẫn hiện.
+
+**State delta:**
+
+```text
+State A (glyph hiện): dashicon string trên document admin (sidebar, menu plugin)
+State B (không glyph): cùng Button icon string trong block edit, canvas iframe
+Delta:                glyph là font dashicons; iframe không nhận dashicons.css
+```
+
+**Nhãn:** suy luận từ source WordPress 7.1.4, chưa đo stylesheet trong iframe.
+
+**Case này do gì:**
+
+1. `Button` biến slug thành `<span class="dashicons-plus-alt2">`. Nét dấu cộng là `content: "\f543"` và `font-family: dashicons` trong `dashicons.css`.
+2. Handle đó enqueue cho wp-admin. Block editor iframe không kéo file này. CSS `wp-components` trong iframe chỉ chỉnh khung `.dashicon`, không có glyph.
+3. Rule `.skvn-slider-editor__add` không giấu icon.
+
+**Repair source, chưa runtime PASS:** `plus` (SVG dấu cộng) từ `@wordpress/icons`, `iconSize={ 20 }`.
+
+**Đừng làm:** đổi màu/cỡ nút để “kéo” dashicon hiện. Đừng enqueue `dashicons` vào iframe chỉ để một nút. Đừng coi slug dashicon hỏng ở mọi nơi — `PluginSidebar` nằm document cha nên slug vẫn vẽ được.
+
+Chi tiết: [DP-14](../../.context/PITFALLS.md#dp-14--dashicon-string-không-vẽ-glyph-trong-canvas-iframe-2026-11-20).
 
 ## Related
 

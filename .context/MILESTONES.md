@@ -1138,6 +1138,16 @@ Scope: inventory base blocks/variations/inner blocks; SVG phù hợp công dụn
 
 Plan/source evidence/acceptance draft **IO-UX-01–03, IO-TECH-01–02**: `planning/056_FUTURE_CANDIDATE_BLOCK_INSERTER_ORGANIZATION.md`. Tất cả **Chưa làm**; human đã chốt lịch/scope, chưa duyệt SVG/grouping cụ thể hoặc runtime PASS. Mockup toàn Inserter và onsite thử tìm/chọn block trước nghiệm thu; runbook tạo khi mở task. Không bump/build trong lượt note này.
 
+### Sau 1.4.x — Step Slider editor sidebar (Future Candidate, SemVer TBD)
+
+Status: **NOTED 2026-11-20 — chưa start, chưa gán version.**
+
+Human: giữ thiết kế cột Playback cạnh canvas, quay lại làm sau các mục 1.4.x. Không thuộc acceptance 1.3.24. Plan 086 chỉ giữ năm control Playback trong Inspector.
+
+Bố cục đã chốt trên artifact: hàng ngang, canvas `1fr` và cột `230px`, gap `18px`; dưới 860px cột xuống dưới. Thẻ trắng, viền `#d9dcef`, radius `14px`, padding `16px`. Tiêu đề `Playback`. Thứ tự Autoplay, Dwell 5/8/10 (mặc định 8), Loop, Pause on hover, Show play button. Badge và dòng trạng thái chỉ theo Autoplay, Dwell, Loop.
+
+Nguồn: plan [086](planning/086_VER_1_3_24_STEP_SLIDER_EDITOR_STAGE_EXECUTION_PLAN.md) mục 9, decision `docs/decisions/sliders/step-slider/step-slider-editor-stage-1.3.24.md`, artifact `docs/artifacts/editor-ui/step-slider-editor-stage-prototype.html`. Start cần lệnh human và SemVer riêng.
+
 ### 1.5.0 — Woo Catalog Plugin (`woo-catalog`)
 
 Status: **BRAINSTORM / PLANNING IN PROGRESS**

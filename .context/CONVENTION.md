@@ -117,6 +117,7 @@ Cột "Đọc bắt buộc" là tối thiểu. Cột "Đọc thêm khi" chỉ đ
 | Code sắp copy từ tính năng khác sang, chỉ đổi tên biến/label | D2, D9.2 | Copy lần hai được phép có ghi chú; copy y nguyên lần ba là vi phạm nếu không qua D3/D4 |
 | Block plugin chỉ đúng khi theme hiện tại đang bật, hoặc CSS của block nằm trong `style.css` của theme | A9.1, A3 | Plugin phải tự đứng được khi chỉ cài plugin; chrome và hộp của block đi cùng zip plugin |
 | Block dùng `alignfull` và nghi bleed của khung cha | A9.3, A2, A3 | Phải phân biệt "chưa deploy" với "CSS sai" bằng CSS bytes trên live và `getComputedStyle` trước khi kết luận |
+| Sửa hoặc thiết kế chrome trong canvas Editor (khung xem trước, stage, dải nằm trong block) | A5.12 | Chiều ngang thuộc hộp căn lề của block. Bỏ class align thì block hẹp hơn canvas. Ép full-bleed thì tràn cột cha |
 | Chủ dự án yêu cầu digest một PITFALL (nêu mã pitfall, file pitfall, hoặc nói rõ "digest PITFALL …") | 0.5, Phần E | Đây là lệnh chạy quy trình ở 0.5, không phải lời mời tóm tắt: phải digest, research và quyết định có tạo luật hay không theo 0.5.3 |
 
 ## Bản đồ tài liệu — mỗi mục giải quyết việc gì
@@ -139,6 +140,7 @@ Dùng bảng này khi bảng định tuyến chưa đủ rõ, hoặc khi cần b
 | A7 | Media, khoảng cách, typography con, danh sách lặp, liên kết, control phụ thuộc | Theo loại setting |
 | A8 | UI nối backend, apiFetch, bốn trạng thái, Interactivity API | Mọi task UI gọi dữ liệu |
 | A5.11 | Atomic check cho attribute `undefined`, pattern ternary/boolean/`SelectControl`, kiểm chứng component ở runtime | Trước commit của mọi thay đổi Editor UI |
+| A5.12 | Chiều ngang của chrome trong Editor: class căn lề trên root, chrome rộng 100% hộp đó | Khi vẽ hoặc sửa khung, stage, dải nằm trong canvas |
 | A9 | Độc lập theme–plugin, hai lớp width, kiểm tra deploy DP-12 và bleed của theme/framework | Block phải chạy khi chỉ cài plugin; khi local và live lệch nhau |
 | B1–B2 | Cây quyết định nơi lưu, đặt tên, đăng ký meta | Mọi task có dữ liệu mới |
 | B3–B3.5 | Schema, kiểu cột, index, ba mẫu bảng điển hình | Tạo hoặc sửa custom table |
@@ -458,7 +460,7 @@ Block Editor có bốn vị trí hiển thị control. Đặt sai vị trí là 
 | Thân block (`RichText`, `InnerBlocks`, `MediaPlaceholder`) | Nội dung chính người dùng sửa trực tiếp tại chỗ | Form cấu hình xếp chồng trong canvas |
 
 - MUST sửa nội dung tại chỗ bằng `RichText` cho text giàu và `InnerBlocks` cho cấu trúc lồng nhau. NEVER bắt người dùng sửa nội dung chính trong một textarea ở sidebar.
-- MUST dùng `useBlockProps()` cho phần tử bao ngoài cùng trong `edit` và trong `save`, để class, style và thuộc tính do supports sinh ra được gắn đúng chỗ. Với block con dùng `useInnerBlocksProps()`.
+- MUST dùng `useBlockProps()` cho phần tử bao ngoài cùng trong `edit` và trong `save`, để class, style và thuộc tính do supports sinh ra được gắn đúng chỗ. Với block con dùng `useInnerBlocksProps()`. Chiều ngang của chrome trong canvas không đặt tại đây: owner là hộp căn lề, xem A5.12.
 - MUST truyền `...useBlockProps.save()` tương ứng ở phía `save`. Thiếu bước này làm style từ supports biến mất ở frontend.
 
 ### A5.4. Luật số một của Editor UI: supports trước, custom control sau
@@ -815,6 +817,16 @@ Ba điểm kiểm tra của mẫu trên: màu tự do đi qua `sanitize_hex_colo
 
 Kiểm tra tương phản trong Editor, ở mức cảnh báo theo A6.3: tính tỉ lệ tương phản từ hai giá trị màu thật đang áp dụng (sau khi đã giải slug thành hex qua palette), chỉ cảnh báo khi cặp đó áp lên chữ thật. Không cảnh báo cho màu của phần tử trang trí không chứa chữ, và không cảnh báo khi một trong hai màu kế thừa từ ngữ cảnh mà Editor không biết chắc — cảnh báo sai làm người dùng tắt cảnh báo thật.
 
+### A5.12. Chiều ngang của chrome trong Editor
+
+Chrome vẽ trong canvas — khung xem trước, stage, dải điều khiển, mọi lớp nằm trong block — lấy chiều ngang từ hộp căn lề mà Editor đã tính cho block đó. Không có chiều ngang thứ hai cho riêng chrome.
+
+- MUST, khi block khai báo `supports.align`, gắn class căn lề khớp attribute `align` đã lưu lên root mà `useBlockProps()` trả về: `alignwide`, `alignfull`, hoặc không thêm class khi căn thường. `useBlockProps()` không thay cho class này nếu class không có trên đúng root đang nhận CSS editor. Thiếu class thì Editor áp content width mặc định của canvas và block hẹp hơn vùng soạn.
+- MUST để chrome bên trong rộng `width: 100%` của root đó. `max-width` và margin ngang của root thuộc về Editor và về parent (Group, Columns). NEVER ghi đè chúng bằng `max-width: none`, margin ngang âm, hoặc `100vw`.
+- NEVER lấy chiều rộng pixel của trang mockup, artifact review, hoặc cửa sổ trình duyệt làm width của block.
+- SHOULD coi là xong chỉ sau khi đo trong đúng document hoặc iframe của Editor: hai mép của root trùng một block cùng chế độ căn lề trong cùng parent; trong parent hẹp, rect của chrome nằm trong rect của parent và `scrollWidth` của document không lớn hơn `clientWidth`.
+- A9.3 là luật frontend: reset bleed của khung theme trên trang đã xuất bản. Nó không áp cho CSS editor và không cho phép chrome editor thoát content width của canvas. Chiều ngang trong Editor là mục này.
+
 ## A7. Các pattern Editor UI thường gặp khác
 
 ### A7.1. Khoảng cách và kích thước
@@ -954,6 +966,7 @@ Mục này rút ra từ dự án skvn-marine (pitfall DP-12 và hợp đồng `d
 - Đây là ngoại lệ có phạm vi hẹp của luật giới hạn đặc hiệu ở A3 (tối đa một class cộng một pseudo-class): ngoại lệ chỉ áp cho đúng selector reset `alignfull` này, chỉ để thắng bleed đã đo được của khung cha, và phải có comment ghi bleed của ai, đo ở đâu. Mọi selector khác vẫn theo A3. NEVER dùng ngoại lệ này làm tiền lệ nới đặc hiệu cho style thường.
 - NEVER đòi hỏi một class canvas riêng trên `body` (trong dự án nguồn là dạng `body.skvn-full-width-canvas`) như điều kiện để block đúng width: block phải tự đúng trong hộp của nó.
 - NEVER che overflow bằng `overflow-x: hidden` hoặc `overflow-x: clip` trên tổ tiên, bằng `100vw`, bằng lề âm dạng `-50vw`, hoặc bằng cách trừ chiều cao header. Các cách đó giấu triệu chứng và làm vỡ sticky, focus outline và cuộn ngang thật ở nơi khác; cách đúng là sửa hộp gây tràn ở đúng chủ sở hữu của nó (A9.1).
+- Reset ở mục này không áp cho CSS của Editor. Chrome trong canvas theo A5.12.
 
 # Phần B — Tiêu chuẩn xây dựng cơ sở dữ liệu
 
@@ -1914,10 +1927,11 @@ Phần này là hồ sơ, không phải một bộ checklist thứ hai. Các bà
 | Atomic check cho attributes undefined: từng attribute một, ba test case mất attribute / có giá trị / giá trị không mong đợi; áp đặc biệt cho attribute optional không `default` (nhóm P2 của dự án: `actionGapPx`, `actionWidthPercent`) | A5.11 | Phụ lục 1, Giao diện; Recipe 15 |
 | Pattern check: ternary có `else` explicit cho `undefined`, boolean toggle kiểm tra `!== false` / `=== true`, `SelectControl` có value fallback | A5.11 | Phụ lục 1, Giao diện; Recipe 15 |
 | Pitfall DP-06 đã sửa root cause (ghi chú 2026-11-10): root cause đúng là tên component không tồn tại trong runtime `wp.components` (bản dist core WordPress 7.1 chỉ có tên dạng `__experimental*`), không phải attribute `undefined` như bản đầu quy nhầm | A5.11 | Thứ tự chẩn đoán ở A5.11 |
+| Chiều ngang chrome Editor (2026-11-20): Slider thiếu class align nên canvas áp content width mặc định; Responsive Spacer ép `alignfull` cùng `max-width: none` và `margin-inline: 0` nên tràn cột Wide | A5.12 | Phụ lục 1, Giao diện; Recipe 15 |
 
 Ba quy tắc khi dùng hồ sơ này:
 
-- **Phạm vi:** các con số và selector của dự án (specificity `(0,3,1)`, selector `body:not(.no-sidebar) .entry-content .alignfull`, tên attribute nhóm P2) là số đo của skvn-marine. Dự án khác lấy nguyên tắc — plugin tự đứng được, phân biệt trạng thái deploy trước khi kết luận code sai, kiểm tra từng attribute độc lập, kiểm chứng component trong runtime — và tự đo lại con số theo repo của mình.
+- **Phạm vi:** các con số và selector của dự án (specificity `(0,3,1)`, selector `body:not(.no-sidebar) .entry-content .alignfull`, tên attribute nhóm P2, content width mặc định 760px của canvas Editor, `max-width: 1180px` của trang artifact, default `align` `full` của step-slider) là số đo của skvn-marine. Dự án khác lấy nguyên tắc — plugin tự đứng được, phân biệt trạng thái deploy trước khi kết luận code sai, kiểm tra từng attribute độc lập, kiểm chứng component trong runtime — và tự đo lại con số theo repo của mình.
 - **Xung đột phải ghi rõ:** reset ở A9.3 là ngoại lệ hẹp của luật specificity ở A3, và A9.3 đã ghi phạm vi của ngoại lệ đó. Không mục nào của hồ sơ này lặng lẽ ghi đè luật chung.
 - **Trích dẫn pitfall đã sửa:** khi nhắc DP-06, chỉ trích root cause đã đính chính tại A5.11 và mục DP-06 [CORRECTED] trong `.context/PITFALLS.md` của dự án. Bản quy nhầm ban đầu chỉ được nhắc như một lỗi chẩn đoán cần tránh, không bao giờ như nguyên nhân.
 
@@ -1941,6 +1955,7 @@ Agent tự chạy qua cổng này cho mọi thay đổi và báo lại mục nà
 - [ ] Deploy (A9.2): đã phân biệt đường build/deploy của plugin và của theme; selector thiếu trên live ghi là “chưa deploy”, không ghi “CSS sai”; kết luận width dựa trên `getComputedStyle`, không chỉ đọc file CSS.
 - [ ] Atomic check (A5.11): mọi `attributes.X` đã đối chiếu `default` trong `block.json`; đã chạy ba test case mất attribute / có giá trị / giá trị không mong đợi; ternary có `else` tường minh, toggle dùng `!== false` hoặc `=== true` theo ý nghĩa đã ghi, `SelectControl` có value fallback.
 - [ ] Component runtime (A5.11): mọi tên component từ `wp.components` đã kiểm chứng tồn tại trong bản phân phối ở môi trường đích trước khi quy lỗi cho attribute hoặc dữ liệu.
+- [ ] Chrome Editor (A5.12): root có class căn lề khớp `align`; chrome bên trong rộng 100% root; không `max-width: none`, margin ngang âm, `100vw`, hoặc px lấy từ mockup.
 
 ## Cơ sở dữ liệu
 
@@ -1970,7 +1985,7 @@ Agent tự chạy qua cổng này cho mọi thay đổi và báo lại mục nà
 - [ ] Biến thể: điểm rẽ nhánh chỉ có một (T08) hoặc đã tách Strategy/Registry khi tới biến thể thứ ba (T09); thêm biến thể mới không phải sửa nơi gọi.
 - [ ] Không Singleton tự chế, không kế thừa sâu quá một cấp cho class nghiệp vụ, không event bus tự chế thay hook.
 
-## Bài học dự án skvn-marine (luật tại A5.11 và A9, hồ sơ tại Phần E)
+## Bài học dự án skvn-marine (luật tại A5.11, A5.12 và A9, hồ sơ tại Phần E)
 
 - [ ] Block đã kiểm tra ở trạng thái chỉ cài plugin và qua DP-12 theo A9; gate atomic check và component runtime nằm trong danh sách Giao diện ở trên theo A5.11.
 - [ ] Recipe 15 đã chạy đủ năm bước trước commit.
@@ -2013,6 +2028,7 @@ Agent tự chạy qua cổng này cho mọi thay đổi và báo lại mục nà
 | Che overflow bằng `overflow-x: hidden/clip`, `100vw` hoặc lề âm toàn cục | Giấu nguyên nhân tràn, vỡ sticky/focus/cuộn ngang ở nơi khác | Sửa hộp gây tràn ở đúng chủ sở hữu theme/plugin — xem A9.3 |
 | Truyền thẳng attribute có thể `undefined` vào ternary ngầm, truthy/falsy của toggle, hoặc `value` của `SelectControl` | `undefined`, `false` và giá trị ngoài danh sách cho ba hành vi khác nhau không kiểm soát được | `else` tường minh, `!== false`/`=== true` theo ý nghĩa, value fallback trong danh sách options — xem A5.11 |
 | Quy lỗi Editor gãy cho attribute `undefined` khi chưa kiểm chứng tên component có tồn tại ở runtime đích | Sửa dữ liệu trong khi root cause là API không tồn tại — đúng lỗi DP-06 bản đầu đã mắc | Kiểm chứng component/API ở runtime đích trước, theo thứ tự chẩn đoán ở A5.11 |
+| Chrome Editor thiếu class align, hoặc ép `max-width: none`, margin ngang âm, `100vw`, hay px của mockup | Block hẹp hơn canvas hoặc tràn khỏi cột cha | Class align trên root, chrome `width: 100%`, parent giữ max-width và margin — xem A5.12 |
 | Tự chế event bus, query builder tổng quát, hoặc SDK nội bộ cho một nhà cung cấp | Trùng cơ chế gốc của WordPress, không ai ngoài tác giả biết nó tồn tại | Hook của WP (D5.4), `WP_Query`/repository (D4.1), lớp biên mỏng (D7.2) |
 | Kết luận "CSS sai" khi selector chỉ thiếu trên live | Sửa code đúng thành code khác trong khi bản chất là chưa deploy | Đối chiếu CSS bytes và `getComputedStyle` trên live; ghi "chưa deploy" — xem A9.2 |
 | Dùng `overflow-x: hidden`, `100vw` hoặc `-50vw` để che overflow | Giấu triệu chứng, phá layout ở ngữ cảnh khác, lỗi thật không bao giờ lộ ra | Tìm và sửa owner thật của width theo A9.1–A9.3 |
@@ -2050,7 +2066,7 @@ Mỗi recipe là một tuyến đọc đã đóng gói: làm theo bước, mở 
 3. Khai báo supports theo ma trận A5.8, chỉ bật thứ block thật dùng, đặt `__experimentalDefaultControls` cho control quan trọng nhất.
 4. Viết `edit` với `useBlockProps()`, nội dung sửa tại chỗ bằng `RichText` hoặc `InnerBlocks`, control tự chế chỉ cho thứ supports không có và đặt đúng vị trí theo A5.3.
 5. Viết `save` với `useBlockProps.save()` khớp từng class và style mà `edit` sinh ra.
-6. Kiểm tra ở Editor và frontend trên theme đang hỗ trợ: màu, khoảng cách và thứ tự khớp nhau; kiểm tra responsive theo A2.3.
+6. Kiểm tra ở Editor và frontend trên theme đang hỗ trợ: màu, khoảng cách và thứ tự khớp nhau; kiểm tra responsive theo A2.3. Block có chrome trong canvas thì chiều ngang theo A5.12.
 
 Gate: Phụ lục 1 — Giao diện, cộng bước 5 của A5.10 áp dụng ngược — lưu bài bằng block này, sửa `save` thử trong đầu và tự hỏi bản deprecated sẽ trông thế nào.
 
@@ -2213,15 +2229,16 @@ Gate: Phụ lục 1 — Design Pattern, mục biến thể; cộng Phụ lục 1
 
 ## Recipe 15 — Self-check trước commit cho một block plugin (độc lập theme, width/deploy, attribute)
 
-Đọc: A5.11, A9, A3. File chạm: không sửa file nào ở bước kiểm tra; chỉ sửa khi một mục kiểm tra thất bại và mục đó chỉ rõ file phải sửa. Recipe này rút ra từ self-check trước commit của dự án skvn-marine.
+Đọc: A5.11, A5.12, A9, A3. File chạm: không sửa file nào ở bước kiểm tra; chỉ sửa khi một mục kiểm tra thất bại và mục đó chỉ rõ file phải sửa. Recipe này rút ra từ self-check trước commit của dự án skvn-marine.
 
 1. Kiểm tra độc lập: tắt hoặc đổi theme đi kèm, để lại chỉ plugin, mở trang có block. Chrome của block và width của hộp block phải đúng. Ghi kết quả tách khỏi kết quả trên theme đi kèm (A9.1).
 2. Kiểm tra deploy: build và đóng gói plugin theo đường của plugin; nếu đối chiếu live, lấy CSS bytes thật và `getComputedStyle` trên live. Selector thiếu trên live ghi “chưa deploy”, dừng ở đó, không sửa CSS (A9.2).
 3. Kiểm tra width: xác nhận reset bleed `alignfull` nằm trong CSS plugin ở đặc hiệu đã đo (A9.3), và trang không có `overflow-x: hidden/clip`, `100vw` hay lề âm dùng để che tràn.
 4. Chạy atomic check ở A5.11: đối chiếu `default` cho mọi `attributes.X`, rồi ba test case mất attribute, có giá trị, giá trị không mong đợi.
 5. Chạy pattern check ở A5.11: ternary có `else` tường minh, toggle theo `!== false` hoặc `=== true` đúng ý nghĩa đã ghi, `SelectControl` có value fallback; và kiểm chứng mọi tên component `wp.components` tồn tại ở runtime đích.
+6. Khi diff chạm CSS editor hoặc class căn lề của root editor: đo theo A5.12. Root có class khớp `align`. Chrome rộng 100% root. Không `max-width: none`, margin ngang âm, `100vw`, hoặc px lấy từ mockup.
 
-Gate: Phụ lục 1 — Giao diện, gồm năm mục bổ sung về độc lập theme–plugin, deploy, atomic check và component runtime.
+Gate: Phụ lục 1 — Giao diện, gồm các mục bổ sung về độc lập theme–plugin, deploy, atomic check, component runtime và chrome Editor.
 
 ## Recipe 16 — Digest một PITFALL theo yêu cầu
 

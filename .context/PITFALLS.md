@@ -557,3 +557,69 @@ Cấm 6 vẫn cấm trừ header cho đến khi human chọn phương án A ho�
 - **Không phải:** progress `#7ec8e3` thay `#3ddc84`, nút Play ẩn, không có counter `01/04`. Plan 081 Cấm 3 và Cấm 4 khóa những chỗ đó. Không phải DP-12 (lần đo này slider rộng 1905, left 0).
 - **Chưa sửa.** Source working tree đã chuyển tab sang `position: relative` trong cột flex và `min-height` swiper `calc(100svh - tab)`. Cách đó gần §9 hơn bundle đang live, và vẫn không kéo thanh lên màn đầu chừng nào vỏ còn `100svh` dưới header. Chưa runtime PASS.
 - **Casebook:** `docs/debug-casebook/PITFALLS.md` Pitfall 14.
+
+### DP-14 — Dashicon string không vẽ glyph trong canvas iframe [2026-11-20]
+
+- **Case:** Slider editor, nút Add slide. `Button` `icon="plus-alt2"` (`src/slider/editor/canvas.tsx`) không hiện dấu cộng. Chữ "Add slide" vẫn hiện.
+- **Nhãn nguyên nhân: suy luận từ source, chưa đo iframe.** Chưa mở DevTools trong canvas để xác nhận document iframe không có `<link>` `dashicons` và `font-family` của span không phải `dashicons`. Cơ chế dưới đây đọc từ WordPress 7.1.4 local (`D:\Github\minhhaifish`), không phải từ một lần computed style.
+- **State delta:**
+
+```text
+State A (glyph hiện): dashicon string trên chrome admin / PluginSidebar — document cha đã enqueue dashicons.css
+State B (không glyph): cùng prop trên block edit, vẽ trong canvas iframe
+Delta:                ::before content + font-family dashicons chỉ có trong dashicons.css, không được iframe kéo vào
+```
+
+- **Cơ chế (source WP 7.1.4):** `wp.components.Button` nhận `icon` string rồi `Icon` gọi `Dashicon`, ra `<span class="dashicon dashicons dashicons-plus-alt2">` (`wp-includes/js/dist/components.js`, `Dashicon` ~26742, nhánh string ~26778, chỗ render icon ~26969). Size mặc định 20 không gắn inline width/height. Glyph là `.dashicons-plus-alt2:before { content: "\f543" }` trong `wp-includes/css/dashicons.css` ~1066, kèm `font-family: dashicons`. Handle `dashicons` đăng ký cho wp-admin (`wp-includes/script-loader.php` ~1652). `wp-includes/js/dist/block-editor.js` không chứa chuỗi `dashicons`. `wp-includes/css/dist/components/style.css` ~498 chỉ đặt flex/padding cho `.components-button.has-icon .dashicon`, không có `content` hay font.
+- **Không phải:** CSS `.skvn-slider-editor__add` giấu icon (rule chỉ màu, cỡ chữ, padding). Không phải slug sai — `plus-alt2` có trong `dashicons.css`.
+- **Repair (source 2026-11-20, chưa build, chưa runtime PASS):** `canvas.tsx` đổi sang `icon={ plus }` `iconSize={ 20 }` từ `@wordpress/icons` (SVG dấu cộng). `build/index.ts.asset.php` không phụ thuộc `wp-icons`; WP 7.1 không có `wp-includes/js/dist/icons.js` — package được bundle, SVG dùng `fill: currentColor` của `.components-button svg` (components CSS có trong iframe).
+- **Chống tái diễn:** UI trong `edit` của block (canvas iframe) không truyền dashicon slug (`icon="plus-alt2"`) cho `Button` / `Icon`. Dùng SVG `@wordpress/icons`. Slug dashicon vẫn dùng được ở `PluginSidebar` / `PluginMoreMenuItem` vì chúng nằm document cha. Chỗ đang nằm cha: `design-sidebar/index.tsx` (`admin-customizer`), `block-clipboard/index.tsx` (`clipboard`, `editor-paste-text`).
+- **Casebook:** `docs/debug-casebook/PITFALLS.md` Pitfall 15.
+
+### DP-15 — Step Slider editor bị 100svh kéo đáy card; block sau không có margin [2026-11-20]
+
+- **Case:** Editor, Test page 2, card Step Slider. Thu hẹp bề ngang editor thì vùng trống dưới nút Add step dài ra, viền card chạy xuống sát block kế. Block kế (nền tối) dính đáy card.
+- **Nhãn nguyên nhân: quan sát selector, suy luận cascade.** Chưa đo `getComputedStyle` trong iframe. Screenshot 2026-11-20 cho thấy hộp card cao hơn header + stage 16:9 + footer. Source khớp cơ chế đó.
+- **State delta:**
+
+```text
+State A (canvas rộng): stage 16:9 đã chiếm gần hết chiều cao card
+State B (canvas hẹp): stage thấp theo bề ngang, đáy card vẫn dài
+Delta:             min-height frontend bám chiều cao canvas, không bám stage
+```
+
+- **Cơ chế:** `style.css` đặt `min-height: 100svh` trên `.skvn-step-slider:not(.skvn-step-slider--height-content)`. Edit gắn `skvn-step-slider--height-viewport`, nên `:not(--height-content)` vẫn khớp. Class `--editor` trước đây không nằm trong selector này. Reset `min-height: 0` ở `editor.css` là (0,3,0), cùng rule với nền card. `block-editor.js` local (WP trong `D:\Github\minhhaifish`) bọc style canvas không-iframe bằng `:where(.editor-styles-wrapper)` (specificity 0). Nhánh iframe (`ExperimentalBlockCanvas`, `shouldIframe` mặc định) không bọc. Vì vậy (0,3,0) lẽ ra thắng (0,2,0) khi cả hai sheet cùng document. Reset đã có trong `build/index.ts.css` mà card vẫn dài, nên người sửa không được coi reset là đủ. Loại `--editor` khỏi rule viewport thì `100svh` không còn phần tử để khớp.
+- **Margin:** `useEditorPreviewFrame` (`src/shared/editor-preview-frame.ts`) chỉ cộng `margin-block-start` khi sibling phía trên cũng có `skvn-editor-preview-frame`, và chỉ khi hai hộp chồng ngang. Block phía dưới không phải frame thì adjustment về 0. Hook không đặt margin dưới.
+- **Không phải:** đổi tỉ lệ stage. 16:9 thấp đi khi hẹp là đúng; phần kéo dài là vỏ card. Không phải `frontend.ts` ghi inline `minHeight` — hàm đó return khi không có `.swiper`, editor không render `.swiper`.
+- **Fixed (source 2026-11-20, chưa build, chưa runtime PASS):** `style.css` thêm `:not(.skvn-step-slider--editor)` vào rule `min-height: 100svh` và vào rule `.skvn-step-slide { height/min-height: 100% }`. `--editor` chỉ có trên `useBlockProps` trong `edit.tsx`, không có trong PHP render. `editor.css` thêm `margin-block-end: 10px` trên card, cùng 10px mà hook đang nhắm giữa hai frame. Frontend đã lưu không đổi.
+- **Chống tái diễn:** Rule viewport (`svh`/`vh`) của block không được khớp root editor. Loại bằng class chỉ editor đặt trên `useBlockProps`, không đè bằng reset `min-height: 0` rồi coi là xong. Khoảng cách với block thường phía dưới là margin của chính card editor. Hook đo frame chỉ lo khoảng giữa hai frame.
+
+### DP-16 — Step slide: FocalPointPicker import sai package làm React #130; getMedia deprecated 6.9 [2026-11-20]
+
+- **Case:** Editor trên `https://minhhaifishery.com/`, console cùng lúc hai dòng. Preview block có thể trắng với `BlockCrashWarning`.
+- **Console:**
+
+```text
+'getMedia' is deprecated since version 6.9. Please use the 'postType', 'attachment' entity via the 'getEntityRecord' function instead.
+Error: Minified React error #130; args[]=undefined&args[]=
+```
+
+- **Nhãn:** #130 = element type không phải string/function. Decoder React 18: `args[]=undefined` là type của element bị `undefined`. Stack minify không nêu tên component. Import sai là quan sát trên source và trên file dist local. Việc chính dòng #130 này đến từ picker là suy luận cho đến khi build mới hết lỗi.
+- **Cơ chế picker:** `src/step-slide/edit.tsx` import `FocalPointPicker` từ `@wordpress/block-editor`. Dist local `wp-includes/js/dist/block-editor.js` không có export `FocalPointPicker`. `wp-includes/js/dist/components.js` có (`FocalPointPicker: () => focal_point_picker_default`). Named import từ package external không có export thì binding là `undefined`, build không báo. Picker chỉ mount khi step đã có ảnh (`hasImage`). Cùng file Hero `src/slide/edit.tsx` import picker từ `@wordpress/components`. Khác DP-06: ở đây component có thật, nhưng nằm package kia.
+- **Cơ chế getMedia:** Cảnh báo là shorthand `select('core').getMedia` bị deprecated từ 6.9. Thay bằng `getEntityRecord( 'postType', 'attachment', id )`. Record attachment vẫn có `source_url` và `alt_text`. Gọi khi không có id thì bỏ qua, không query `0`.
+- **Không phải:** `getMedia` không phải nguyên nhân #130. Deprecation không unmount được block. Các chỗ còn `getMedia` nên cảnh báo có thể còn sau khi step slide đã đổi: `src/slide/edit.tsx`, `src/slider/editor/canvas.tsx`, `src/feature-showcase/edit.tsx`, `src/product-category-grid/details.tsx`.
+- **Fixed (source 2026-11-20, chưa build, chưa runtime PASS):** `step-slide/edit.tsx` import `FocalPointPicker` từ `@wordpress/components`. `useSelect` đọc ảnh bằng `getEntityRecord( 'postType', 'attachment', imageId )`.
+- **Chống tái diễn:** Trước khi import một component Gutenberg, grep tên export trong `wp-includes/js/dist/<package>.js` của runtime đang chạy (`FocalPointPicker:` phải có trong file đó). Hero đã dùng package nào thì step slide dùng đúng package đó. Không gọi `getMedia` trong code mới.
+
+### DP-17 — Đổi default `align` để co thẻ editor làm Step Slider trang chính còn 1200px [2026-11-21]
+
+- **Case:** https://minhhaifishery.com/test-page-2/, viewport 1920×1080. Step Slider từng full hàng. Sau lượt chrome editor, slider rộng 1200px, dính mép trái, khoảng trắng bên phải. Hero Slider ngay dưới vẫn `alignfull`, rộng 1905px.
+- **Số đo:** `.skvn-step-slider` class `alignwide`, `getBoundingClientRect` width 1200, x 0. Hàng `.entry-content` rộng 1905. `--skvn-wide-width` là `1200px`. Body có `skvn-full-width-canvas` và `full-width-content`.
+- **Nhãn nguyên nhân: quan sát source và DOM.** Commit `b80df40` đặt `align.default` là `"full"`. Working tree và `build/step-slider/block.json` trên site (2026-11-21) là `"default": "wide"`. Đổi đó chưa commit. `git blame` dòng default là Not Committed Yet. Phiên editor ghi vào plan 086 như thể human 2026-11-20 chọn wide; human không chốt hướng đó. Human 2026-11-21 chọn hướng 2: trả default `full`.
+- **Cơ chế:** `get_block_wrapper_attributes()` in class từ attribute `align`. Block không lưu khóa `align` lấy default trong `block.json` lúc render. Default `wide` ra `alignwide`. Theme `.skvn-full-width-canvas .entry-content > .alignwide` chặn `max-width: var(--skvn-wide-width)`. Reset full-bleed của plugin chỉ khớp `.alignfull`, nên không còn áp. GeneratePress `.full-width-content .entry-content .alignwide { margin-left: 0 }` thắng `margin: auto` của `.entry-content > *`, nên 1200px dính trái. Phần 1200px là token wide của theme SKVN. GeneratePress chỉ bỏ căn giữa.
+- **Vì sao agent đụng trang chính:** Lượt chrome editor thấy thẻ Full sát hai mép canvas, Hero Slider thì wide. Agent sửa default của block đã phát hành để hai thẻ editor cùng bề ngang. `align` là hợp đồng width của trang chính, không phải kích thước thẻ editor. Thẻ editor rộng bằng canvas cộng padding của `.skvn-step-slider--editor`.
+- **Cơ chế editor `alignwide alignfull` (quan sát DOM 2026-11-22):** Attribute `align: full` + `supports.align` → `useBlockProps()` **merge** class `alignfull` vào `className` của root, kể cả khi `edit.tsx` tự thêm `alignwide`. Root Step Slider: `… alignwide alignfull …`; Hero wide chỉ `alignwide`. Editor Gutenberg áp layout full lên token `alignfull`; `alignwide` thêm vào không thu hẹp thẻ. Chỉ đổi string `className` lúc gọi `useBlockProps` **không đủ** — core vẫn gắn `alignfull` sau merge.
+- **Không phải:** sheet `editor.css` bị nạp ra frontend. Trang test không có `index.ts.css`. Class trên DOM không có `skvn-step-slider--editor`. DP-15 chỉ thêm `:not(--editor)` vào rule chiều cao. Không phải rule 1200px của GeneratePress: rule 1200px là theme SKVN. Bỏ GeneratePress sau này, wide vẫn 1200px.
+- **Fixed (source 2026-11-21, chưa build, chưa runtime PASS):** `src/step-slider/block.json` trả `"default": "full"`. Plan [088](.context/planning/088_VER_1_3_24_STEP_SLIDER_ALIGN_DEFAULT_REPAIR_PLAN.md). Plan 086 bỏ câu default wide. `save` không đổi, không thêm `deprecated`. Block đã lưu `"align":"wide"` hoặc `"align":"full"` giữ giá trị đó. Block không có khóa `align` về full sau bản build mới. Bài đã Update lúc default là wide (test-page-2 nếu toolbar đang Wide) cần chọn Full width rồi Update.
+- **Fixed editor width (source 2026-11-21, chưa build, chưa runtime PASS):** `src/step-slider/edit.tsx` — sau `useBlockProps`, `classNameWithoutAlignment()` bỏ `alignfull`/`alignwide` do core merge từ attribute; rồi `editorAlignmentClass()` chỉ thêm `alignwide` trên `--editor` khi `align` là `full` hoặc `wide`. DOM editor không được còn `alignwide alignfull` cùng lúc. Trang chính: `useBlockProps.save()` + `.entry-content .wp-block-skvn-marine-step-slider.skvn-step-slider.alignfull` trong `src/step-slider/style.css`.
+- **Chống tái diễn:** Không đổi `align.default`, và không `setAttributes({ align })`, để chỉnh bề ngang thẻ editor. Muốn thẻ editor hẹp hơn canvas: sau `useBlockProps`, gỡ mọi `align*` khỏi `className` đã merge (dùng cùng filter như `classNameWithoutAlignment`), rồi gắn class căn lề **editor-only** (ví dụ một `alignwide`); render `className={…}` override, không chỉ nhét `alignwide` vào option `className` của hook. Không dựa vào `editor.css` `max-width` pixel để “chữa” khi DOM còn `alignfull`. Không đụng `save`/`style.css` frontend cho full. Block full màn giữ default `full`. Wide và Full phải vẫn khác nhau trên trang chính. Kiểm editor: root không được `alignwide` và `alignfull` cùng lúc.
