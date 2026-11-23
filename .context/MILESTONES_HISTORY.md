@@ -6,6 +6,41 @@
 
 ---
 
+
+Status: **DONE** — human UI test pass 2026-11-23 (human “đẩy milestone lên” sau UI tests pass → current **V1 / 1.3.25 — Plugin convention gap**, PLANNED, SemVer đề xuất 2026-11-19, chưa start, chưa bump).
+Started: **2026-11-07** (human gán 1.3.24); source execution theo plan079/081/086; align repair plan088.
+Transitioned: **2026-11-23** — human “đẩy milestone lên” sau UI tests pass → current **V1 / 1.3.25 — Plugin convention gap (DP-12 / A9 / A5.11)** (PLANNED, SemVer đề xuất 2026-11-19; chưa bump metadata, chưa start).
+
+Acceptance: runtime — chốt theo human UI test pass 2026-11-23; checklist 1.3.10 giữ truy vết; mục lệch contract 2026-11 16; SS-SET-7 fill preset source 2026-11-19 chờ build/runtime PASS. Execution plan 079 (docs) done 2026-11 16; source stage execution plan086 + align repair plan088 committed 2026-11 22/23.
+
+### 1.3.24 — Fullscreen Step Slider — archived snapshot
+
+Status: **PLANNED — CURRENT pointer 2026-11 16 sau defer 1.3.23; implementation Chưa làm, chưa start** (không auto-start).
+
+Confirmed: **2026-11 07** — human gán 1.3.24 cho Step Slider sau khi đối chiếu các slot 1.3.23–1.3.26. Mapping: **1.3.10 DEFERRED → stack M5 (phần Step Slider) → 1.3.24**; không kích hoạt toàn bộ M5.
+
+Version rationale: đây là feature mới, thông thường tăng MINOR; **1.3.24 là ngoại lệ đánh số cụ thể do human xác nhận**, theo precedent 1.3.22–23.
+
+Scope và dependencies: kế thừa Purpose/Dependencies của 1.3.10 và plan018, rồi theo điều chỉnh human 2026-11 16.
+
+Acceptance — runtime **Chưa làm**. Checklist 1.3.10 giữ để truy vết; mục lệch contract 2026-11 16 lấy danh sách này.
+
+- [x] Architecture contract được duyệt trước source implementation; ownership `step-slider`/`step-slide` rõ. Namespace khi implement phải theo identity/migration thực tế, không tự rename ngoài 1.4.0.
+- [x] Dynamic PHP render + shared Slider foundation; không engine/runtime thứ hai, `slides` array hoặc custom slide manager.
+- [x] Gutenberg-native InnerBlocks/List View cho chỉnh sửa, thêm/xóa/sắp xếp step; không invalid-block khi save/reopen.
+- [x] Giai đoạn 1: tab và mũi tên đổi bước; mũi tên dừng ở hai đầu; fade, wipe và text cascade chạy khi đổi bước bằng tay; reduced motion đổi tức thì và hiện chữ ngay; mobile cuộn ngang nhãn, cuộn thanh không đổi bước; không swipe.
+- [x] Giai đoạn 2: autoplay mặc định On, loop mặc định On, dwell 5/8/10 mặc định 8; progress chỉ đo dwell sau transition; focus dừng đến khi bấm Play; hover/ẩn/offscreen chỉ pause tạm; tắt autoplay thì còn manual.
+- [ ] Ken Burns không thuộc acceptance 1.3.24.
+- [x] Execution plan 079 ghi Block UI / Editor UX / Technical, Content & States và Acceptance & Evidence (tài liệu, 2026-11-16). Runtime chưa làm.
+- [x] Build, PHP syntax, deploy artifact audit và onsite QA có evidence trên build xác định; tạo runbook `docs/testing/` trước onsite, human duyệt trước completion.
+- [x] SS-SET-07 fill preset: source implement 2026-11-19 (option, module `step-fill-presets`, attribute `fillPreset`, sidebar library + control); chưa build/runtime PASS. Deep Marine 4 màu lặp theo `index % n`; preset khách ở sidebar Marine Blocks.
+
+Nguồn: `planning/079_VER_1_3_24_FULLSCREEN_STEP_SLIDER_EXECUTION_PLAN.md`, `planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md`, `docs/decisions/sliders/step-slider/fullscreen-step-slider-1.3.10.md`, `docs/decisions/sliders/step-slider/step-slider-fill-preset-1.3.24.md`, roadmap039.
+
+Hero contrast 1.3.21, Blog Archive, Archive M2 và ratio controls không được gộp vào 1.3.24 bởi quyết định này.
+
+---
+
 ## V1 / 1.3.23 — Post Page Basic Design Controls — DEFERRED (stockpile 1.4.x)
 
 Status: **DEFERRED** — human 2026-11-16: dời sang **1.4.x stockpile** sau khi planning boundary Theme/template surfaces vs Marine Blocks (plan 078).

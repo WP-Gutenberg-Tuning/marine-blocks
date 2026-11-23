@@ -631,18 +631,39 @@ Error: Minified React error #130; args[]=undefined&args[]=
 - **Precedent đúng:** Hero Slider `src/slider/style.css` — pill mặc định chỉ khi `:not(.has-background)`; hover custom qua marker trên wrapper (khoảng dòng 688–702). Step CTA phải bám pattern marker-gated, không chỉ copy snippet Tailwind/artifact.
 - **Không phải:** `button_hover` feature tắt; attribute `skvnHoverBgColor` / `skvnHoverTextColor` không save; người dùng chỉ đổi màu nền/chữ **trạng thái bình thường** (không phải Hover Colors panel).
 - **Fixed (source 2026-11-23, chưa build, chưa runtime PASS):** `src/step-slider/style.css` + `editor.css` — rule custom dùng **cả** `.has-skvn-btn-hover-* .wp-block-button.skvn-cta` (editor ancestor) và `.wp-block-button.skvn-cta.has-skvn-btn-hover-*` (frontend PHP); preset đặt trước, custom specificity cao hơn đè. `src/core-controls/button-hover/index.tsx` — no-op khi handler nhận `undefined`; chỉ clear attribute kênh đối lập khi nhận giá trị truthy mới.
+- **Phân tích (2026-11-23, chưa code):** [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md). Inventory finding: `docs/audits/hover-marker-gradient-panel-pattern-inventory.md`. HMGP-009/010/011 vẫn OPEN; hướng sửa khuyến nghị là A trong plan 089.
 - **Chống tái diễn (agent bắt buộc khi được yêu cầu thêm preset nút / CTA trong block hoặc InnerBlocks):**
   1. Đọc `docs/standards/gutenberg-block-extension-css-contract.md` + grep `has-skvn-btn-hover` / `skvnHover` trong repo trước khi viết `:hover` cố định.
-  2. So **specificity** rule preset với rule marker global và theme; preset scoped thường cao hơn → phải **gate** default hover bằng `:not(.has-skvn-btn-hover-bg)` / `:not(.has-skvn-btn-hover-text)` (tách kênh bg và text để chỉ đổi một bên vẫn giữ default bên kia).
+  2. So **specificity** rule preset với rule marker global và theme; preset scoped thường cao hơn → phải **gate** default hover bằng `:not(.has-skvn-btn-hover-bg)` / `:not(.has-skvn-btn-hover-text)` (tách kênh bg và text để chỉ đổi một bên vẫn giữ default bên kia). **Đính chính 2026-11-23:** gate chỉ trên `.wp-block-button` không thấy marker editor (marker nằm ở ancestor). Mục này đứng một mình vẫn tái hiện lỗi. Làm cùng luật 2 của AP-16.
   3. Thêm rule song song `.has-skvn-btn-hover-bg` / `.has-skvn-btn-hover-text` → `var(--skvn-btn-hover-*)` trên **cả frontend và editor** surface (stage focused / iframe).
   4. Default artifact (hex) chỉ là fallback khi chưa có marker; không `!important` trừ khi có evidence GP/Gutenberg đè và đã thử marker trước.
   5. Acceptance: chọn nút → Hover Colors đổi bg/text → preview editor + trang đã Update phải khớp; xóa hover custom → quay preset demo.
-  6. **Audit định kỳ / handoff agent:** `docs/audits/hover-marker-gradient-panel-pattern-inventory.md` + prompt `docs/workflows/prompts/agent-audit-hover-marker-gradient-panel.md` — mọi finding ghi row HMGP-*; “tương tự” = cùng pattern, không cần y chang file.
+  6. **Audit định kỳ / handoff agent:** inventory `docs/audits/hover-marker-gradient-panel-pattern-inventory.md` + plan [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md) + prompt `docs/workflows/prompts/agent-audit-hover-marker-gradient-panel.md` — mọi finding ghi row HMGP-*; “tương tự” = cùng pattern, không cần y chang file.
 
 ### AP-16 — Thêm CSS preset CTA/nút trong block mà không tích hợp SKVN `core/button` Hover Colors
 
 - **Xảy ra:** 2026-11-23, Step Slide `skvn-cta` theo artifact HTML; agent ship rule `:hover` cứng, human báo không đổi được Hover Colors.
 - **Lỗi của agent:** (1) Chỉ port visual demo (outline + `#4cd964`) mà không đối chiếu Hero precedent và `button-hover` markers. (2) Không kiểm specificity scoped block vs extension. (3) Giả định Inspector Hover Colors “tự hoạt động” vì feature đã bật globally.
-- **Rule:** Mọi task thêm/thiết kế **preset style cho `core/button` bên trong block plugin** (template InnerBlocks, class marketing như `skvn-cta`, slide content, collection card CTA) → coi là **bắt buộc** tích hợp Hover Colors từ đầu (DP-18 checklist), không chỉ sửa sau khi human phàn nàn.
-- **Evidence:** `src/step-slider/style.css` / `editor.css` (trước fix); `src/slider/style.css` Hero marker-gated hover; `modules/core-control/features/button-hover.php`.
-- **Tránh:** Không đóng task “đã có nút mặc định” nếu chưa verify Hover Colors trên cùng nút. Ghi tension chỉ khi product **cố ý** khóa hover (cần human decision), không im lặng đè extension.
+- **Vì sao (2026-11-23, viết lại để làm convention):** Hai owner cùng style một `:hover` của `core/button`. Agent giao hover cho preset của block. Extension Hover Colors bị coi là đã chạy vì panel hiện ra.
+
+  Quan sát, thấy trong source:
+
+  1. Template gắn `className: 'skvn-cta'` lên `core/button` (`src/step-slide/edit.tsx`). CSS block ghi hover `#4cd964`. Cùng lúc extension `button-hover` style mọi `core/button` có marker.
+  2. Gate `:not(.has-skvn-btn-hover-bg)` đặt trên `.wp-block-button`. PHP gắn marker trên chính nút đó (`modules/core-control/features/button-hover.php`). Editor gắn marker lên wrapper `editor.BlockListBlock`, không lên nút (comment `src/core-controls/button-hover/style.css`; contract Quy tắc 2). Trong iframe, nút không bao giờ có class marker, nên preset luôn khớp.
+  3. Contract Quy tắc 2 nói CSS editor không cần specificity cao vì iframe không có rule theme, và ghi selector editor `(0,2,1)`. Câu đó sai. `inc/setup.php` gọi `add_editor_style( 'style.css' )`. Rule editor thực tế là `(0,4,0)`. Preset Step CTA scoped khoảng `(0,6,0)`, cao hơn marker global.
+  4. Hero đã gate hover bằng marker trên wrapper trước khi có Step CTA: `src/slider/style.css` khoảng dòng 676–713.
+  5. Skill `html-2-gutenberg`: màu artifact chỉ là gợi ý, không giữ hex prototype trong output. `#4cd964` vẫn thành rule của block.
+  6. `button_hover` gắn Inspector lên mọi `core/button`. Panel hiện và attribute lưu được không chứng minh rule hover của extension đã thắng.
+  7. `PanelColorGradientSettings` gọi handler kênh không dùng với `undefined` khi đổi tab solid/gradient. Diagnosis 2026-06-23 nằm ở `docs/ideations/button-hover-diagnosis.md`. Handler dạng `value || ''` ghi rỗng và xóa attribute kia. `undefined` không phải user xóa. File ideation không thuộc context bắt buộc khi code block mới, nên handler sau copy lại kiểu xóa cả hai kênh.
+
+  Suy luận, chưa có transcript lượt code: acceptance của task là khớp ảnh artifact, không có bước hover sau khi đổi Hover Colors, nên xanh `#4cd964` bị tính là đúng. Agent không mở `src/slider/style.css` và `button-hover/style.css` vì file task nằm trong Step Slider. Câu contract ở mục 3 khiến iframe trông an toàn.
+
+- **Luật rút được (gán 1.3.25 / WP6, plan 089; digest vào contract CSS extension khi có lệnh code, chưa ghi `CONVENTION.md`):**
+  1. `core/button` trong block plugin có hai owner hover: preset của block và extension `button-hover`. Hex trên artifact chỉ là fallback khi chưa có marker.
+  2. Marker editor và frontend không cùng element. Cấm gate chỉ bằng `:not(.has-skvn-btn-hover-*)` trên `.wp-block-button`. Rule custom phải có selector ancestor (editor) và selector self (frontend). Specificity của rule custom phải cao hơn preset và cao hơn rule theme đang vào iframe.
+  3. Panel Hover Colors hiện ra không phải nghiệm thu. Đổi màu, hover trong editor và trên trang đã Update, rồi xóa custom để preset hiện lại.
+  4. `onColorChange` / `onGradientChange`: `value === undefined` thì return. Chỉ xóa attribute kênh kia khi value mới là truthy.
+  5. Không dùng câu contract “iframe editor không có theme rule, specificity `(0,2,1)` là đủ”. So specificity với `style.css` của theme trước khi chốt selector.
+- **Rule:** Mọi task thêm/thiết kế **preset style cho `core/button` bên trong block plugin** (template InnerBlocks, class marketing như `skvn-cta`, slide content, collection card CTA) → làm theo năm luật ở trên và checklist DP-18 trước khi ship `:hover`, không chỉ sửa sau khi human phàn nàn.
+- **Evidence:** `src/step-slide/edit.tsx` (`skvn-cta`); `src/step-slider/style.css` / `editor.css` (trước fix, `#4cd964`); `src/slider/style.css` Hero marker-gated hover; `modules/core-control/features/button-hover.php`; `src/core-controls/button-hover/style.css`; `inc/setup.php` `add_editor_style`; `docs/standards/gutenberg-block-extension-css-contract.md` Quy tắc 2; `docs/ideations/button-hover-diagnosis.md`. Plan sửa phần theme còn OPEN: [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md).
+- **Tránh:** Không đóng task “đã có nút mặc định” nếu chưa verify Hover Colors trên cùng nút. Ghi tension chỉ khi product **cố ý** khóa hover (cần human decision), không im lặng đè extension. Năm luật thuộc 1.3.25 WP6: khi code thì ghi vào `docs/standards/gutenberg-block-extension-css-contract.md`. Không digest cả pitfall sang `CONVENTION.md` trong lượt gán scope.

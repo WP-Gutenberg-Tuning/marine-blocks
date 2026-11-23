@@ -8,8 +8,9 @@
 
 ## Current Milestone
 
-Current: **V1 / 1.3.24 — Fullscreen Step Slider**
-Status: **PLANNED — pointer only; chưa start, chưa có runtime evidence**
+Current: **V1 / 1.3.25 — Plugin convention gap (DP-12 / A9 / A5.11)**
+Status: **PLANNED — SemVer đề xuất 2026-11-19; chưa start, chưa có runtime evidence**
+Human transition **2026-11-23:** 1.3.24 → **DONE** (human UI test pass 2026-11-23); current chuyển **V1 / 1.3.25 — Plugin convention gap** (PLANNED, SemVer đề xuất 2026-11-19; chưa bump metadata, chưa start).
 Human transition **2026-11-16 (sáng):** 1.3.22 → DONE_WITH_CARRY_OVER; mở **1.3.23** (metadata bump-only `1.3.23`, implementation Chưa làm).
 Human transition **2026-11-16 (boundary):** defer **1.3.23 — Post Page Basic Design Controls** → **stockpile 1.4.x**; lý do: chưa chốt tách Theme/template surfaces vs Block (plan [078](planning/078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md), decision `docs/decisions/template-surface-theme-block-boundary.md`). **Không auto-start 1.3.24**; coding cần lệnh human. Working metadata có thể vẫn `1.3.23` cho đến bump lần tới — không bắt buộc rollback bump.
 Carry register và deferred baseline **1.3.20** vẫn áp dụng trước follow-up runtime không liên quan. Carry1.3.22 (PDP Related B/C) → **1.4.x** giữ nguyên.
@@ -1041,45 +1042,25 @@ Acceptance draft — tất cả **Chưa làm**, chưa có runtime evidence:
 
 Rationale tách mốc: Product cần QA Woo gallery/specs/Request Quote; Post cần QA nội dung Gutenberg và reading UX. Mỗi surface có evidence nghiệm thu độc lập, giảm phạm vi regression của từng lượt.
 
-### 1.3.24 — Fullscreen Step Slider
-
-Status: **PLANNED — CURRENT pointer 2026-11-16 sau defer 1.3.23; implementation Chưa làm, chưa start** (không auto-start).
-Confirmed: **2026-11-07** — human gán 1.3.24 cho Step Slider sau khi đối chiếu các slot 1.3.23–1.3.26. Mapping: **1.3.10 DEFERRED → stack M5 (phần Step Slider) → 1.3.24**; không kích hoạt toàn bộ M5.
-
-Version rationale: đây là feature mới, thông thường tăng MINOR; **1.3.24 là ngoại lệ đánh số cụ thể do human xác nhận**, theo precedent 1.3.22–23. Slot chưa được gán trước quyết định này; không đè scope khác hoặc đổi Version Naming Rule. Dòng “current giữ 1.3.20” là lịch sử lúc chốt version 2026-11-07. Pointer hiện tại là 1.3.24; chưa start, chưa bump metadata.
-
-Scope và dependencies: kế thừa Purpose/Dependencies của 1.3.10 và plan018, rồi theo điều chỉnh human 2026-11-16. Block family Step Slider/Step Slide riêng, bottom tabs, shared dynamic Slider foundation/Swiper, native InnerBlocks/List View. Không tạo engine hoặc slide manager thứ hai. Hai giai đoạn dev nằm trong cùng milestone: (1) manual + fade + wipe + text cascade; (2) autoplay mặc định On, loop mặc định On, manual vẫn là tắt autoplay. Ken Burns deferred. Handoff code: plan 079. Source vẫn cần lệnh implement riêng.
-
-Acceptance — runtime **Chưa làm**. Checklist 1.3.10 giữ để truy vết; mục lệch contract 2026-11-16 lấy danh sách này.
-
-- [ ] Architecture contract được duyệt trước source implementation; ownership `step-slider`/`step-slide` rõ. Namespace khi implement phải theo identity/migration thực tế, không tự rename ngoài 1.4.0.
-- [ ] Dynamic PHP render + shared Slider foundation; không engine/runtime thứ hai, `slides` array hoặc custom slide manager.
-- [ ] Gutenberg-native InnerBlocks/List View cho chỉnh sửa, thêm/xóa/sắp xếp step; không invalid-block khi save/reopen.
-- [ ] Giai đoạn 1: tab và mũi tên đổi bước; mũi tên dừng ở hai đầu; fade, wipe và text cascade chạy khi đổi bước bằng tay; reduced motion đổi tức thì và hiện chữ ngay; mobile cuộn ngang nhãn, cuộn thanh không đổi bước; không swipe.
-- [ ] Giai đoạn 2: autoplay mặc định On, loop mặc định On, dwell 5/8/10 mặc định 8; progress chỉ đo dwell sau transition; focus dừng đến khi bấm Play; hover/ẩn/offscreen chỉ pause tạm; tắt autoplay thì còn manual.
-- [ ] Ken Burns không thuộc acceptance 1.3.24.
-- [x] Execution plan 079 ghi Block UI / Editor UX / Technical, Content & States và Acceptance & Evidence (tài liệu, 2026-11-16). Runtime chưa làm.
-- [ ] Build, PHP syntax, deploy artifact audit và onsite QA có evidence trên build xác định; tạo runbook `docs/testing/` trước onsite, human duyệt trước completion.
-- [ ] SS-SET-07 fill preset: source implement 2026-11-19 (option, module `step-fill-presets`, attribute `fillPreset`, sidebar library + control); chưa build/runtime PASS. Deep Marine 4 màu lặp theo `index % n`; preset khách ở sidebar Marine Blocks.
-
-Nguồn: `planning/079_VER_1_3_24_FULLSCREEN_STEP_SLIDER_EXECUTION_PLAN.md`, `planning/018_VERSION_1_3_10_FULLSCREEN_STEP_SLIDER_PLANNING.md`, `docs/decisions/sliders/step-slider/fullscreen-step-slider-1.3.10.md`, `docs/decisions/sliders/step-slider/step-slider-fill-preset-1.3.24.md`, roadmap039. Giữ filename cũ để bảo toàn liên kết. Hero contrast 1.3.21, Blog Archive, Archive M2 và ratio controls không được gộp vào 1.3.24 bởi quyết định này.
-
 ### 1.3.25 — Plugin convention gap (DP-12 / A9 / A5.11)
 
-Status: **PLANNED — SemVer đề xuất 2026-11-19; không phải current; chưa start.**  
-Confirmed SemVer (đề xuất): human **2026-11-19** — current **1.3.24 + 1**. Slot 1.3.25 chưa gán trước đó. Không đổi Current, không bump metadata, không implement cho đến lệnh start.
+Status: **PLANNED — current từ 2026-11-23; chưa start, chưa bump.**  
+Confirmed SemVer: human **2026-11-19** — current lúc đó **1.3.24 + 1**. Transition current: header file này, 2026-11-23. Chưa implement cho đến lệnh start.
 
-Version rationale: **PATCH** — hardening plugin (width/alignfull reset, chrome Accordion/Card Grid vào zip, SelectControl/optional attr, enqueue heading-number, runtime `wp.components`). Không feature surface mới. Hàng sau 1.3.24; không đè 1.3.24 Step Slider, không gộp 1.4.0 rename.
+Version rationale: **PATCH** — hardening plugin (width/alignfull reset, chrome Accordion/Card Grid vào zip, SelectControl/optional attr, enqueue heading-number, runtime `wp.components`). Không feature surface mới. Không gộp 1.4.0 rename.
 
-Scope: plan [084](planning/084_VER_1_3_25_PLUGIN_CONVENTION_GAP_AUDIT.md) WP1–WP5. Loại trừ Step Slider. PCA-01–21; HIGH = PCA-01–05.
+Scope: plan [084](planning/084_VER_1_3_25_PLUGIN_CONVENTION_GAP_AUDIT.md) WP1–WP6. Loại trừ sửa file Step Slider. PCA-01–21; HIGH = PCA-01–05.
+
+Scope addition **2026-11-23:** Hover Colors thắng preset theme, và năm luật AP-16. Plan [089](planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md) = WP6. HMGP-009/010/011 vẫn OPEN đến khi code. Hướng A. Chưa digest `CONVENTION.md`.
 
 Acceptance — tất cả **Chưa làm**:
 
 - [ ] PCA-HIGH: plugin-only (không theme SKVN / không `body.skvn-full-width-canvas`) Slider + Collection `full` + Feature Showcase `full` không GP bleed; Accordion + Card Grid chrome đi cùng zip plugin.
 - [ ] WP3: SelectControl fallback; optional attrs có danh sách hoặc default đã chốt A5.10.
 - [ ] WP4: heading-number frontend enqueue; runtime check `PluginDocumentSettingPanel` trên WP đích.
-- [ ] Không sửa GeneratePress; không sửa Step Slider; không global replace `skvn`.
-- [ ] Start/bump/chuyển current cần lệnh human sau 1.3.24.
+- [ ] WP6: HMGP-009/010/011 source theo plan 089 hướng A; contract Quy tắc 2 hết câu “iframe không có theme rule”; năm luật AP-16 nằm trong contract đó. Chưa runtime PASS.
+- [ ] Không sửa GeneratePress; không sửa file Step Slider; không global replace `skvn`.
+- [ ] Bump metadata cần lệnh human riêng. Start code cần lệnh riêng.
 
 ### 1.4.3 — Interactive Illustrated Map
 

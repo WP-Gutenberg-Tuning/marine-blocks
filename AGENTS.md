@@ -1,4 +1,4 @@
-# AGENTS.md — SKVN Marine
+﻿# AGENTS.md — SKVN Marine
 
 > Đọc file này TRƯỚC KHI làm bất kỳ task nào.
 > Đây là protocol bắt buộc cho mọi AI agent làm việc trong project này.
@@ -7,7 +7,11 @@
 
 ## 0. Milestone hiện tại
 
-Current milestone: **V1 / 1.3.24 — Fullscreen Step Slider** (PLANNED pointer only — **chưa start**, không auto-start)
+Current milestone: **V1 / 1.3.25 — Plugin convention gap (DP-12 / A9 / A5.11)** (PLANNED — chưa start, chưa bump)
+
+Human transition 2026-11-23: 1.3.24 → DONE (UI test pass cùng ngày). Scope addition cùng ngày: WP6 hover marker / năm luật AP-16, plan [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md). Chưa code. Không bump metadata trừ lệnh riêng.
+
+(lịch sử, superseded bởi transition 2026-11-23) Current milestone trước đó: **V1 / 1.3.24 — Fullscreen Step Slider** (PLANNED pointer only — **chưa start**, không auto-start)
 
 Human transition2026-11-16: 1.3.22 DONE_WITH_CARRY_OVER (tạm PASS); bump-only mở **1.3.23** rồi **cùng ngày defer 1.3.23 — Post Page Basic Design Controls → stockpile 1.4.x** vì chưa chốt tách Theme/template surfaces vs Block. Planning gate: [078](.context/planning/078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md); decision `docs/decisions/template-surface-theme-block-boundary.md`. POST-* và GATE-078 tại MILESTONES §1.3.23 + §1.4.x stockpile. **Không** implement Post / không copy 067 P3 Theme Design cho Post cho đến khi human chốt 078 SURFACE-01/02. Current pointer **1.3.24** chỉ là hàng tiếp theo trong roadmap; coding 1.3.24 cần lệnh human. Metadata repo có thể vẫn `1.3.23` working build — không bắt buộc bump ngay. Agent không build/lint/deploy/git remote push trừ lệnh. Deferred baseline **1.3.20** vẫn nhắc trước follow-up runtime khác.
 
@@ -765,7 +769,7 @@ Mỗi task đưa cho AI nên có đủ 6 phần:
 | 1.3.22 | Product Page Basic Design Controls + PDP Related plan076/077 — DONE_WITH_CARRY_OVER (tạm PASS theo human 2026-11-16; rework 1.4.x) |
 | 1.3.23 | Post Page Basic Design Controls — **deferred → 1.4.x stockpile** (boundary plan 078) |
 | 1.3.24 | Fullscreen Step Slider — **current pointer** (PLANNED, chưa start) |
-| 1.3.25 | Plugin convention gap (DP-12 / A9 / A5.11) — SemVer đề xuất 2026-11-19, chưa start, không phải current |
+| 1.3.25 | Plugin convention gap (DP-12 / A9 / A5.11) + WP6 hover marker / AP-16 (plan 089) — current từ 2026-11-23, PLANNED, chưa start |
 | 1.4.1 | SKVN Theme Init Setup UI |
 | 1.4.2 | Layout Blocks Validation & Quote Evaluation |
 | 1.5.0 | Woo Catalog Plugin |

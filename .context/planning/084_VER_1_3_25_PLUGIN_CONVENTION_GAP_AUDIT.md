@@ -1,9 +1,9 @@
 # V1 / 1.3.25 — Plugin convention gap audit
 
 Created: **2026-11-19**.  
-Status: **PLANNED — SemVer đề xuất; chưa start, không phải current.**  
-Current pointer giữ **V1 / 1.3.24 — Fullscreen Step Slider**.  
-Human **2026-11-19:** lấy current + 1 → **1.3.25**. Slot **1.3.25 chưa dùng** (grep repo). Không implement, không bump metadata, không start 1.4.0 rename, không đụng Step Slider.
+Status: **PLANNED — current từ 2026-11-23; chưa start.**  
+Current: **V1 / 1.3.25 — Plugin convention gap**.  
+Human **2026-11-19:** lấy current lúc đó + 1 → **1.3.25**. Human **2026-11-23:** chuyển current sang 1.3.25 và gán thêm WP6 (plan 089, AP-16). Không implement, không bump metadata, không start 1.4.0 rename, không đụng file Step Slider.
 
 **PATCH rationale:** hardening CSS/width/chrome/enqueue/Inspector theo DP-12, A9, A5.11 — không thêm block hay product surface. Không tăng MINOR.
 
@@ -94,7 +94,7 @@ Severity: **HIGH** = sai khi chỉ cài plugin hoặc width `alignfull`/`alignwi
 
 ## Work packages (1.3.25)
 
-Mỗi gói ≤ ~5 file. SemVer đề xuất: **1.3.25 PATCH**, hàng tiếp theo sau current **1.3.24**. Start / chuyển current / bump metadata cần lệnh human riêng sau khi 1.3.24 xong.
+Mỗi gói ≤ ~5 file. SemVer: **1.3.25 PATCH**. Current đã là 1.3.25 (2026-11-23). Start code và bump metadata cần lệnh human riêng.
 
 ### WP1 — Alignfull/wide plugin reset (P0 width)
 
@@ -121,6 +121,15 @@ Mỗi gói ≤ ~5 file. SemVer đề xuất: **1.3.25 PATCH**, hàng tiếp theo
 
 - `skvn-marine-blocks.php` header `Tested up to`; `readme.txt` tối thiểu; PCA-14 comment `!important`; PCA-16 RTL không bắt buộc cùng mốc.
 
+### WP6 — Hover marker cascade + luật AP-16 (2026-11-23)
+
+Human gán cùng 1.3.25. Spec: [089](089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md). Chưa code.
+
+- Việc: hướng A trong plan 089 (selector marker editor + frontend, `!important` chỉ trên `color` / `background` của rule marker). Sửa câu sai ở contract Quy tắc 2 (iframe có theme `style.css`; `(0,2,1)` không đủ). Ghi năm luật AP-16 vào contract đó khi code. Không digest cả pitfall sang `CONVENTION.md` trong lượt gán scope.
+- Files: `src/core-controls/button-hover/style.css`, `modules/core-control/features/button-hover.php`, `docs/standards/gutenberg-block-extension-css-contract.md`, bullet DP-18, inventory HMGP-009/010/011.
+- PCA-20 nói selector editor button-hover “đúng contract”. WP6 thay câu đó: selector hiện `(0,4,0)` hòa preset theme trong iframe. Không migrate hex hover (phần PCA-20 còn lại giữ).
+- Acceptance: HMGP-009, 010, 011 source FIXED, chưa runtime PASS. Nút chưa có marker giữ preset. Step CTA không sửa file Step Slider.
+
 ---
 
 ## Tensions / conflicts
@@ -145,7 +154,7 @@ OPEN tensions đã đọc (không filter): Polylang V1; Slider Inter; T-DEMO-1/2
 - Implement 1.3.24, chuyển current sang 1.3.25, bump metadata, start 1.4.0 Marine Blocks rename
 - GeneratePress parent
 - PDP Woo loop swap (DP-11)
-- Digest PITFALL (không được yêu cầu)
+- Digest cả file PITFALL sang `CONVENTION.md` (WP6 chỉ năm luật AP-16, vào contract CSS extension, khi có lệnh code)
 - Agent `npm run build` / lint
 
 ---
