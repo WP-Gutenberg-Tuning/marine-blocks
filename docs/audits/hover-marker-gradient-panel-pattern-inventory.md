@@ -147,3 +147,4 @@ Quy tắc cột **Status:** `OPEN` (cần sửa) · `FIXED` (đã merge, ghi com
 - Prompt handoff (copy cho agent khác): `docs/workflows/prompts/agent-audit-hover-marker-gradient-panel.md`
 - Pitfall: `.context/PITFALLS.md` → DP-18, AP-16
 - Plan sửa 009/010/011 (chưa code): `.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md`
+- Prompt rà lại WP6 (chưa code): `docs/workflows/prompts/agent-handoff-1.3.25-wp6-hover-marker-reaudit.md`

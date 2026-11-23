@@ -123,7 +123,7 @@ Mỗi gói ≤ ~5 file. SemVer: **1.3.25 PATCH**. Current đã là 1.3.25 (2026-
 
 ### WP6 — Hover marker cascade + luật AP-16 (2026-11-23)
 
-Human gán cùng 1.3.25. Spec: [089](089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md). Chưa code.
+Human gán cùng 1.3.25. Spec: [089](089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md). Rà lại trước khi code: `docs/workflows/prompts/agent-handoff-1.3.25-wp6-hover-marker-reaudit.md`. Chưa code.
 
 - Việc: hướng A trong plan 089 (selector marker editor + frontend, `!important` chỉ trên `color` / `background` của rule marker). Sửa câu sai ở contract Quy tắc 2 (iframe có theme `style.css`; `(0,2,1)` không đủ). Ghi năm luật AP-16 vào contract đó khi code. Không digest cả pitfall sang `CONVENTION.md` trong lượt gán scope.
 - Files: `src/core-controls/button-hover/style.css`, `modules/core-control/features/button-hover.php`, `docs/standards/gutenberg-block-extension-css-contract.md`, bullet DP-18, inventory HMGP-009/010/011.

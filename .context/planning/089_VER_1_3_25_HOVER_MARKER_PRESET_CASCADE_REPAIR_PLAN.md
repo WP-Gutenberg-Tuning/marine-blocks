@@ -7,7 +7,9 @@ Human **2026-11-23:** gộp plan này vào **1.3.25**, cùng convention gap (DP-
 
 Nguồn: audit Pattern A pass 2 cùng ngày, inventory `docs/audits/hover-marker-gradient-panel-pattern-inventory.md`. Pitfall DP-18, AP-16. Contract CSS: `docs/standards/gutenberg-block-extension-css-contract.md` Quy tắc 1–2.
 
-Human 2026-11-23: lập plan, lưu plan, rồi gán vào 1.3.25. Chưa nói `implement` / `làm A` trong lượt gán scope. Hướng A vẫn là khuyến nghị. Hướng B còn mở cho đến lệnh code.
+Human 2026-11-23: lập plan, lưu plan, rồi gán vào 1.3.25. Hướng A vẫn là khuyến nghị. Hướng B còn mở cho đến lệnh code.
+
+Prompt rà lại, chưa code: `docs/workflows/prompts/agent-handoff-1.3.25-wp6-hover-marker-reaudit.md`.
 
 ---
 

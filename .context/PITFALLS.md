@@ -638,7 +638,7 @@ Error: Minified React error #130; args[]=undefined&args[]=
   3. Thêm rule song song `.has-skvn-btn-hover-bg` / `.has-skvn-btn-hover-text` → `var(--skvn-btn-hover-*)` trên **cả frontend và editor** surface (stage focused / iframe).
   4. Default artifact (hex) chỉ là fallback khi chưa có marker; không `!important` trừ khi có evidence GP/Gutenberg đè và đã thử marker trước.
   5. Acceptance: chọn nút → Hover Colors đổi bg/text → preview editor + trang đã Update phải khớp; xóa hover custom → quay preset demo.
-  6. **Audit định kỳ / handoff agent:** inventory `docs/audits/hover-marker-gradient-panel-pattern-inventory.md` + plan [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md) + prompt `docs/workflows/prompts/agent-audit-hover-marker-gradient-panel.md` — mọi finding ghi row HMGP-*; “tương tự” = cùng pattern, không cần y chang file.
+  6. **Audit định kỳ / handoff agent:** inventory `docs/audits/hover-marker-gradient-panel-pattern-inventory.md` + plan [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md) + prompt rà WP6 `docs/workflows/prompts/agent-handoff-1.3.25-wp6-hover-marker-reaudit.md` + prompt pattern `docs/workflows/prompts/agent-audit-hover-marker-gradient-panel.md` — mọi finding ghi row HMGP-*; “tương tự” = cùng pattern, không cần y chang file.
 
 ### AP-16 — Thêm CSS preset CTA/nút trong block mà không tích hợp SKVN `core/button` Hover Colors
 
