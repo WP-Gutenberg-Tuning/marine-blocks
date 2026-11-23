@@ -6,6 +6,7 @@
 
 ---
 
+## V1 / 1.3.24 — Fullscreen Step Slider — DONE (human UI test pass 2026-11-23)
 
 Status: **DONE** — human UI test pass 2026-11-23 (human “đẩy milestone lên” sau UI tests pass → current **V1 / 1.3.25 — Plugin convention gap**, PLANNED, SemVer đề xuất 2026-11-19, chưa start, chưa bump).
 Started: **2026-11-07** (human gán 1.3.24); source execution theo plan079/081/086; align repair plan088.
