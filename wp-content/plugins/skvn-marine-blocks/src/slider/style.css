@@ -701,6 +701,19 @@
 	color: var( --skvn-btn-hover-text );
 }
 
+/* Editor preview: BlockListBlock injects has-skvn-btn-hover-* on the outer
+   wrapper, not necessarily on .wp-block-button itself. Ancestor selector
+   mirrors the frontend self-marker rule so custom hover shows in preview. */
+.skvn-slider--hero .has-skvn-btn-hover-bg .wp-block-button .wp-block-button__link:hover,
+.skvn-slider--hero .has-skvn-btn-hover-bg .wp-block-button .wp-block-button__link:focus-visible {
+	background: var( --skvn-btn-hover-bg );
+}
+
+.skvn-slider--hero .has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:hover,
+.skvn-slider--hero .has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:focus-visible {
+	color: var( --skvn-btn-hover-text );
+}
+
 .skvn-slider--product-showcase .skvn-slide {
 	background: #f4f8fa;
 	color: #073b5a;

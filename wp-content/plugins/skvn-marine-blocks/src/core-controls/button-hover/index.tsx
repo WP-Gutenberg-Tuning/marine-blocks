@@ -77,11 +77,14 @@ addFilter(
 											skvnHoverTextColor || undefined,
 										onColorChange: (
 											value: string | undefined
-										) =>
+										) => {
+											if ( value === undefined ) {
+												return;
+											}
 											setAttributes( {
-												skvnHoverTextColor:
-													value ?? '',
-											} ),
+												skvnHoverTextColor: value,
+											} );
+										},
 										label: __(
 											'Text',
 											'skvn-marine-blocks'
@@ -94,19 +97,30 @@ addFilter(
 											skvnHoverBgGradient || undefined,
 										onColorChange: (
 											value: string | undefined
-										) =>
+										) => {
+											if ( value === undefined ) {
+												return;
+											}
 											setAttributes( {
-												skvnHoverBgColor: value || '',
-												skvnHoverBgGradient: '',
-											} ),
+												skvnHoverBgColor: value,
+												...( value
+													? { skvnHoverBgGradient: '' }
+													: {} ),
+											} );
+										},
 										onGradientChange: (
 											value: string | undefined
-										) =>
+										) => {
+											if ( value === undefined ) {
+												return;
+											}
 											setAttributes( {
-												skvnHoverBgGradient:
-													value || '',
-												skvnHoverBgColor: '',
-											} ),
+												skvnHoverBgGradient: value,
+												...( value
+													? { skvnHoverBgColor: '' }
+													: {} ),
+											} );
+										},
 										label: __(
 											'Background',
 											'skvn-marine-blocks'

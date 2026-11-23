@@ -293,27 +293,22 @@ export const Edit = memo( function SlideEdit( {
 													'Fill',
 													'skvn-marine-blocks'
 												),
-												onColorChange: (
-													value: string | undefined
-												) =>
+												onColorChange: ( value: string | undefined ) => {
+													if ( value === undefined ) return;
 													setAttributes( {
-														backgroundFillColor:
-															value || '',
-														backgroundFillGradient:
-															'',
-														backgroundFillMode:
-															'custom',
-													} ),
-												onGradientChange: (
-													value: string | undefined
-												) =>
+														backgroundFillColor: value,
+														...( value ? { backgroundFillGradient: '' } : {} ),
+														backgroundFillMode: 'custom',
+													} );
+												},
+												onGradientChange: ( value: string | undefined ) => {
+													if ( value === undefined ) return;
 													setAttributes( {
-														backgroundFillGradient:
-															value || '',
-														backgroundFillColor: '',
-														backgroundFillMode:
-															'custom',
-													} ),
+														backgroundFillGradient: value,
+														...( value ? { backgroundFillColor: '' } : {} ),
+														backgroundFillMode: 'custom',
+													} );
+												},
 											},
 										] }
 										title={ __(
