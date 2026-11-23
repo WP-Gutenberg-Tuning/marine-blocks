@@ -7,6 +7,11 @@
 mà không có error. Document này rút ra từ retrospective
 `.context/planning/archives/033_VER_1_3_8_CORE_BUTTON_HOVER_FIX_PLAN.md`.
 
+**Case study thứ hai (2026-11-23):** WP6 — preset theme thắng Hover Colors trong editor
+(hòa specificity) và bằng `!important` trên frontend; câu sai của Quy tắc 2 về iframe.
+Xem `.context/PITFALLS.md` DP-18/AP-16, plan 089/090 và inventory
+`docs/audits/hover-marker-gradient-panel-pattern-inventory.md`.
+
 ---
 
 ## Quy tắc 1 — Specificity trước, CSS sau
@@ -19,10 +24,14 @@ mà không có error. Document này rút ra từ retrospective
 4. Plugin rule **phải có specificity ≥ rule đó**
 
 ```
-Theme rule: .wp-block-button.skvn-button--primary .wp-block-button__link:hover → 0,3,1
-Plugin cần: ≥ 0,3,1
-Dùng:       .wp-block-button.has-skvn-button-hover .wp-block-button__link:hover → 0,3,1 ✅
+Theme rule: .wp-block-button.skvn-button--primary .wp-block-button__link:hover → (0,4,0)
+Plugin cần: ≥ (0,4,0)
+Dùng:       .wp-block-button.has-skvn-button-hover .wp-block-button__link:hover → (0,4,0) ✅
 ```
+
+Cách đếm: pseudo-class (`:hover`, `:focus-visible`, `:not(.x)`) cộng vào ô class;
+`:not(.x)` mang specificity của `.x`. `!important` không tăng specificity — nó thắng
+declaration không `!important` trên cùng property.
 
 Nếu plugin rule thấp hơn → vars inject đúng nhưng màu không đổi → **silent failure**.
 
@@ -41,6 +50,19 @@ if ( ! str_contains( $classes, 'has-skvn-button-hover' ) ) {
 /* CSS: class trên cùng element → tăng specificity mà không dùng !important */
 .wp-block-button.has-skvn-button-hover .wp-block-button__link:hover { … }
 ```
+
+### Khi nào được dùng `!important` trên rule marker
+
+Specificity không thắng được declaration `!important` của theme/external trên cùng property.
+Khi preset theme khóa đúng property đó bằng `!important` (bằng chứng file:line, ví dụ
+`.skvn-button--white` trong theme SKVN), rule marker được phép `!important` **chỉ trên
+property bị khóa**, với điều kiện:
+
+- Không `!important` trên `transition` hay property không bị khóa.
+- Comment tại chỗ cite bằng chứng (ID pitfall/inventory/plan).
+- Sửa câu contract cấm tuyệt đối trong cùng lượt code — không âm thầm thêm `!important`.
+
+Case: WP6 / HMGP-010 — plan 089/090, marker `(0,6,0) !important` chỉ trên `color`/`background`.
 
 ---
 
@@ -68,7 +90,7 @@ không phải vào `.wp-block-button`:
 
 ```html
 <!-- Editor: class ở NGOÀI .wp-block-button ❌ cho selector frontend -->
-<div class="block-editor-block-list__block has-skvn-button-hover" style="--skvn-btn-hover-text:#fff">
+<div class="block-editor-block-list__block wp-block has-skvn-button-hover" style="--skvn-btn-hover-text:#fff">
   <div class="wp-block-button">          <!-- ← không có class -->
     <a class="wp-block-button__link">Button</a>
   </div>
@@ -81,10 +103,14 @@ Selector `.wp-block-button.has-skvn-button-hover` **KHÔNG match** trong editor.
 
 | Context | Selector | Specificity |
 |---|---|---|
-| Frontend CSS (PHP `wp_add_inline_style`) | `.wp-block-button.has-skvn-button-hover .wp-block-button__link:hover` | 0,3,1 |
-| Editor CSS (`src/*/style.css` import) | `.has-skvn-button-hover .wp-block-button .wp-block-button__link:hover` | 0,2,1 |
+| Frontend CSS (PHP `wp_add_inline_style`) | `.wp-block-button.has-skvn-button-hover.has-skvn-btn-hover-text .wp-block-button__link.wp-element-button:hover` | (0,6,0) |
+| Editor CSS (`src/*/style.css` import) | `.wp-block.has-skvn-button-hover.has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:hover` | (0,6,0) |
 
-Editor CSS không cần specificity cao — không có theme rules xung đột trong editor iframe.
+Editor iframe **có theme rules** khi theme gọi `add_editor_style()` (SKVN: `inc/setup.php` →
+`add_editor_style( 'style.css' )`). Rule marker editor phải có specificity ≥ rule theme mạnh
+nhất trên element đó, và `!important` đúng property khi preset theme khóa property đó bằng
+`!important` (Quy tắc 1). Câu cũ “Editor CSS không cần specificity cao — không có theme rules
+xung đột trong editor iframe” và số đếm `(0,2,1)` là sai; đã sửa trong WP6 (2026-11-23, plan 089/090).
 
 **CSS vars vẫn inherit** từ outer wrapper xuống tất cả descendants — đó là lý do
 injecting vars qua `wrapperProps.style` vẫn hoạt động; chỉ consuming selector cần khác.
@@ -187,6 +213,29 @@ Dùng `PanelColorGradientSettings` (palette-based) để tránh alpha tự do.
 
 ---
 
+## Quy tắc 7 — Preset CTA/nút trong block plugin phải tích hợp Hover Colors (AP-16)
+
+Nguồn: `.context/PITFALLS.md` AP-16 + DP-18; plan 089/090 (1.3.25 WP6). Áp dụng cho mọi task
+thêm/thiết kế preset style cho `core/button` bên trong block plugin (template InnerBlocks,
+class marketing như `skvn-cta`, slide content, collection card CTA).
+
+1. `core/button` trong block plugin có hai owner hover: preset của block và extension
+   `button-hover`. Hex trên artifact chỉ là fallback khi chưa có marker.
+2. Marker editor và frontend không cùng element. Cấm gate chỉ bằng
+   `:not(.has-skvn-btn-hover-*)` trên `.wp-block-button`. Rule custom phải có selector ancestor
+   (editor) và selector self (frontend). Specificity của rule custom phải cao hơn preset và
+   cao hơn rule theme đang vào iframe.
+3. Panel Hover Colors hiện ra không phải nghiệm thu. Đổi màu, hover trong editor và trên trang
+   đã Update, rồi xóa custom để preset hiện lại.
+4. `onColorChange` / `onGradientChange`: `value === undefined` thì return. Chỉ xóa attribute
+   kênh kia khi value mới là truthy.
+5. Không dùng câu “iframe editor không có theme rule, specificity `(0,2,1)` là đủ”.
+   So specificity với `style.css` của theme trước khi chốt selector.
+
+Làm theo năm luật này và checklist DP-18 trước khi ship `:hover`, không chỉ sửa sau khi human phàn nàn.
+
+---
+
 ## Checklist trước khi submit block extension CSS
 
 ```
@@ -200,4 +249,8 @@ Dùng `PanelColorGradientSettings` (palette-based) để tránh alpha tự do.
 [ ] Test gọi transform function với mock HTML, assert output — không chỉ grep source
 [ ] Sanitize PHP chọn đúng hàm cho kiểu giá trị (hex / gradient / palette)
 [ ] Pivot cơ chế specificity phải atomic — bỏ cái cũ và thêm cái mới trong cùng commit
+[ ] Editor iframe: đã so specificity với theme style.css (add_editor_style), không giả định “không có theme rule”
+[ ] !important chỉ trên property preset theme khóa !important, có comment bằng chứng
+[ ] Preset core/button trong block: dual selector ancestor + self, marker-gated, hex artifact chỉ fallback (Quy tắc 7)
+[ ] PanelColorGradientSettings: guard undefined, chỉ clear sibling khi truthy
 ```

@@ -42,18 +42,22 @@ function skvn_marine_blocks_enqueue_button_hover_frontend_style(): void {
 	wp_enqueue_style( 'skvn-marine-core-button-hover' );
 
 	// Gated rules: only override the property that was actually configured.
-	// has-skvn-btn-hover-text/-bg are added by the render filter per-button,
-	// so a text-only button never has its background forced (no inherit reset).
-	// Selector carries .wp-element-button to beat WP global-styles
-	// (.wp-element-button:hover) and the slider hero base rule.
+	// has-skvn-button-hover + has-skvn-btn-hover-text/-bg are added by the
+	// render filter per-button, so a text-only button never has its background
+	// forced (no inherit reset). Selector carries .wp-element-button to beat WP
+	// global-styles (.wp-element-button:hover) and the slider hero base rule.
+	// (0,6,0) + !important on color/background ONLY: theme presets lock those
+	// channels with !important (HMGP-010) and tie the editor at (0,4,0)
+	// (HMGP-009/011). Plans 089/090; contract Quy tắc 1–2. Transition stays
+	// without !important.
 	$css = '
-.wp-block-button.has-skvn-btn-hover-text .wp-block-button__link.wp-element-button:hover,
-.wp-block-button.has-skvn-btn-hover-text .wp-block-button__link.wp-element-button:focus-visible {
-	color: var(--skvn-btn-hover-text);
+.wp-block-button.has-skvn-button-hover.has-skvn-btn-hover-text .wp-block-button__link.wp-element-button:hover,
+.wp-block-button.has-skvn-button-hover.has-skvn-btn-hover-text .wp-block-button__link.wp-element-button:focus-visible {
+	color: var(--skvn-btn-hover-text) !important;
 }
-.wp-block-button.has-skvn-btn-hover-bg .wp-block-button__link.wp-element-button:hover,
-.wp-block-button.has-skvn-btn-hover-bg .wp-block-button__link.wp-element-button:focus-visible {
-	background: var(--skvn-btn-hover-bg);
+.wp-block-button.has-skvn-button-hover.has-skvn-btn-hover-bg .wp-block-button__link.wp-element-button:hover,
+.wp-block-button.has-skvn-button-hover.has-skvn-btn-hover-bg .wp-block-button__link.wp-element-button:focus-visible {
+	background: var(--skvn-btn-hover-bg) !important;
 }
 .wp-block-button.has-skvn-button-hover .wp-block-button__link {
 	transition: color 0.15s ease, background 0.15s ease;

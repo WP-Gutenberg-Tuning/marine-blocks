@@ -1,22 +1,28 @@
 /*
  * Editor-only: frontend hover rules are emitted via PHP wp_add_inline_style.
  *
- * In the editor, BlockListBlock injects has-skvn-button-hover on the OUTER
- * wrapper div, not on .wp-block-button itself. Selector must traverse down:
- *   .has-skvn-button-hover (BlockListBlock wrapper)
+ * In the editor, BlockListBlock injects has-skvn-button-hover and the channel
+ * markers (has-skvn-btn-hover-text / -bg) on the OUTER wrapper div (.wp-block),
+ * not on .wp-block-button itself. Selector must traverse down:
+ *   .wp-block.has-skvn-button-hover.has-skvn-btn-hover-* (BlockListBlock wrapper)
  *     └─ .wp-block-button (block content)
  *          └─ .wp-block-button__link
  *
- * Specificity 0,2,1 is safe here — no theme rules conflict inside editor iframe.
+ * The editor iframe DOES contain theme rules: the SKVN theme loads style.css
+ * via add_editor_style( 'style.css' ) (inc/setup.php). Theme preset hovers are
+ * (0,4,0) and some lock channels with !important, so the marker rule uses
+ * (0,6,0) + !important on color/background only (HMGP-009/010/011, plans 089/090).
+ * The old "0,2,1 is safe — no theme rules conflict inside editor iframe" claim
+ * was wrong. Transition stays without !important.
  */
-.has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:hover,
-.has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:focus-visible {
-	color: var( --skvn-btn-hover-text );
+.wp-block.has-skvn-button-hover.has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:hover,
+.wp-block.has-skvn-button-hover.has-skvn-btn-hover-text .wp-block-button .wp-block-button__link:focus-visible {
+	color: var( --skvn-btn-hover-text ) !important;
 }
 
-.has-skvn-btn-hover-bg .wp-block-button .wp-block-button__link:hover,
-.has-skvn-btn-hover-bg .wp-block-button .wp-block-button__link:focus-visible {
-	background: var( --skvn-btn-hover-bg );
+.wp-block.has-skvn-button-hover.has-skvn-btn-hover-bg .wp-block-button .wp-block-button__link:hover,
+.wp-block.has-skvn-button-hover.has-skvn-btn-hover-bg .wp-block-button .wp-block-button__link:focus-visible {
+	background: var( --skvn-btn-hover-bg ) !important;
 }
 
 .has-skvn-button-hover .wp-block-button .wp-block-button__link {
