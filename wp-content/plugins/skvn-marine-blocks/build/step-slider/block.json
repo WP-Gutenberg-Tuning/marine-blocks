@@ -48,6 +48,7 @@
       "type": "string",
       "enum": [
         "viewport",
+        "tall",
         "content"
       ],
       "default": "viewport"
