@@ -61,10 +61,34 @@ const HEIGHT_MODE_OPTIONS = [
 		label: __( 'Viewport (slider + tabs, min 100svh)', 'skvn-marine-blocks' ),
 	},
 	{
+		value: 'tall',
+		label: __( 'Tall viewport (desktop min 900px shell)', 'skvn-marine-blocks' ),
+	},
+	{
 		value: 'content',
 		label: __( 'Content (height follows content)', 'skvn-marine-blocks' ),
 	},
 ];
+
+function stepSliderHeightModeClass( heightMode: string | undefined ): string {
+	if ( heightMode === 'content' ) {
+		return 'skvn-step-slider--height-content';
+	}
+	if ( heightMode === 'tall' ) {
+		return 'skvn-step-slider--height-tall';
+	}
+	return 'skvn-step-slider--height-viewport';
+}
+
+function stepSliderHeightBadgeLabel( heightMode: string | undefined ): string {
+	if ( heightMode === 'content' ) {
+		return __( 'Height: Content', 'skvn-marine-blocks' );
+	}
+	if ( heightMode === 'tall' ) {
+		return __( 'Height: Tall', 'skvn-marine-blocks' );
+	}
+	return __( 'Height: Viewport', 'skvn-marine-blocks' );
+}
 
 const DEFAULT_PROGRESS_COLOR = '#7ec8e3';
 
@@ -507,10 +531,7 @@ export const Edit = memo( function StepSliderEdit( {
 	};
 
 	const blockCount = snapshot.steps.length;
-	const heightClass =
-		heightMode === 'content'
-			? 'skvn-step-slider--height-content'
-			: 'skvn-step-slider--height-viewport';
+	const heightClass = stepSliderHeightModeClass( heightMode );
 	const editorAlignClass = editorAlignmentClass( attributes.align );
 	const frameRef = useEditorPreviewFrame();
 	const storedClassName = attributes.className ?? '';
@@ -529,6 +550,7 @@ export const Edit = memo( function StepSliderEdit( {
 	const blockProps = useBlockProps( {
 		ref: frameRef,
 		className: `skvn-step-slider skvn-step-slider--editor skvn-editor-preview-frame ${ heightClass }`,
+		'data-fill-preset': activePresetSlug,
 		'data-text-animation': textAnimationValue,
 		style: {
 			'--skvn-step-slider-progress-color': progressColorCss(
@@ -587,6 +609,7 @@ export const Edit = memo( function StepSliderEdit( {
 	const badgeLabel = autoplay
 		? __( 'Autoplay on', 'skvn-marine-blocks' )
 		: __( 'Manual', 'skvn-marine-blocks' );
+	const heightBadgeLabel = stepSliderHeightBadgeLabel( heightMode );
 	const dwellSeconds = sprintf(
 		/* translators: %d: autoplay dwell time in seconds */
 		_n(
@@ -601,6 +624,14 @@ export const Edit = memo( function StepSliderEdit( {
 	if ( loop ) {
 		statusParts.push( __( 'Loop on', 'skvn-marine-blocks' ) );
 	}
+	const tabHeightPx = clampTabHeight( tabHeight );
+	statusParts.push(
+		sprintf(
+			/* translators: %d: height of each bottom step tab in pixels */
+			__( 'Tab height: %dpx', 'skvn-marine-blocks' ),
+			tabHeightPx
+		)
+	);
 	const statusText = statusParts.join( ' · ' );
 	const countText = sprintf(
 		/* translators: %d: number of steps */
@@ -620,7 +651,7 @@ export const Edit = memo( function StepSliderEdit( {
 				>
 					<SelectControl
 						help={ __(
-							'Viewport is 100svh on the outer slider (slides and step tabs together), not the background alone. Content sizes to the steps, then all tabs share the tallest height so switching tabs does not change the slider box.',
+							'Viewport fills the screen height (slides and tabs together). Tall adds a 900px minimum shell on tablet/desktop while keeping offset math. Content sizes to the tallest step copy.',
 							'skvn-marine-blocks'
 						) }
 						label={ __( 'Height', 'skvn-marine-blocks' ) }
@@ -765,6 +796,9 @@ export const Edit = memo( function StepSliderEdit( {
 					</span>
 					<span className="skvn-step-slider-editor__badge">
 						{ badgeLabel }
+					</span>
+					<span className="skvn-step-slider-editor__badge">
+						{ heightBadgeLabel }
 					</span>
 					<span className="skvn-step-slider-editor__count">
 						{ countText }

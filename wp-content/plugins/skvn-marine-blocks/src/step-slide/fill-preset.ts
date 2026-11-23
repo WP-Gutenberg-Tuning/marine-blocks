@@ -12,8 +12,13 @@
  */
 
 import { STEP_DEFAULT_FILLS } from './default-fills';
+import {
+	PROCESS_STRIP_FILLS,
+	PROCESS_STRIP_SLUG,
+} from './process-strip-fills';
 
 export const DEEP_MARINE_SLUG = 'deep-marine';
+export { PROCESS_STRIP_SLUG };
 
 export type StepFillPreset = {
 	slug: string;
@@ -50,6 +55,9 @@ export function stepFillPresetFillsFor(
 	const s = typeof slug === 'string' ? slug.trim().toLowerCase() : '';
 	if ( '' === s || DEEP_MARINE_SLUG === s ) {
 		return null;
+	}
+	if ( PROCESS_STRIP_SLUG === s ) {
+		return PROCESS_STRIP_FILLS;
 	}
 	if ( ! Array.isArray( presets ) ) {
 		return null;

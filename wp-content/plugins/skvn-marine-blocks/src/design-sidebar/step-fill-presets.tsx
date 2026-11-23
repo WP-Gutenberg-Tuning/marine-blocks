@@ -14,8 +14,13 @@
 import { Button, Notice, PanelBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { DEEP_MARINE_SLUG, type StepFillPreset } from '../step-slide/fill-preset';
+import {
+	DEEP_MARINE_SLUG,
+	PROCESS_STRIP_SLUG,
+	type StepFillPreset,
+} from '../step-slide/fill-preset';
 import { STEP_DEFAULT_FILLS } from '../step-slide/default-fills';
+import { PROCESS_STRIP_FILLS } from '../step-slide/process-strip-fills';
 
 const MAX_SLOTS = 8;
 
@@ -212,6 +217,10 @@ export function StepFillPresetSelect( {
 	const options = useMemo(
 		() => [
 			{ label: __( 'Deep Marine', 'skvn-marine-blocks' ), value: DEEP_MARINE_SLUG },
+			{
+				label: __( 'Process Strip', 'skvn-marine-blocks' ),
+				value: PROCESS_STRIP_SLUG,
+			},
 			...( snapshot?.presets ?? [] ).map( ( preset ) => ( {
 				label: preset.name,
 				value: preset.slug,
@@ -247,16 +256,23 @@ export function StepFillPresetSelect( {
 	);
 }
 
-function DeepMarineRow() {
+function BuiltInPresetRow( {
+	fills,
+	name,
+	note,
+}: {
+	fills: readonly string[];
+	name: string;
+	note: string;
+} ) {
 	return (
 		<div style={ { marginBottom: 16 } }>
 			<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 } }>
-				<strong>{ __( 'Deep Marine', 'skvn-marine-blocks' ) }</strong>
+				<strong>{ name }</strong>
 				<span>{ __( 'Built-in preset', 'skvn-marine-blocks' ) }</span>
 			</div>
 			<div style={ { display: 'flex', gap: 6, marginTop: 6 } }>
-				{ STEP_DEFAULT_FILLS.map( ( fill, index ) => (
-					// Swatch mirrors the stored string for display only; it is never editable here.
+				{ fills.map( ( fill, index ) => (
 					<span
 						aria-hidden="true"
 						key={ index }
@@ -272,10 +288,34 @@ function DeepMarineRow() {
 					/>
 				) ) }
 			</div>
-			<p style={ { margin: '6px 0 0' } }>
-				{ __( 'It cannot be edited or deleted. Sliders without a preset, with an unknown slug, or a deleted preset use Deep Marine.', 'skvn-marine-blocks' ) }
-			</p>
+			<p style={ { margin: '6px 0 0' } }>{ note }</p>
 		</div>
+	);
+}
+
+function DeepMarineRow() {
+	return (
+		<BuiltInPresetRow
+			fills={ STEP_DEFAULT_FILLS }
+			name={ __( 'Deep Marine', 'skvn-marine-blocks' ) }
+			note={ __(
+				'It cannot be edited or deleted. Sliders without a preset, with an unknown slug, or a deleted preset use Deep Marine.',
+				'skvn-marine-blocks'
+			) }
+		/>
+	);
+}
+
+function ProcessStripRow() {
+	return (
+		<BuiltInPresetRow
+			fills={ PROCESS_STRIP_FILLS }
+			name={ __( 'Process Strip', 'skvn-marine-blocks' ) }
+			note={ __(
+				'Flat navy tabs (#0b1219). The active tab uses #232d37 with the progress accent on top, matching the step-bar artifact.',
+				'skvn-marine-blocks'
+			) }
+		/>
 	);
 }
 
@@ -543,6 +583,7 @@ export function StepFillPresetsLibrary() {
 				</Notice>
 			) }
 			<DeepMarineRow />
+			<ProcessStripRow />
 			{ loading && <Spinner /> }
 			{ canManageOptions && ! newDraft && (
 				<Button onClick={ startNew } variant="secondary">

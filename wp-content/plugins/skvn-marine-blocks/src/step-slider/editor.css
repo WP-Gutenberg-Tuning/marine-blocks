@@ -253,6 +253,7 @@
 
 .skvn-step-slider-editor__stage--focused
 	.skvn-step-slide__content
+	.wp-block-button:not(.skvn-cta)
 	.wp-block-button__link {
 	padding: 10px 16px;
 	border-radius: 24px;
@@ -260,6 +261,83 @@
 	color: #113f5b;
 	font-size: 12px;
 	font-weight: 600;
+}
+
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta
+	.wp-block-button__link,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.skvn-cta.wp-block-button__link {
+	box-sizing: border-box;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.8);
+	border-radius: 10px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	line-height: 1.2;
+	padding: 12px 18px;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:hover,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:focus-visible {
+	background: #4cd964;
+	border-color: #4cd964;
+	color: #fff;
+}
+
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-bg
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:hover,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-bg
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:focus-visible,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-bg
+	.wp-block-button__link:hover,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-bg
+	.wp-block-button__link:focus-visible {
+	background: var(--skvn-btn-hover-bg);
+	border-color: transparent;
+}
+
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-text
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:hover,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-text
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:focus-visible,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-text
+	.wp-block-button__link:hover,
+.skvn-step-slider-editor__stage--focused
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-text
+	.wp-block-button__link:focus-visible {
+	color: var(--skvn-btn-hover-text);
 }
 
 /* Native stacked fallback only. These selectors must not match the focused
@@ -348,6 +426,16 @@
 .skvn-step-slider-editor__step.is-active {
 	color: #ffffff;
 	box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.skvn-step-slider[data-fill-preset='process-strip'] .skvn-step-slider-editor__steps {
+	background: #0b1219;
+}
+
+.skvn-step-slider[data-fill-preset='process-strip']
+	.skvn-step-slider-editor__step.is-active {
+	box-shadow: none;
+	background-color: #232d37 !important;
 }
 
 .skvn-step-slider-editor__tab {

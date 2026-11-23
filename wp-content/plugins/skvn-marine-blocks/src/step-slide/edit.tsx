@@ -51,6 +51,20 @@ const ALLOWED_CONTENT_BLOCKS = [
 const TEMPLATE = [
 	[ 'core/heading', { level: 2, placeholder: 'Step heading' } ],
 	[ 'core/paragraph', { placeholder: 'Step copy' } ],
+	[
+		'core/buttons',
+		{},
+		[
+			[
+				'core/button',
+				{
+					className: 'skvn-cta',
+					text: 'Learn the process',
+					url: '#',
+				},
+			],
+		],
+	],
 ];
 
 type StepSlideAttributes = SlideFillAttributes & {
@@ -336,20 +350,22 @@ export function Edit( { attributes, clientId, context, setAttributes }: StepSlid
 										attributes.backgroundFillGradient ||
 										undefined,
 									label: __( 'Fill', 'skvn-marine-blocks' ),
-									onColorChange: ( value: string | undefined ) =>
+									onColorChange: ( value: string | undefined ) => {
+										if ( value === undefined ) return;
 										setAttributes( {
-											backgroundFillColor: value || '',
-											backgroundFillGradient: '',
+											backgroundFillColor: value,
+											...( value ? { backgroundFillGradient: '' } : {} ),
 											backgroundFillMode: 'custom',
-										} ),
-									onGradientChange: (
-										value: string | undefined
-									) =>
+										} );
+									},
+									onGradientChange: ( value: string | undefined ) => {
+										if ( value === undefined ) return;
 										setAttributes( {
-											backgroundFillGradient: value || '',
-											backgroundFillColor: '',
+											backgroundFillGradient: value,
+											...( value ? { backgroundFillColor: '' } : {} ),
 											backgroundFillMode: 'custom',
-										} ),
+										} );
+									},
 								},
 							] }
 							title={ __( 'Custom fill', 'skvn-marine-blocks' ) }

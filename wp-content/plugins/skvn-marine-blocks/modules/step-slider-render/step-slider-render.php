@@ -139,10 +139,16 @@ function skvn_marine_blocks_normalize_step_text_animation( $value ) {
  * Normalize step-slider height mode.
  *
  * @param mixed $value Raw attribute.
- * @return string viewport|content
+ * @return string viewport|tall|content
  */
 function skvn_marine_blocks_normalize_step_height_mode( $value ) {
-	return 'content' === $value ? 'content' : 'viewport';
+	if ( 'content' === $value ) {
+		return 'content';
+	}
+	if ( 'tall' === $value ) {
+		return 'tall';
+	}
+	return 'viewport';
 }
 
 /**
@@ -198,6 +204,20 @@ function skvn_marine_blocks_get_step_default_fill_gradient( $index ) {
 }
 
 /**
+ * Flat fills for the built-in Process Strip preset (artifact tab bar).
+ * Editor copy: src/step-slide/process-strip-fills.ts — keep in sync.
+ *
+ * @param int $index Zero-based step index.
+ * @return string CSS background value.
+ */
+function skvn_marine_blocks_get_process_strip_fill( $index ) {
+	$fills = array( '#0b1219', '#0b1219', '#0b1219', '#0b1219' );
+	$slot  = ( (int) $index ) % count( $fills );
+
+	return $fills[ $slot ];
+}
+
+/**
  * Resolve the preset-based default fill for a step.
  *
  * One rule for both PHP and TS (src/step-slide/fill-preset.ts):
@@ -213,6 +233,10 @@ function skvn_marine_blocks_get_step_default_fill_gradient( $index ) {
 function skvn_marine_blocks_resolve_step_fill_preset_fill( $preset_slug, $index ) {
 	$index = max( 0, (int) $index );
 	$slug  = is_string( $preset_slug ) ? sanitize_title( trim( $preset_slug ) ) : '';
+
+	if ( 'process-strip' === $slug ) {
+		return skvn_marine_blocks_get_process_strip_fill( $index );
+	}
 
 	if ( '' !== $slug && 'deep-marine' !== $slug ) {
 		$preset = skvn_marine_blocks_get_step_fill_preset_by_slug( $slug );
@@ -519,6 +543,8 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 	$class_name = 'skvn-step-slider';
 	if ( 'content' === $height_mode ) {
 		$class_name .= ' skvn-step-slider--height-content';
+	} elseif ( 'tall' === $height_mode ) {
+		$class_name .= ' skvn-step-slider--height-tall';
 	}
 
 	$wrapper_style  = '--skvn-step-slider-progress-color:' . $progress_color . ';';
@@ -534,6 +560,7 @@ function skvn_marine_blocks_render_step_slider( $attributes, $content, $block ) 
 			'data-loop'        => $loop ? '1' : '0',
 			'data-height-mode'     => $height_mode,
 			'data-text-animation'  => $text_animation,
+			'data-fill-preset'     => sanitize_title( $fill_preset ),
 		)
 	);
 

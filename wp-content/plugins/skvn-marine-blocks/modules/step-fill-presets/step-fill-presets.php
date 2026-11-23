@@ -24,6 +24,25 @@ const SKVN_MARINE_BLOCKS_STEP_FILL_PRESETS_OPTION   = 'skvn_marine_blocks_step_f
 const SKVN_MARINE_BLOCKS_STEP_FILL_PRESETS_MAX      = 50;
 const SKVN_MARINE_BLOCKS_STEP_FILL_PRESETS_MAX_SLOT = 8;
 
+/**
+ * Built-in preset slugs (code-only, not stored in the option).
+ *
+ * @return string[]
+ */
+function skvn_marine_blocks_reserved_step_fill_preset_slugs() {
+	return array( 'deep-marine', 'process-strip' );
+}
+
+/**
+ * @param string $slug Raw slug.
+ * @return bool
+ */
+function skvn_marine_blocks_is_reserved_step_fill_preset_slug( $slug ) {
+	$slug = is_string( $slug ) ? sanitize_title( trim( $slug ) ) : '';
+
+	return '' !== $slug && in_array( $slug, skvn_marine_blocks_reserved_step_fill_preset_slugs(), true );
+}
+
 add_action( 'admin_init', 'skvn_marine_blocks_register_step_fill_presets_setting' );
 add_action( 'enqueue_block_editor_assets', 'skvn_marine_blocks_step_fill_presets_bootstrap' );
 add_action( 'wp_ajax_skvn_marine_blocks_step_fill_presets', 'skvn_marine_blocks_step_fill_presets_ajax' );
@@ -83,7 +102,7 @@ function skvn_marine_blocks_sanitize_step_fill_preset( $raw ) {
 	}
 
 	$slug = isset( $raw['slug'] ) && is_string( $raw['slug'] ) ? sanitize_title( trim( $raw['slug'] ) ) : '';
-	if ( '' === $slug || 'deep-marine' === $slug ) {
+	if ( skvn_marine_blocks_is_reserved_step_fill_preset_slug( $slug ) ) {
 		return null;
 	}
 
@@ -172,7 +191,7 @@ function skvn_marine_blocks_get_step_fill_presets() {
  */
 function skvn_marine_blocks_get_step_fill_preset_by_slug( $slug ) {
 	$slug = is_string( $slug ) ? sanitize_title( trim( $slug ) ) : '';
-	if ( '' === $slug || 'deep-marine' === $slug ) {
+	if ( skvn_marine_blocks_is_reserved_step_fill_preset_slug( $slug ) ) {
 		return null;
 	}
 
@@ -287,11 +306,11 @@ function skvn_marine_blocks_step_fill_presets_ajax() {
 		$name      = isset( $_POST['name'] ) && is_string( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
 		$fills_raw = isset( $_POST['fills'] ) && is_string( $_POST['fills'] ) ? json_decode( wp_unslash( $_POST['fills'] ), true ) : null;
 
-		if ( 'deep-marine' === $slug ) {
+		if ( skvn_marine_blocks_is_reserved_step_fill_preset_slug( $slug ) ) {
 			wp_send_json_error(
 				array(
 					'code'    => 'reserved_slug',
-					'message' => __( 'deep-marine is reserved for the built-in preset.', 'skvn-marine-blocks' ),
+					'message' => __( 'That slug is reserved for a built-in preset.', 'skvn-marine-blocks' ),
 				),
 				400
 			);
@@ -372,7 +391,7 @@ function skvn_marine_blocks_step_fill_presets_ajax() {
 			$used   = wp_list_pluck( $presets, 'slug' );
 			$slug   = $base;
 			$suffix = 2;
-			while ( in_array( $slug, $used, true ) || 'deep-marine' === $slug ) {
+			while ( in_array( $slug, $used, true ) || skvn_marine_blocks_is_reserved_step_fill_preset_slug( $slug ) ) {
 				$slug = $base . '-' . $suffix;
 				++$suffix;
 			}
@@ -408,11 +427,11 @@ function skvn_marine_blocks_step_fill_presets_ajax() {
 
 	if ( 'delete' === $operation ) {
 		$slug = isset( $_POST['slug'] ) && is_string( $_POST['slug'] ) ? sanitize_title( wp_unslash( $_POST['slug'] ) ) : '';
-		if ( '' === $slug || 'deep-marine' === $slug ) {
+		if ( skvn_marine_blocks_is_reserved_step_fill_preset_slug( $slug ) ) {
 			wp_send_json_error(
 				array(
 					'code'    => 'reserved_slug',
-					'message' => __( 'The built-in Deep Marine preset cannot be deleted.', 'skvn-marine-blocks' ),
+					'message' => __( 'Built-in presets cannot be deleted.', 'skvn-marine-blocks' ),
 				),
 				400
 			);

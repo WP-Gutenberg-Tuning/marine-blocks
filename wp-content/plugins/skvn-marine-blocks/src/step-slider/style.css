@@ -49,6 +49,38 @@
 	overflow: hidden;
 }
 
+/*
+ * Tall viewport: same offset + swiper flex as viewport, but desktop shell is at
+ * least 900px (slide area + tab bar). Mobile/tablet narrow keeps viewport caps.
+ */
+@media (min-width: 782px) {
+	.skvn-step-slider--height-tall:not(.skvn-step-slider--height-content):not(
+			.skvn-step-slider--editor
+		) {
+		--skvn-step-slider-shell-min: 900px;
+		min-height: max(100svh, var(--skvn-step-slider-shell-min));
+	}
+
+	.skvn-step-slider--height-tall:not(.skvn-step-slider--height-content).is-ready {
+		height: max(
+			calc(100svh - var(--skvn-step-slider-offset, 0px)),
+			calc(
+				var(--skvn-step-slider-shell-min, 900px) -
+					var(--skvn-step-slider-offset, 0px)
+			)
+		);
+		min-height: max(
+			calc(100svh - var(--skvn-step-slider-offset, 0px)),
+			calc(
+				var(--skvn-step-slider-shell-min, 900px) -
+					var(--skvn-step-slider-offset, 0px)
+			)
+		);
+		max-height: none;
+		overflow: hidden;
+	}
+}
+
 .skvn-step-slider .swiper {
 	flex: 1 1 auto;
 	width: 100%;
@@ -222,6 +254,89 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 	line-height: 1.7;
 }
 
+/* Step CTA — outline button on dark slide (plugin-owned; ships with block zip). */
+.skvn-step-slider .skvn-step-slide__content .wp-block-button.skvn-cta .wp-block-button__link,
+.skvn-step-slider .skvn-cta.wp-block-button__link {
+	box-sizing: border-box;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.8);
+	border-radius: 10px;
+	color: #fff;
+	font-size: clamp(1rem, 0.85rem + 0.5vw, 1.375rem);
+	font-weight: 700;
+	letter-spacing: 0.15em;
+	line-height: 1.2;
+	padding: 20px 24px;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.skvn-step-slider
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:hover,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:focus-visible,
+.skvn-step-slider .skvn-cta.wp-block-button__link:hover,
+.skvn-step-slider .skvn-cta.wp-block-button__link:focus-visible {
+	background: #4cd964;
+	border-color: #4cd964;
+	color: #fff;
+}
+
+/* Markers on .wp-block-button (frontend PHP) or BlockListBlock ancestor (editor). */
+.skvn-step-slider
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-bg
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:hover,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-bg
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:focus-visible,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-bg
+	.wp-block-button__link:hover,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-bg
+	.wp-block-button__link:focus-visible {
+	background: var(--skvn-btn-hover-bg);
+	border-color: transparent;
+}
+
+.skvn-step-slider
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-text
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:hover,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.has-skvn-btn-hover-text
+	.wp-block-button.skvn-cta
+	.wp-block-button__link:focus-visible,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-text
+	.wp-block-button__link:hover,
+.skvn-step-slider
+	.skvn-step-slide__content
+	.wp-block-button.skvn-cta.has-skvn-btn-hover-text
+	.wp-block-button__link:focus-visible {
+	color: var(--skvn-btn-hover-text);
+}
+
+.skvn-step-slider .skvn-step-slide__content .wp-block-button.skvn-cta .wp-block-button__link:focus-visible,
+.skvn-step-slider .skvn-cta.wp-block-button__link:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
 /* Step bar — full-width strip, equal columns, rendered step number + tab label. */
 .skvn-step-slider__tabs {
 	position: relative;
@@ -309,6 +424,19 @@ body:not(.wp-admin) .skvn-step-slide__content p {
 .skvn-step-slider__tab[aria-current="true"],
 .skvn-step-slider__tab.is-active {
 	color: #ffffff;
+}
+
+/* Process Strip — artifact tab bar: navy strip, lifted active cell. */
+.skvn-step-slider[data-fill-preset='process-strip'] .skvn-step-slider__tabs {
+	background: #0b1219;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+
+.skvn-step-slider[data-fill-preset='process-strip'] .skvn-step-slider__tab.is-active,
+.skvn-step-slider[data-fill-preset='process-strip']
+	.skvn-step-slider__tab[aria-current='true'] {
+	background-color: #232d37 !important;
 }
 
 /* Arrows — narrow layout is the base: top-left pair, 2.25rem (081).
