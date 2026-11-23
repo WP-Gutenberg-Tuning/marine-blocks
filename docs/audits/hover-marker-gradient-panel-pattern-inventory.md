@@ -1,0 +1,136 @@
+# Audit inventory — Hover marker (editor vs PHP) + Gradient panel handler
+
+**Status:** OPEN (living register — agents append rows; không xóa row FIXED, đổi Status)  
+**Origin:** Step Slider `skvn-cta` + `core/button` Hover Colors, 2026-11-23 (DP-18)  
+**Related:** `.context/PITFALLS.md` DP-18 · `src/core-controls/button-hover/style.css` (editor DOM) · `modules/core-control/features/button-hover.php` (frontend DOM)
+
+Mục đích: **một file duy nhất** để các agent grep/rà và **ghi kết quả** sau mỗi lượt audit. Audit khác (security, milestone) không thay file này.
+
+---
+
+## Pattern A — Marker / class chỉ giống frontend, không giống editor
+
+### Định nghĩa (tương tự, không cần y chang selector)
+
+Hai surface gắn cùng một “marker” UX (class hoặc CSS var) **ở chỗ khác nhau**:
+
+| Surface | Vị trí marker thường gặp |
+|---|---|
+| **Frontend (PHP `render_block_*`, saved HTML)** | Trên element target (ví dụ `.wp-block-button`) |
+| **Editor (`editor.BlockListBlock`, `wrapperProps`)** | Trên **ancestor** list-block wrapper, không trên element target |
+
+**Mắc pattern khi:**
+
+- CSS scoped preset (block theme, CTA, hero, slider content) dùng `.target.marker` hoặc `.target:not(.marker)` **trên cùng element** với class marketing (`skvn-cta`, …).
+- Rule scoped specificity **cao hơn** rule global `.marker .target` trong `core-controls/*/style.css`.
+- Kết quả: attribute + vars đã set, **editor preview sai**; frontend có thể đúng hoặc cũng sai tùy selector.
+
+**Repair pattern (đã chứng minh Step Slider):**
+
+```css
+/* Preset — specificity thấp hơn custom */
+.context .wp-block-button.preset … :hover { … }
+
+/* Custom — cả ancestor (editor) và self (PHP) */
+.context .has-marker .wp-block-button.preset … :hover,
+.context .wp-block-button.preset.has-marker … :hover {
+  … var(--css-var) …
+}
+```
+
+**Grep seeds (plugin):**
+
+```text
+has-skvn-btn-hover
+has-skvn-button-hover
+BlockListBlock
+wrapperProps
+\.wp-block-button\.[a-z0-9-]+:not\(\.has-
+\.[a-z0-9-]+\.has-skvn
+```
+
+**Grep seeds (toàn repo — marker khác hover):**
+
+```text
+editor\.BlockListBlock
+wrapperProps.*className
+render_block_core/
+:has(
+```
+
+---
+
+## Pattern B — `PanelColorGradientSettings` xóa attribute khi handler nhận `undefined`
+
+### Định nghĩa
+
+Solid và gradient lưu **hai attribute**. Panel gọi `onColorChange` / `onGradientChange` với `undefined` khi mount, chuyển tab solid ↔ gradient, hoặc đóng popover — **không phải** user clear.
+
+**Mắc pattern khi handler:**
+
+```ts
+onColorChange: (value) =>
+  setAttributes({ colorAttr: value || '', gradientAttr: '' });
+```
+
+`undefined` → ghi `''` và **luôn xóa** kênh đối lập → mất giá trị vừa chọn; UI không giữ state khi chuyển loại.
+
+**Repair pattern:**
+
+```ts
+onColorChange: (value: string | undefined) => {
+  if (value === undefined) return;
+  setAttributes({
+    colorAttr: value,
+    ...(value ? { gradientAttr: '' } : {}),
+  });
+};
+```
+
+Tương tự `onGradientChange`. Chỉ clear kênh kia khi nhận giá trị truthy mới.
+
+**Grep seeds:**
+
+```text
+PanelColorGradientSettings
+onGradientChange
+onColorChange
+skvnHover
+backgroundFillGradient
+```
+
+---
+
+## Inventory (agents MUST append / update)
+
+Quy tắc cột **Status:** `OPEN` (cần sửa) · `FIXED` (đã merge, ghi commit hoặc ngày) · `N/A` (false positive, 1 dòng lý do) · `DEFERRED` (ghi milestone / human).
+
+| ID | Pattern | File:line (hoặc glob) | Triệu chứng | Status | Fixed / notes |
+|---|---|---|---|---|---|
+| HMGP-001 | A | `wp-content/plugins/skvn-marine-blocks/src/step-slider/style.css`, `editor.css` (skvn-cta hover) | Editor: Hover Colors không thắng preset `#4cd964` | FIXED | 2026-11-23 — ancestor + self selectors |
+| HMGP-002 | B | `wp-content/plugins/skvn-marine-blocks/src/core-controls/button-hover/index.tsx` | Chuyển solid ↔ gradient xóa hover bg | FIXED | 2026-11-23 — guard `undefined` |
+| HMGP-003 | B | `wp-content/plugins/skvn-marine-blocks/src/step-slide/edit.tsx` (`backgroundFill*`) | `onColorChange`/`onGradientChange` luôn x kênh đối lập khi `undefined` | FIXED | 2026-11-23 — thêm `if ( value === undefined ) return;` + chỉ clear sibling khi truthy, mirror button-hover |
+| HMGP-004 | B | `wp-content/plugins/skvn-marine-blocks/src/slide/edit.tsx` (`backgroundFill*`) | Cùng lỗi step-slide: clear gradient/color khi handler nhận `undefined` | FIXED | 2026-11-23 — thêm `if ( value === undefined ) return;` + chỉ clear sibling khi truthy |
+| HMGP-005 | A | `wp-content/plugins/skvn-marine-blocks/src/slider/style.css` (hero CTA) | Chỉ self-marker `.wp-block-button.has-skvn-btn-hover-*`; thiếu ancestor variant cho editor BlockListBlock wrapper | FIXED | 2026-11-23 — bổ sung `.has-skvn-btn-hover-* .wp-block-button` ancestor selector, mirror step-slider dual-selector |
+| HMGP-006 | B | `wp-content/plugins/skvn-marine-blocks/src/step-slider/edit.tsx` (`PanelColorGradientSettings` progress bar) | Single `progressColor` attribute, không có cặp solid/gradient chia panel; `onProgressColorChange` có guard `! nextColor` | N/A | Không phải Pattern B (không sibling attribute để clobber) |
+| HMGP-007 | A | `wp-content/plugins/skvn-marine-blocks/src/step-slider/style.css` (skvn-cta hover) | Có dual selector: ancestor `.has-skvn-btn-hover-* .wp-block-button` + self `.wp-block-button.skvn-cta.has-skvn-btn-hover-*` | N/A | Đã đúng mẫu repair dual-selector, không cần sửa |
+| HMGP-008 | A | `wp-content/plugins/skvn-marine-blocks/src/step-slider/editor.css` (editor-focused stage skvn-cta hover) | Có dual selector trong `.skvn-step-slider-editor__stage--focused`: ancestor + self | N/A | Đã đúng mẫu repair dual-selector, không cần sửa |
+
+*Thêm dòng mới dưới bảng với ID tiếp theo `HMGP-00N`. Không recycle ID.*
+
+---
+
+## Agent checklist (một lượt audit)
+
+1. Đọc Pattern A + B trên (không cần đọc lại DP-18 đầy đủ trừ khi sửa).
+2. Chạy grep seeds; mở từng hit có `setAttributes` + gradient hoặc `:not(.has-` + block scoped CSS.
+3. Với mỗi finding: thêm hoặc cập nhật row inventory; nếu FIXED trong cùng session ghi file + tóm tắt ngắn.
+4. Không bump version, không commit trừ human lệnh.
+5. Nếu sửa code: tối đa 3–5 file / lượt; cập nhật DP-18 chỉ khi có quyết định kiến trúc mới.
+
+---
+
+## Cross-links
+
+- Prompt handoff (copy cho agent khác): `docs/workflows/prompts/agent-audit-hover-marker-gradient-panel.md`
+- Pitfall: `.context/PITFALLS.md` → DP-18, AP-16

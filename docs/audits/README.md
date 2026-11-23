@@ -16,6 +16,7 @@ These documents are human-fill questionnaires and audit reports. They complement
 | Document | Scope | Status |
 |---|---|---|
 | [milestone-security-questionnaire-v1-3.6-to-1.7.md](./milestone-security-questionnaire-v1-3.6-to-1.7.md) | V1.3.6 through 1.7.0 + 1.x Element CPT; pre-2.0.0 boundary | OPEN — awaiting human answers |
+| [hover-marker-gradient-panel-pattern-inventory.md](./hover-marker-gradient-panel-pattern-inventory.md) | Living register: editor vs PHP marker DOM + PanelColorGradientSettings handlers (DP-18) | OPEN — agents append HMGP-* rows |
 
 ## Conventions
 
