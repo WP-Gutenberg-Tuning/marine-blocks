@@ -1051,14 +1051,14 @@ Version rationale: **PATCH** — hardening plugin (width/alignfull reset, chrome
 
 Scope: plan [084](planning/084_VER_1_3_25_PLUGIN_CONVENTION_GAP_AUDIT.md) WP1–WP6. Loại trừ sửa file Step Slider. PCA-01–21; HIGH = PCA-01–05.
 
-Scope addition **2026-11-23:** Hover Colors thắng preset theme, và năm luật AP-16. Plan [089](planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md) = WP6. HMGP-009/010/011 vẫn OPEN đến khi code. Hướng A. Chưa digest `CONVENTION.md`.
+Scope addition **2026-11-23:** Hover Colors thắng preset theme, và năm luật AP-16. Plan [089](planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md) = WP6. HMGP-009/010/011 vẫn OPEN đến khi code. Hướng A. Chưa digest `CONVENTION.md`. Reaudit 2026-11-23: 009/010/011 còn đúng với hướng A. Plan thực thi chi tiết [090](planning/090_VER_1_3_25_WP6_HOVER_MARKER_CASCADE_EXECUTION_PLAN.md) lưu 2026-11-23 theo lệnh human “lập plan implement chi tiết theo contract, lưu lại trước khi làm” — chưa code, start cần lệnh riêng. Thực thi: human “tiến hành” 2026-11-23 → source done commit `08085b2` (nhánh `planning/1.3.25-wp6-hover-marker`), chưa build, chưa runtime PASS.
 
 Acceptance — tất cả **Chưa làm**:
 
 - [ ] PCA-HIGH: plugin-only (không theme SKVN / không `body.skvn-full-width-canvas`) Slider + Collection `full` + Feature Showcase `full` không GP bleed; Accordion + Card Grid chrome đi cùng zip plugin.
 - [ ] WP3: SelectControl fallback; optional attrs có danh sách hoặc default đã chốt A5.10.
 - [ ] WP4: heading-number frontend enqueue; runtime check `PluginDocumentSettingPanel` trên WP đích.
-- [ ] WP6: HMGP-009/010/011 source theo plan 089 hướng A; contract Quy tắc 2 hết câu “iframe không có theme rule”; năm luật AP-16 nằm trong contract đó. Chưa runtime PASS.
+- [ ] WP6: HMGP-009/010/011 source theo plan 089 hướng A (thực thi chi tiết: plan [090](planning/090_VER_1_3_25_WP6_HOVER_MARKER_CASCADE_EXECUTION_PLAN.md)); contract Quy tắc 2 hết câu “iframe không có theme rule”; năm luật AP-16 nằm trong contract đó. Chưa runtime PASS. Source 2026-11-23: commit `08085b2`; chờ human build + T0–T8 (runbook `docs/testing/wp6-hover-marker-cascade-1.3.25.md`).
 - [ ] Không sửa GeneratePress; không sửa file Step Slider; không global replace `skvn`.
 - [ ] Bump metadata cần lệnh human riêng. Start code cần lệnh riêng.
 

@@ -1,7 +1,7 @@
 # Hover Colors — marker thắng preset theme (HMGP-009 / 010 / 011)
 
 Created: **2026-11-23**.  
-Status: **PLANNED trong 1.3.25 — chưa lệnh code.**  
+Status: **SOURCE DONE 2026-11-23 (commit `08085b2`, hướng A) — chưa build, chưa runtime PASS.**  
 Current: **V1 / 1.3.25 — Plugin convention gap**. Không bump metadata trong lượt gán scope.  
 Human **2026-11-23:** gộp plan này vào **1.3.25**, cùng convention gap (DP-12 / A9 / A5.11). Gồm hai việc: sửa cascade HMGP-009/010/011 theo hướng A, và đưa năm luật AP-16 vào contract CSS extension khi code. Không phải acceptance Step Slider.
 
@@ -10,6 +10,8 @@ Nguồn: audit Pattern A pass 2 cùng ngày, inventory `docs/audits/hover-marker
 Human 2026-11-23: lập plan, lưu plan, rồi gán vào 1.3.25. Hướng A vẫn là khuyến nghị. Hướng B còn mở cho đến lệnh code.
 
 Prompt rà lại, chưa code: `docs/workflows/prompts/agent-handoff-1.3.25-wp6-hover-marker-reaudit.md`.
+
+Plan thực thi chi tiết (human yêu cầu lưu trước khi làm, **2026-11-23**, chưa code): [090](090_VER_1_3_25_WP6_HOVER_MARKER_CASCADE_EXECUTION_PLAN.md) — edit chính xác từng file, thứ tự atomic, runbook T0–T8, acceptance. Reaudit 2026-11-23 xác nhận 009/010/011 còn đúng với hướng A. Human “tiến hành” 2026-11-23 → đã code theo 090, commit `08085b2`; chưa build/runtime PASS.
 
 ---
 
