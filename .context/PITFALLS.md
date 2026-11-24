@@ -668,3 +668,251 @@ Error: Minified React error #130; args[]=undefined&args[]=
 - **Rule:** Mọi task thêm/thiết kế **preset style cho `core/button` bên trong block plugin** (template InnerBlocks, class marketing như `skvn-cta`, slide content, collection card CTA) → làm theo năm luật ở trên và checklist DP-18 trước khi ship `:hover`, không chỉ sửa sau khi human phàn nàn.
 - **Evidence:** `src/step-slide/edit.tsx` (`skvn-cta`); `src/step-slider/style.css` / `editor.css` (trước fix, `#4cd964`); `src/slider/style.css` Hero marker-gated hover; `modules/core-control/features/button-hover.php`; `src/core-controls/button-hover/style.css`; `inc/setup.php` `add_editor_style`; `docs/standards/gutenberg-block-extension-css-contract.md` Quy tắc 2; `docs/ideations/button-hover-diagnosis.md`. Plan sửa phần theme còn OPEN: [089](.context/planning/089_VER_1_3_25_HOVER_MARKER_PRESET_CASCADE_REPAIR_PLAN.md).
 - **Tránh:** Không đóng task “đã có nút mặc định” nếu chưa verify Hover Colors trên cùng nút. Ghi tension chỉ khi product **cố ý** khóa hover (cần human decision), không im lặng đè extension. Năm luật thuộc 1.3.25 WP6: khi code thì ghi vào `docs/standards/gutenberg-block-extension-css-contract.md`. Không digest cả pitfall sang `CONVENTION.md` trong lượt gán scope.
+
+### DP-19 — `PluginDocumentSettingPanel` import `@wordpress/components` → React #130; panel đã chuyển sang `wp.editor` (WP 6.6+) [2026-11-23]
+
+- **Case:** Onsite vipafood — mở block editor (đặc biệt **sản phẩm Woo**), console `Minified React error #130; args[]=undefined`. Human không chỉnh sửa được; có lúc critical error admin (gỡ Elementor/Jetpack/Pojo là việc riêng — PHP/plugin khác).
+- **Cơ chế (cùng họ DP-06):** React #130 = render component `undefined`. `dependency-extraction-webpack-plugin` map `import { PluginDocumentSettingPanel } from '@wordpress/components'` → `wp.components.PluginDocumentSettingPanel`. Trên runtime onsite: `typeof wp.components.PluginDocumentSettingPanel === 'undefined'`. `__experimentalPanelColorGradientSettings` vẫn là `function` — **không** phải nguyên nhân lần này.
+- **Vì sao sai package:** WordPress **6.6+** gom extensibility (`PluginDocumentSettingPanel`, `PluginSidebar`, …) sang `@wordpress/editor` → global `wp.editor.PluginDocumentSettingPanel`. WP **6.4–6.5** vẫn có trên `wp.editPost`. **Không** có trên `wp.components` (plan084 PCA-10 đã cảnh báo; trước đó code PDP/Product design copy import cũ).
+- **Chỗ gãy trong repo:** `src/pdp-related/panel.tsx`, `src/product-design/panel.tsx` — `registerPlugin` luôn load trong bundle editor; khi `postType === 'product'` render `<PluginDocumentSettingPanel>` → crash (surface API sai package — DP-19). **[CORRECTED 2026-11-24]** `return null` khi `postType !== 'product'` **không** đủ nếu `useEntityProp( 'postType', 'product', … )` đã chạy **trước** guard — tái hiện #130 trên **page/post** khi mở block **Options (⋮)**; xem DP-20 case `useEntityProp`.
+- **Precedent đúng trong repo:** `wp-content/themes/skvn-marine/assets/js/page-display-controls.js` dùng `wp.editPost.PluginDocumentSettingPanel` và **chỉ** `registerPlugin` khi panel tồn tại.
+- **Fixed (source 2026-11-23):** `src/shared/plugin-document-setting-panel.tsx` — resolve runtime `wp.editor?.PluginDocumentSettingPanel ?? wp.editPost?.PluginDocumentSettingPanel ?? wp.components?.PluginDocumentSettingPanel`; nếu không có thì `return null` (không crash). Hai panel import wrapper thay vì `@wordpress/components`. Milestone 1.3.25 WP4. **Onsite:** chỉ hết #130 từ hai panel PDP/Product design khi đủ deploy + deps — nếu vẫn #130 xem **DP-20** (asset/deploy + slot khác).
+- **Evidence:** Console vipafood 2026-11-23: `wp.components.PluginDocumentSettingPanel === undefined`; `__experimentalPanelColorGradientSettings` vẫn `function`. [WP 6.6 unified APIs](https://make.wordpress.org/core/2024/06/18/editor-unified-extensibility-apis-in-6-6/). Plan [084](planning/084_VER_1_3_25_PLUGIN_CONVENTION_GAP_AUDIT.md) PCA-10 / WP4.
+- **Tránh:** Trước khi dùng `PluginDocumentSettingPanel` (hoặc slot fill document): trên WP runtime đích chạy `typeof wp.editor?.PluginDocumentSettingPanel`, `wp.editPost?.PluginDocumentSettingPanel` — không tin typings/npm. Một wrapper dùng chung; không import từ `@wordpress/components`. Sau sửa phải `npm run build` rồi deploy **cả** `build/index.ts.js` **và** `build/index.ts.asset.php` (DP-20). Critical error admin do plugin khác → tách chẩn đoán khỏi React #130 Marine Blocks.
+
+### DP-20 — React #130 vipafood sau build DP-19: thiếu `index.ts.asset.php` (deps rỗng) + webpack external lúc init + `onToggle` panel [2026-11-24]
+
+- **Case:** https://vipafood.com — sau `npm run build` và upload `index.ts.js`, editor vẫn `Minified React error #130; args[]=undefined`. Stack: `onToggle` / `onClick` → `components.min.js`, có nhánh `createRoot` → `edit-post.min.js`. Lúc trước có critical admin (Elementor/Jetpack/Pojo) — tách riêng; lần này là editor React.
+- **Kỳ vọng sai dễ mắc:** Console sau khi editor đã load: `typeof wp.editor.PluginDocumentSettingPanel === 'function'` → **không** chứng minh bundle Marine Blocks đã có deps đúng hoặc không còn component `undefined` khác. DP-19 có trong JS (`editor?.PluginDocumentSettingPanel` trong dist) **vẫn có thể** #130 vì nguyên nhân khác.
+
+#### Kết quả debug onsite (human + console, 2026-11-24)
+
+**A — API WordPress (đủ cho Document panel sau DP-19):**
+
+```js
+{
+  editor: typeof wp?.editor?.PluginDocumentSettingPanel,   // "function"
+  editPost: typeof wp?.editPost?.PluginDocumentSettingPanel, // "function"
+  components: typeof wp?.components?.PluginDocumentSettingPanel, // "undefined" (đúng WP 6.6+)
+}
+```
+
+**B — Fingerprint bundle (fetch, cache-bust):**
+
+```js
+// index.ts.js
+{ dp19_resolver: true }  // chuỗi editor?.PluginDocumentSettingPanel có trong dist onsite
+```
+
+**C — Asset PHP (deploy gap — bằng chứng chính):**
+
+```text
+GET .../build/index.ts.asset.php?nocache=... → HTTP/1.1 404 Not Found
+{
+  http_ok: false,
+  version: undefined,
+  deps_count: 0,
+  has_wp_editor: true,      // false positive: chuỗi lẫn trong HTML trang 404
+  has_wp_edit_post: false   // xác nhận không phải nội dung asset thật
+}
+```
+
+**D — API khác lúc console (sau load, không chứng minh thứ tự lúc bundle chạy):**
+
+```js
+PluginSidebar_editPost/editor → function
+panelGradient_exp → function
+LinkControl_exp → function
+FocalPointPicker → function
+```
+
+**E — Stack trace (lần crash sau build):** `#130` + `onToggle` / `onClick` → `components.min.js`. **Không** đọc được tên component từ minify — #130 = **một** JSX type `undefined`. Human onsite 2026-11-24 chốt UI: nút **Options (⋮)** trên **toolbar block** (dropdown `components-dropdown-menu`, `aria-label="Options"`). Giả thuyết đầu: fill `BlockSettingsMenuControls` — **bác** onsite khi `block_clipboard: false` → `skvn-marine-block-content-actions` không đăng ký. **Bisect lượt 1:** document panels product (`useEntityProp`) — **Bisect lượt 2 (sau deploy shell `ver=cc124d93…`):** `skvn-marine-design` — case **Design sidebar** (section dưới); product panels shell đã fix nhưng không còn là nguồn duy nhất.
+
+**F — Thứ tự script onsite (regex `/dist/…`, 2026-11-24):** `components` 34 → `block-editor` 43 → `editor` 94 → `edit-post` 96 → **marine** 116 → `depsOk: true`. **Đã loại** race deps làm nguyên nhân duy nhất; còn lại import external lúc **evaluate module** hoặc API sai surface.
+
+**G — Fingerprint bundle DP-20 onsite (đủ resolver):**
+
+```js
+{ dp19: true, dp20_sidebar: true, dp20_gradient: true }
+// Sau fix menu block — thêm khi deploy:
+// js.includes('blockEditor?.BlockSettingsMenuControls')
+```
+
+#### Bản đồ surface editor (convention — digest `CONVENTION.md` / PCA-10 khi human lệnh; đọc pitfall này khi thêm slot Fill)
+
+Marine Blocks chạm **bốn loại “menu/panel” khác nhau**. Nhầm surface → import sai package → #130 hoặc menu trống.
+
+| Surface | UI (human thấy) | API / global đúng | Package npm (không phải source runtime) | Wrapper repo |
+|--------|------------------|-------------------|----------------------------------------|--------------|
+| **Document** (post/product meta) | Sidebar phải editor: “Related products”, “Product page”, “SKVN Page Display” | `wp.editor.PluginDocumentSettingPanel` → fallback `wp.editPost` | Trước 6.6 hay import nhầm `components` | `src/shared/plugin-document-setting-panel.tsx` |
+| **Plugin sidebar** | Sidebar trái: tab “Marine Blocks” / customizer icon | `wp.editor.PluginSidebar` → fallback `wp.editPost` | `@wordpress/edit-post` (external) | `src/shared/plugin-sidebar.tsx` |
+| **Editor chrome** | Menu ⋮ **trên cùng** editor (More tools / Save, v.v.) | `wp.editor.PluginMoreMenuItem` | `@wordpress/editor` | `src/shared/plugin-more-menu-item.tsx` |
+| **Block ⋮ Options** | Nút **Options** trên **toolbar block** đã chọn (HTML: `components-dropdown-menu__toggle`, label Options) — menu Copy/Paste block, Convert, Lock… | `wp.blockEditor.BlockSettingsMenuControls` | `@wordpress/block-editor` (Fill slot, **không** `edit-post`) | `src/shared/block-settings-menu-controls.tsx` |
+
+**Block ⋮ vs Editor ⋮:** `PluginMoreMenuItem` / block-clipboard **whole block** ≠ `BlockSettingsMenuControls` / block-content **Copy content–Paste content only** (plan057). Cùng có chữ “clipboard” trong `skvn_core_controls` nhưng **hai menu khác nhau**.
+
+**Inspector experimental:** `__experimentalPanelColorGradientSettings` (hover `core/button`, slide background) → `src/shared/panel-color-gradient-settings.tsx`. Chưa bọc: `__experimentalLinkControl` (Feature Showcase) — nếu #130 khi mở panel link, làm cùng pattern.
+
+#### Case menu ⋮ từng block — `BlockSettingsMenuControls` (onsite vipafood, 2026-11-24)
+
+- **Feature:** Core Control `block_clipboard` (option `skvn_core_controls`; UI “content actions” plan057). Entry: `src/core-controls/block-content/index.tsx`.
+- **Hành vi mong đợi:** Chọn một block root được support (collection, slider, …) → bấm **Options** trên block → thấy nhóm **Marine Blocks** với **Copy content** / **Paste content only**.
+- **Sai (trước fix):** Mở Options → console `#130` ngay; stack `onClick` / dropdown `components`; toàn editor có thể blank phần menu.
+- **Cơ chế:** `import { BlockSettingsMenuControls } from '@wordpress/block-editor'` → webpack external `window.wp.blockEditor.BlockSettingsMenuControls` gán **lúc module evaluate**. Pattern giống DP-19/20: closure giữ reference `undefined` nếu race hoặc build/deps lệch; hoặc Fill vẫn mount với type `undefined` khi dropdown mở — **lần đầu render menu block** (không cần PanelBody `initialOpen`).
+- **Không phải:** Panel Document (product) đã DP-19; Marine sidebar DP-20; `#130` khi **depsOk true** + fingerprint DP-20 full vẫn có thể do slot này.
+- **Fixed:** `src/shared/block-settings-menu-controls.tsx` — `resolve()` lúc render; `registerPlugin( 'skvn-marine-block-content-actions' )` **chỉ** khi `hasBlockSettingsMenuControls()` (không đăng ký fill “chết” trên runtime thiếu API).
+- **Tái hiện / verify onsite:**
+  1. `typeof wp?.blockEditor?.BlockSettingsMenuControls` → `"function"`.
+  2. Bật `block_clipboard` trong plugin settings (nếu default off thì bật để thấy menu).
+  3. Chọn block → Options → không #130; thấy Marine Blocks group.
+  4. Dist: `index.ts.js` chứa `blockEditor?.BlockSettingsMenuControls` (sau build có fix).
+- **Evidence:** Human DOM Options button; deps matrix F; plan [057](planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md) P3; runbook `docs/testing/block-content-actions.md`.
+
+#### Case Document panels product — `useEntityProp` trước guard `postType` → Options (⋮) #130 (vipafood, bisect 2026-11-24)
+
+- **Case:** https://vipafood.com — editor **page/post** (không phải product). Bấm **Options (⋮)** trên toolbar block → `#130` + `onToggle` / `onClick` → `components.min.js`. Bundle DP-19/20 đã deploy (`dp20_minified: true`, `ver` index.ts.js khớp). `block_clipboard: false` → không phải `BlockSettingsMenuControls`. Rank Math tắt → vẫn lỗi.
+- **Hành vi mong đợi:** Panel “Product page” / “Related products” chỉ entity `product`; **page/post** editor không gọi meta product; block Options native không crash.
+- **Sai (trước fix):** `ProductDesignPanel` / `PdpRelatedPanel` gọi `useEntityProp( 'postType', 'product', 'meta' )` (và hook PDP khác) **trước** `if ( postType !== 'product' ) return null`. `registerPlugin` vẫn mount mỗi lần editor re-render (kể cả khi chưa mở Document sidebar). Re-render do mở dropdown block ⋮ → state/editor lệch → React #130 (không nhất thiết render `PluginDocumentSettingPanel` trên page).
+- **Bisect onsite lượt 1 (trước shell fix):** `unregisterPlugin('skvn-marine-design')` → OK. `skvn-marine-product-design` / `skvn-marine-pdp-related` → lỗi. **Lượt 2 (sau deploy shell, `hasFixOnSite: true`):** unregister product + pdp (`getPlugin` → `undefined`) → **vẫn** #130; **A** chỉ `skvn-marine-design` → OK; **B** chỉ `skvn-page-display-controls` → lỗi (design còn chạy); **C/D** gỡ design → OK — xem case Design sidebar.
+- **Không phải:** Rank Math `lodash` (đã tắt, vẫn #130). Fill menu block `block-content-actions` (chưa đăng ký). `PluginDocumentSettingPanel` wrapper undefined (runtime `wp.editor` OK). Stack `onToggle` **không** chứng minh đúng surface — Document plugin vẫn có thể gây crash khi toggle UI **khác** (dropdown block) vì cùng cây React editor.
+- **Fixed (source 2026-11-24):** Tách shell + fields: outer chỉ `useSelect( postType )`; `return null` khi không `product`; inner (`ProductDesignPanelFields` / `PdpRelatedPanelFields`) mới `useEntityProp` + `PluginDocumentSettingPanel`. Files: `src/product-design/panel.tsx`, `src/pdp-related/panel.tsx`. **Onsite:** shell đúng (`ver` khớp) nhưng #130 còn do **Design sidebar** — không dừng ở case này.
+- **Quy ước (bắt buộc khi `registerPlugin` + product meta):**
+  1. **Không** `useEntityProp` / `useEntityRecord` / `useEntityId` cho CPT khác **trước** khi chắc `getCurrentPostType()` khớp — Rules of Hooks: guard bằng **component con** mount có điều kiện, không chỉ `return null` sau hook sai entity.
+  2. Pattern: `function PluginShell() { const postType = useSelect(...); if ( postType !== 'product' ) return null; return <PluginFields />; }` — `PluginFields` chứa mọi hook entity/product.
+  3. Chẩn đoán nhanh: reload editor → `wp.plugins.unregisterPlugin( 'skvn-marine-product-design' )` và/hoặc `skvn-marine-pdp-related` → thử Options ⋮ (chỉ session; reload đăng ký lại).
+- **Evidence:** Console bisect vipafood 2026-11-24; `skvnCoreControls.block_clipboard: false`; `contentActions: false`; `design: true` sau khi bundle load đủ. Liên quan DP-19 (cùng hai file panel), không thay wrapper `plugin-document-setting-panel.tsx`.
+
+#### Case Design sidebar — `registerPlugin( skvn-marine-design )` → Options (⋮) #130 (vipafood, bisect 2026-11-24 lượt 2)
+
+- **Case:** https://vipafood.com — editor **page/post**, block thông thường, **chưa** mở Marine sidebar. Bundle product shell + DP-19/20 OK (`ver=cc124d93c36a84093539`, `hasFixOnSite: true`). `unregisterPlugin` product + pdp đã verify `undefined` → vẫn #130.
+- **Bisect (human):** `wp.plugins.unregisterPlugin('skvn-marine-design')` → **không** #130 (A). Chỉ `skvn-page-display-controls` → **vẫn** #130 (B). Gỡ design (+ product khi cần) → OK (C/D). **`skvn-page-display-controls` không phải nguồn** khi design còn đăng ký.
+- **Cơ chế (suy luận có bisect):** `registerPlugin` **luôn** render `DesignSidebar` → `PluginSidebar` với `icon={ MarineBlocksSidebarIcon }` (custom component + `useSelect` plan 080). Mỗi re-render editor (kể cả `onToggle` dropdown block ⋮) chạy lại nhánh icon/panel; stack vẫn `components.min.js`, **không** chứng minh component JSX cụ thể từ minify — bisect chỉ Marine design.
+- **Không phải (lượt 2):** Product `useEntityProp` sau shell fix; `block-content-actions` (`contentActions: false`); Rank Math; page-display theme khi gỡ design đã OK.
+- **Fixed (source 2026-11-24):** `src/design-sidebar/index.tsx` — (1) **`icon`:** chỉ truyền `MarineBlocksSidebarIcon` khi `getActiveGeneralSidebarName() === 'skvn-marine-design/design'`; khi đóng dùng Dashicon `admin-customizer`. (2) **Mount panel:** children sidebar (`PostDesignSidebarPanels`) chỉ khi `isOpen`; `useThemeDesign` giữ trên shell luôn mount để không discard draft Theme Design. **Onsite:** chờ build/deploy + verify 1–3 (page ⋮; mở/đóng sidebar icon; draft tab Plugin).
+- **Chẩn đoán nhanh:** Lệnh luôn `wp.plugins.unregisterPlugin( '…' )` — không gọi `unregisterPlugin` trần. Reload editor trước mỗi vòng bisect. Liệt kê plugin: `Object.values( wp.plugins.getPlugins() ).map( ( p ) => p.name )` — không tin `Object.keys` khi runtime trả dạng lạ.
+- **Quy ước:** `PluginSidebar` `icon` custom (component có hook) — cân nhắc chỉ mount khi sidebar active, hoặc Dashicon khi đóng (plan 080 hover/selected CSS vẫn áp khi panel mở).
+
+#### Quy ước code — resolver Fill/slot (Marine Blocks; PCA-10 gap)
+
+Áp dụng **mọi** import TSX dùng làm **type JSX** (component/Fill), không phải hook/store/function thuần (`useSelect`, `dispatch`, `parse`):
+
+1. **Không** `import { Plugin* / Block*Fill / __experimental* } from '@wordpress/components|edit-post|editor|block-editor'` trực tiếp trong file consumer nếu export là slot Fill hoặc đã/đang chuyển package (6.6+).
+2. **Thêm hoặc tái dùng** wrapper trong `src/shared/<name>.tsx`: đọc `window.wp.<package>?.<Export>` **trong function component** (hoặc helper gọi lúc render); `if ( ! Resolved ) return null`.
+3. **`registerPlugin`:** Chỉ gọi khi runtime có API (`has*()` hoặc check trước register). Precedent: `page-display-controls.js` (theme), `block-content/index.tsx`.
+4. **Build + deploy:** `index.ts.js` + `index.ts.asset.php` + `skvn-marine-blocks.php` (fallback deps). Fingerprint string trong dist khi debug onsite.
+5. **Chẩn đoán surface:** Human mô tả **nút/panel** (Options block vs sidebar vs document) → tra bảng surface trước khi đoán `PluginDocumentSettingPanel`.
+6. **`registerPlugin` + meta CPT khác:** `useEntityProp` / `useEntityRecord` chỉ trong child component sau guard `postType` (DP-20 case `useEntityProp`) — `return null` sau hook product trên page/post **không** an toàn.
+
+**Inventory wrapper hiện tại (mở rộng khi thêm slot):** `plugin-document-setting-panel`, `plugin-sidebar`, `plugin-more-menu-item`, `panel-color-gradient-settings`, `block-settings-menu-controls`. **Pattern entity guard:** shell + fields trong `product-design/panel.tsx`, `pdp-related/panel.tsx`.
+
+#### Cơ chế (tách ba lớp; có thể cùng lúc)
+
+1. **Deploy thiếu `build/index.ts.asset.php`:** `skvn_marine_blocks_register_blocks()` chỉ đọc deps khi file tồn tại; thiếu file → `$editor_deps = []`. `wp_register_script( 'skvn-marine-blocks-editor', …, array() )` → WordPress có thể chạy `index.ts.js` **trước** `wp-block-editor` / `wp-edit-post` / `wp-editor`. Bundle mở đầu: `const a = window.wp.blockEditor, l = window.wp.editor, m = window.wp.components` — gán **một lần**; nếu sớm quá, `a.__experimentalPanelColorGradientSettings` hoặc `wp.editPost.PluginSidebar` (webpack external) = `undefined` **vĩnh viễn trong closure** dù vài giây sau `typeof wp.editPost.PluginSidebar === 'function'`.
+2. **Webpack external ≠ DP-19:** DP-19 sửa `PluginDocumentSettingPanel` import `@wordpress/components`. Còn slot/sidebar/experimental — kể cả `BlockSettingsMenuControls` (menu **block** ⋮) — map property lúc **evaluate module**, không resolve lúc **render** (xem bảng surface).
+3. **Lazy mount UI:** PanelBody `initialOpen={false}`, **hoặc** dropdown Options chỉ render Fill khi mở → #130 **trễ**, stack `components.min.js` `onToggle`/`onClick`; không suy ngay “lỗi Document panel”.
+
+#### Không phải (lần trace này)
+
+- Tinymce `MouseEvent.mozPressure` / WindPress source-map wasm / `getMedia` deprecated — noise.
+- DP-19 nguyên nhân đầu tiên (components panel) — đã có resolver trong dist; runtime `wp.editor` OK.
+- Chẩn đoán “chỉ cần build lại JS” khi asset PHP vẫn 404.
+
+#### Fixed (source 2026-11-24, chưa onsite PASS sau lượt này)
+
+**PHP (`skvn-marine-blocks.php`):**
+
+- `skvn_marine_blocks_editor_script_fallback_dependencies()` — mirror deps `index.ts.asset.php` khi thiếu file asset trên host.
+- `enqueue_block_editor_assets` priority 1: `skvn_marine_blocks_enqueue_editor_script()` — `wp_enqueue_script( 'skvn-marine-blocks-editor' )` để áp deps đã register.
+
+**JS — resolve lúc render (pattern mở rộng DP-19):**
+
+| File | Thay import trực tiếp |
+|------|------------------------|
+| `src/shared/plugin-sidebar.tsx` | `wp.editor.PluginSidebar ?? wp.editPost.PluginSidebar` |
+| `src/shared/panel-color-gradient-settings.tsx` | `blockEditor.__experimentalPanelColorGradientSettings ?? blockEditor.PanelColorGradientSettings` |
+| `src/shared/plugin-more-menu-item.tsx` | `wp.editor.PluginMoreMenuItem` |
+| `src/design-sidebar/index.tsx` | → `plugin-sidebar` |
+| `src/core-controls/button-hover/index.tsx` | → `panel-color-gradient-settings` |
+| `src/core-controls/block-clipboard/index.tsx` | → `plugin-more-menu-item` |
+| `src/slide/edit.tsx`, `step-slide/edit.tsx`, `step-slider/edit.tsx` | → `panel-color-gradient-settings` |
+| `src/shared/block-settings-menu-controls.tsx` | `wp.blockEditor.BlockSettingsMenuControls` (menu ⋮ block — onsite 2026-11-24) |
+| `src/core-controls/block-content/index.tsx` | → `block-settings-menu-controls`; `registerPlugin` chỉ khi `hasBlockSettingsMenuControls()` |
+| `src/product-design/panel.tsx`, `src/pdp-related/panel.tsx` | Shell `postType` → inner fields; `useEntityProp` chỉ khi `product` (Options ⋮ #130 vipafood 2026-11-24 lượt 1) |
+| `src/design-sidebar/index.tsx` | `PluginSidebar` icon branded chỉ khi sidebar mở; lazy mount `PostDesignSidebarPanels`; `useThemeDesign` trên shell (Options ⋮ #130 vipafood lượt 2) |
+
+(Giữ `src/shared/plugin-document-setting-panel.tsx` — DP-19.)
+
+#### Deploy onsite bắt buộc (một lượt)
+
+1. `npm run build` trong `wp-content/plugins/skvn-marine-blocks/`.
+2. Upload: `build/index.ts.js`, **`build/index.ts.asset.php`**, `skvn-marine-blocks.php` (fallback + enqueue).
+3. Verify: `fetch('.../index.ts.asset.php')` → **200**, không 404; HTML view-source: script Marine Blocks **sau** `wp-edit-post` / `wp-editor`.
+4. Hard refresh editor. Nếu còn #130: ghi **một** thao tác toggle + tắt thử WindPress để tách plugin ngoài.
+
+#### Chẩn đoán nhanh (copy onsite)
+
+```js
+Promise.all([
+  fetch('/wp-content/plugins/skvn-marine-blocks/build/index.ts.js?nocache=' + Date.now()).then((r) => r.text()),
+  fetch('/wp-content/plugins/skvn-marine-blocks/build/index.ts.asset.php?nocache=' + Date.now()).then((r) => ({ status: r.status, text: r.text() })),
+]).then(([js, asset]) =>
+  console.log({
+    dp19_resolver: js.includes('editor?.PluginDocumentSettingPanel'),
+    dp20_block_menu: js.includes('blockEditor?.BlockSettingsMenuControls'),
+    dp20_sidebar: js.includes('editor?.PluginSidebar'),
+    asset_status: asset.status,
+    asset_ok: asset.status === 200 && !asset.text.trim().startsWith('<'),
+    asset_version: (asset.text.match(/'version'\s*=>\s*'([^']+)'/) || [])[1],
+  })
+);
+```
+
+**Script order (regex đúng — không dùng `wp-block-editor` trong URL):**
+
+```js
+(() => {
+  const scripts = [...document.querySelectorAll('script[src]')].map((n) => n.getAttribute('src'));
+  const idx = (re) => scripts.findIndex((s) => s && re.test(s));
+  const marine = idx(/skvn-marine-blocks\/build\/index\.ts\.js/);
+  const blockEditor = idx(/\/dist\/block-editor(\.min)?\.js/);
+  const editPost = idx(/\/dist\/edit-post(\.min)?\.js/);
+  const editor = idx(/\/dist\/editor(\.min)?\.js/);
+  const components = idx(/\/dist\/components(\.min)?\.js/);
+  return {
+    marine,
+    blockEditor,
+    editPost,
+    editor,
+    components,
+    depsOk:
+      marine > -1 &&
+      blockEditor > -1 &&
+      editPost > -1 &&
+      editor > -1 &&
+      components > -1 &&
+      marine > blockEditor &&
+      marine > editPost &&
+      marine > editor &&
+      marine > components,
+  };
+})();
+```
+
+**Tránh:** Deploy chỉ `index.ts.js`; bỏ qua `.asset.php` vì “chỉ là metadata”. Dùng `php.includes('wp-editor')` trên body **404** để kết luận deploy OK. Coi API `function` trong console = đã hết race. Tiếp tục import slot fill / experimental từ `@wordpress/*` trong TSX mà không wrapper resolve-at-render cho mọi component đã/chuẩn bị chuyển package (PCA-10). **Nhầm menu block ⋮ với Editor More menu hoặc Document panel** khi human chỉ “nút Options”. **Coi `return null` sau `useEntityProp( product )` là đủ** trên page/post. **Chỉ bisect `BlockSettingsMenuControls`** khi `block_clipboard` bật / `getPlugin('skvn-marine-block-content-actions')` truthy. Đo script `depsOk` với regex `wp-block-editor` (false positive). Fingerprint dist: chuỗi minify có thể là `wp?.blockEditor` + `BlockSettingsMenuControls`, không phải literal `blockEditor?.BlockSettingsMenuControls`. Liên quan DP-19, DP-06, plan [084](planning/084_VER_1_3_25_PLUGIN_CONVENTION_GAP_AUDIT.md) PCA-10, plan [057](planning/057_FUTURE_CANDIDATE_BLOCK_CONTENT_COPY_PASTE.md).
+
+**Bisect plugin Marine (session editor, sau reload đăng ký lại):**
+
+```js
+[
+  'skvn-marine-design',
+  'skvn-marine-product-design',
+  'skvn-marine-pdp-related',
+  'skvn-marine-block-clipboard',
+  'skvn-marine-block-content-actions',
+].forEach((id) => {
+  try {
+    wp.plugins.unregisterPlugin(id);
+  } catch (e) {}
+});
+// Chọn block → Options (⋮). Clipboard/content-actions: "not registered" là bình thường khi block_clipboard off.
+```

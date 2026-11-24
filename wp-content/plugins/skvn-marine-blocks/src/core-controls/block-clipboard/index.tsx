@@ -1,7 +1,7 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { select, useDispatch, useSelect } from '@wordpress/data';
-import { PluginMoreMenuItem } from '@wordpress/editor';
+import { PluginMoreMenuItem } from '../../shared/plugin-more-menu-item';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { registerPlugin } from '@wordpress/plugins';

@@ -832,6 +832,7 @@ Constraints:
 - Must not add a dependency/plugin unless human explicitly changes dependency policy.
 - Must not custom-code CF7 form handling; setup UI may only create/update approved WP content/config.
 - Must require wp-admin capability checks and nonce protection when implemented.
+- Settings UX / “where do I change X?” hub may overlap this milestone or a follow-on 1.4.x item — planning [091](planning/091_FUTURE_CANDIDATE_1_4_X_MARINE_SETTINGS_UX_REORGANIZATION_PLANNING.md) (2026-11-24); discuss before merge scope.
 
 Acceptance draft:
 
@@ -1108,6 +1109,19 @@ Human **2026-11-16**: đưa **Post Page Basic Design Controls** (trước là **
 | PDP Related independence B/C | Tension OPEN; plan khi 1.4.x start |
 
 Nguồn: [078](planning/078_FUTURE_CANDIDATE_THEME_BLOCK_TEMPLATE_SURFACE_BOUNDARY_PLANNING.md), `docs/decisions/template-surface-theme-block-boundary.md`.
+
+### 1.4.x — Marine settings UX reorganization (Future Candidate, SemVer TBD)
+
+Status: **STOCKPILE — discussion doc only (2026-11-24); chưa gán SemVer, chưa start.**
+
+Human: plugin tự dev khó nhớ đường vào cài đặt (admin vs editor sidebar vs Core Control); muốn dọn lại cho dễ dùng khi tới 1.4.x. Không implement trong current 1.3.25.
+
+| Hạng mục | Ghi chú |
+|---|---|
+| Settings map + setup hub | Candidate directions A–E; task→path table (hover button, Theme Design, footer, …) |
+| Liên kết 1.4.1 | Setup UI cards có thể chứa một phần hub; hoặc version riêng sau 1.4.1 — human chốt Q2 |
+
+Nguồn: [091](planning/091_FUTURE_CANDIDATE_1_4_X_MARINE_SETTINGS_UX_REORGANIZATION_PLANNING.md).
 
 ### 1.4.x — Block Inserter SVG & Organization (Future Candidate, SemVer TBD)
 

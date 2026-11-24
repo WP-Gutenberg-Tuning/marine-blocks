@@ -1,4 +1,5 @@
-import { Button, PluginDocumentSettingPanel, SelectControl, ToggleControl } from '@wordpress/components';
+import { Button, SelectControl, ToggleControl } from '@wordpress/components';
+import { PluginDocumentSettingPanel } from '../shared/plugin-document-setting-panel';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { registerPlugin } from '@wordpress/plugins';
@@ -26,11 +27,16 @@ const defaults: ProductDesignMeta = {
 
 function ProductDesignPanel() {
 	const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
-	const [ meta, setMeta ] = useEntityProp( 'postType', 'product', 'meta' ) as [ Record< string, unknown >, ( value: Record< string, unknown > ) => void ];
 
 	if ( postType !== 'product' ) {
 		return null;
 	}
+
+	return <ProductDesignPanelFields />;
+}
+
+function ProductDesignPanelFields() {
+	const [ meta, setMeta ] = useEntityProp( 'postType', 'product', 'meta' ) as [ Record< string, unknown >, ( value: Record< string, unknown > ) => void ];
 
 	const stored = ( meta?._skvn_product_design && typeof meta._skvn_product_design === 'object'
 		? meta._skvn_product_design

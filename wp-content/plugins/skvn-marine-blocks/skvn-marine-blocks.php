@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SKVN Marine Blocks
  * Description: Custom Gutenberg blocks for SKVN Marine.
- * Version: 1.3.24
+ * Version: 1.3.25
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Text Domain: skvn-marine-blocks
@@ -29,7 +29,19 @@ require_once __DIR__ . '/modules/sidebar-blog-content/sidebar-blog-content.php';
 require_once __DIR__ . '/modules/preloader-settings/preloader-settings.php';
 
 add_action( 'init', 'skvn_marine_blocks_register_blocks' );
+add_action( 'enqueue_block_editor_assets', 'skvn_marine_blocks_enqueue_editor_script', 1 );
 add_filter( 'block_categories_all', 'skvn_marine_blocks_register_category' );
+
+/**
+ * Enqueue editor bundle with registered dependency order (see index.ts.asset.php).
+ *
+ * @return void
+ */
+function skvn_marine_blocks_enqueue_editor_script() {
+	if ( wp_script_is( 'skvn-marine-blocks-editor', 'registered' ) ) {
+		wp_enqueue_script( 'skvn-marine-blocks-editor' );
+	}
+}
 
 /**
  * Register the shared SKVN Marine block inserter category.
@@ -57,6 +69,36 @@ function skvn_marine_blocks_register_category( $categories ) {
 }
 
 /**
+ * Editor bundle dependencies when build/index.ts.asset.php is missing from deploy.
+ *
+ * Mirror @wordpress/scripts output; stale list is better than empty deps (race → React #130).
+ *
+ * @return string[]
+ */
+function skvn_marine_blocks_editor_script_fallback_dependencies() {
+	return array(
+		'react-jsx-runtime',
+		'wp-api-fetch',
+		'wp-block-editor',
+		'wp-blocks',
+		'wp-components',
+		'wp-core-data',
+		'wp-data',
+		'wp-edit-post',
+		'wp-editor',
+		'wp-element',
+		'wp-hooks',
+		'wp-html-entities',
+		'wp-i18n',
+		'wp-notices',
+		'wp-plugins',
+		'wp-primitives',
+		'wp-rich-text',
+		'wp-url',
+	);
+}
+
+/**
  * Register SKVN Marine custom blocks.
  *
  * @return void
@@ -76,6 +118,8 @@ function skvn_marine_blocks_register_blocks() {
 		$asset       = require $editor_asset;
 		$editor_deps = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
 		$editor_ver  = isset( $asset['version'] ) ? $asset['version'] : $editor_ver;
+	} elseif ( file_exists( $editor_script ) ) {
+		$editor_deps = skvn_marine_blocks_editor_script_fallback_dependencies();
 	}
 
 	if ( file_exists( $editor_script ) ) {
@@ -109,6 +153,8 @@ function skvn_marine_blocks_register_blocks() {
 		$asset     = require $view_asset;
 		$view_deps = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
 		$view_ver  = isset( $asset['version'] ) ? $asset['version'] : $view_ver;
+	} elseif ( file_exists( $view_script ) ) {
+		$view_deps = array( 'wp-i18n' );
 	}
 
 	if ( file_exists( $view_script ) ) {

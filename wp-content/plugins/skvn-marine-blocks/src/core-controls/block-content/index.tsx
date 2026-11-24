@@ -7,7 +7,10 @@
  * contextmenu handler and no Ctrl+C/V override.
  */
 
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import {
+	BlockSettingsMenuControls,
+	hasBlockSettingsMenuControls,
+} from '../../shared/block-settings-menu-controls';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
@@ -115,7 +118,10 @@ function BlockContentActions() {
 	);
 }
 
-if ( isCoreControlEnabled( 'block_clipboard' ) ) {
+if (
+	isCoreControlEnabled( 'block_clipboard' ) &&
+	hasBlockSettingsMenuControls()
+) {
 	registerPlugin( 'skvn-marine-block-content-actions', {
 		render: BlockContentActions,
 	} );

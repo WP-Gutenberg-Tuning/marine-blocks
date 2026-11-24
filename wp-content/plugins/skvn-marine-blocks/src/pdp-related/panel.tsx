@@ -1,4 +1,5 @@
-import { Button, Notice, PluginDocumentSettingPanel, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
+import { Button, Notice, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
+import { PluginDocumentSettingPanel } from '../shared/plugin-document-setting-panel';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { registerPlugin } from '@wordpress/plugins';
@@ -50,16 +51,21 @@ const chipColorSchemes: { label: string; value: string }[] = [
 
 function PdpRelatedPanel() {
 	const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
+
+	if ( postType !== 'product' ) {
+		return null;
+	}
+
+	return <PdpRelatedPanelFields />;
+}
+
+function PdpRelatedPanelFields() {
 	const postId = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
 	const isDirty = useSelect( ( select ) => select( 'core/editor' ).isEditedPostDirty(), [] );
 	const [ meta, setMeta ] = useEntityProp( 'postType', 'product', 'meta' ) as [ Record< string, unknown >, ( value: Record< string, unknown > ) => void ];
 	const [ promotePending, setPromotePending ] = useState( false );
 	const [ promoteMessage, setPromoteMessage ] = useState( '' );
 	const [ promoteFailed, setPromoteFailed ] = useState( false );
-
-	if ( postType !== 'product' ) {
-		return null;
-	}
 
 	const stored = ( meta?._skvn_pdp_related && typeof meta._skvn_pdp_related === 'object'
 		? meta._skvn_pdp_related
