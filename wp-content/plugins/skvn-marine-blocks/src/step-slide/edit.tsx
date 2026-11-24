@@ -4,10 +4,10 @@ import {
 	InspectorControls,
 	MediaUpload,
 	MediaUploadCheck,
-	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { PanelColorGradientSettings } from '../shared/panel-color-gradient-settings';
 import {
 	Button,
 	FocalPointPicker,

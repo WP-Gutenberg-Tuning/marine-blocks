@@ -2,11 +2,11 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	RichText,
-	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	store as blockEditorStore,
 	useBlockProps,
 	useSetting,
 } from '@wordpress/block-editor';
+import { PanelColorGradientSettings } from '../shared/panel-color-gradient-settings';
 import { createBlock } from '@wordpress/blocks';
 import {
 	Button,
